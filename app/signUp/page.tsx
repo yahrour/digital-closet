@@ -15,6 +15,9 @@ import { signUpSchema } from "@/schemas";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
+import Link from "next/link";
 
 export default function SignUp() {
   type signUpSchemaType = z.infer<typeof signUpSchema>;
@@ -28,9 +31,47 @@ export default function SignUp() {
       confirmPassword: "",
     },
   });
+  const [error, setError] = useState<{ message: string | undefined }>({
+    message: undefined,
+  });
 
-  const onSubmit = (data: signUpSchemaType) => {
-    console.log("data: ", data);
+  const onSubmit = async (formData: signUpSchemaType) => {
+    const { error } = await authClient.signUp.email(
+      {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          form.reset();
+          setError({ message: undefined });
+        },
+      },
+    );
+
+    if (error !== null) {
+      switch (error?.code) {
+        case "PASSWORD_TOO_SHORT":
+          form.setError("password", {
+            type: "custom",
+            message: "password too short",
+          });
+          break;
+        case "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL":
+          form.setError("email", {
+            type: "custom",
+            message: "email already exist",
+          });
+          break;
+        default:
+          setError({
+            message:
+              "One or more input values are invalid. Please check and try again.",
+          });
+      }
+    }
   };
 
   return (
@@ -123,6 +164,7 @@ export default function SignUp() {
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
+                {error && <FieldError errors={[error]} />}
               </Field>
             )}
           />
@@ -131,6 +173,16 @@ export default function SignUp() {
       <Button type="submit" className="w-full">
         Sign Up
       </Button>
+
+      <p className="text-sm text-gray-600">
+        Already have an account?
+        <Link
+          href="/signIn"
+          className="pl-2 font-medium text-blue-600 hover:text-blue-500"
+        >
+          Sign In
+        </Link>
+      </p>
     </form>
   );
 }
