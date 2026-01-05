@@ -67,7 +67,7 @@ export default function SignUp() {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="w-full max-w-125 mx-auto mt-20 space-y-5"
+      className="w-full max-w-125 space-y-5 absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]"
     >
       <FieldSet>
         <FieldLegend>Sign in</FieldLegend>
