@@ -14,5 +14,8 @@ export const signUpSchema = z
 
 export const signInSchema = z.object({
   email: z.email(),
-  password: z.string().min(8, "password too short"),
+  password: z
+    .string()
+    .min(1, "please set a password")
+    .min(8, "password too short"),
 });

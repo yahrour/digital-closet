@@ -15,8 +15,15 @@ import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInSchema } from "@/schemas";
+import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
 
 export default function SignUp() {
+  const [error, setError] = useState<{ message: string | undefined }>({
+    message: undefined,
+  });
+
   type signInSchemaType = z.infer<typeof signInSchema>;
   const form = useForm<signInSchemaType>({
     resolver: zodResolver(signInSchema),
@@ -27,8 +34,17 @@ export default function SignUp() {
     },
   });
 
-  const onSubmit = (data: signInSchemaType) => {
-    console.log("data: ", data);
+  const onSubmit = async (formData: signInSchemaType) => {
+    await authClient.signIn.email(
+      {
+        email: formData.email,
+        password: formData.password,
+        callbackURL: "/",
+      },
+      {
+        onError: (err) => setError({ message: err.error.message }),
+      },
+    );
   };
 
   return (
@@ -79,6 +95,7 @@ export default function SignUp() {
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
+                {error && <FieldError errors={[error]} />}
               </Field>
             )}
           />
@@ -87,6 +104,15 @@ export default function SignUp() {
       <Button type="submit" className="w-full">
         Sign Up
       </Button>
+      <p className="text-sm text-gray-600">
+        Don&apos;t have an account?
+        <Link
+          href="/signUp"
+          className="pl-2 font-medium text-blue-600 hover:text-blue-500"
+        >
+          Sign Up
+        </Link>
+      </p>
     </form>
   );
 }
