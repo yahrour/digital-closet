@@ -18,13 +18,18 @@ import { signInSchema } from "@/schemas";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
+import { redirect } from "next/navigation";
+import LoadingSpinner from "@/components/LoadingSpinner";
+
+type signInSchemaType = z.infer<typeof signInSchema>;
 
 export default function SignUp() {
+  const { data: session, isPending } = authClient.useSession();
+
   const [error, setError] = useState<{ message: string | undefined }>({
     message: undefined,
   });
 
-  type signInSchemaType = z.infer<typeof signInSchema>;
   const form = useForm<signInSchemaType>({
     resolver: zodResolver(signInSchema),
     mode: "onSubmit",
@@ -46,6 +51,18 @@ export default function SignUp() {
       },
     );
   };
+
+  if (isPending) {
+    return (
+      <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    redirect("/");
+  }
 
   return (
     <form

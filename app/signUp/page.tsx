@@ -18,9 +18,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 import Link from "next/link";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { redirect } from "next/navigation";
+
+type signUpSchemaType = z.infer<typeof signUpSchema>;
 
 export default function SignUp() {
-  type signUpSchemaType = z.infer<typeof signUpSchema>;
+  const { data: session, isPending } = authClient.useSession();
   const form = useForm<signUpSchemaType>({
     resolver: zodResolver(signUpSchema),
     mode: "onSubmit",
@@ -73,6 +77,18 @@ export default function SignUp() {
       }
     }
   };
+
+  if (isPending) {
+    return (
+      <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    redirect("/");
+  }
 
   return (
     <form
