@@ -29,10 +29,10 @@ export default function SignUp() {
     resolver: zodResolver(signUpSchema),
     mode: "onSubmit",
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: undefined,
+      email: undefined,
+      password: undefined,
+      confirmPassword: undefined,
     },
   });
   const [error, setError] = useState<{ message: string | undefined }>({
@@ -79,11 +79,7 @@ export default function SignUp() {
   };
 
   if (isPending) {
-    return (
-      <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
-        <LoadingSpinner />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (session?.user) {
@@ -93,7 +89,7 @@ export default function SignUp() {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="w-full max-w-125 space-y-5 absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]"
+      className="w-full max-w-125 space-y-4 absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]"
     >
       <FieldSet>
         <FieldLegend>Sign Up</FieldLegend>
@@ -186,7 +182,7 @@ export default function SignUp() {
           />
         </FieldGroup>
       </FieldSet>
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full cursor-pointer">
         Sign Up
       </Button>
 
