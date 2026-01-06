@@ -54,6 +54,16 @@ export function AccountForm({ session }: { session: SessionType | null }) {
 
     // if email changed update it
     if (session?.user.email !== formData.email) {
+      setIsPendig(true);
+      await authClient.changeEmail({
+        newEmail: formData.email,
+        callbackURL: "/account",
+      });
+      setIsPendig(false);
+      setMessage({
+        message: "Verify your new email address to complete the update.",
+        isError: false,
+      });
     }
 
     // if new password set update password
@@ -123,7 +133,6 @@ export function AccountForm({ session }: { session: SessionType | null }) {
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   {...field}
-                  disabled
                   aria-invalid={fieldState.invalid}
                   id="email"
                   autoComplete="off"

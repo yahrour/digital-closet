@@ -27,6 +27,11 @@ export const auth = betterAuth({
     autoSignIn: false,
     requireEmailVerification: true,
   },
+  user: {
+    changeEmail: {
+      enabled: true,
+    },
+  },
 });
 
 export type SessionType = typeof auth.$Infer.Session;
