@@ -34,8 +34,8 @@ export default function SignUp() {
     resolver: zodResolver(signInSchema),
     mode: "onSubmit",
     defaultValues: {
-      email: undefined,
-      password: undefined,
+      email: "",
+      password: "",
     },
   });
 

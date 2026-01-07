@@ -29,10 +29,10 @@ export default function SignUp() {
     resolver: zodResolver(signUpSchema),
     mode: "onSubmit",
     defaultValues: {
-      name: undefined,
-      email: undefined,
-      password: undefined,
-      confirmPassword: undefined,
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
   const [error, setError] = useState<{ message: string | undefined }>({

@@ -28,7 +28,7 @@ export function AccountForm({ session }: { session: SessionType | null }) {
     defaultValues: {
       name: session?.user.name,
       email: session?.user.email,
-      oldPassword: undefined,
+      currentPassword: undefined,
       newPassword: undefined,
     },
   });
@@ -70,7 +70,7 @@ export function AccountForm({ session }: { session: SessionType | null }) {
     if (formData.newPassword) {
       setIsPendig(true);
       const { error } = await authClient.changePassword({
-        currentPassword: formData.oldPassword!,
+        currentPassword: formData.currentPassword!,
         newPassword: formData.newPassword,
         revokeOtherSessions: true,
       });
@@ -84,7 +84,7 @@ export function AccountForm({ session }: { session: SessionType | null }) {
         switch (error.code) {
           case "INVALID_PASSWORD":
             setMessage({
-              message: "Old password is incorrect",
+              message: "Current password is incorrect",
               isError: true,
             });
         }
@@ -146,16 +146,18 @@ export function AccountForm({ session }: { session: SessionType | null }) {
           />
 
           <Controller
-            name="oldPassword"
+            name="currentPassword"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="oldPassword">Old password</FieldLabel>
+                <FieldLabel htmlFor="currentPassword">
+                  Current password
+                </FieldLabel>
                 <Input
                   {...field}
                   aria-invalid={fieldState.invalid}
                   value={undefined}
-                  id="oldPassword"
+                  id="currentPassword"
                   type="password"
                   autoComplete="off"
                   placeholder="· · · · · · · ·"
