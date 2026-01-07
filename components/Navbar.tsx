@@ -1,6 +1,6 @@
-import { Plus, UserRound } from "lucide-react";
+import { Plus, User } from "lucide-react";
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   return (
@@ -14,7 +14,7 @@ export default function Navbar() {
         </li>
         <li>
           <Link href="/account" prefetch={false}>
-            <UserRound />
+            <User />
           </Link>
         </li>
       </ul>

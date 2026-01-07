@@ -1,7 +1,13 @@
+import Home from "@/components/Home/Home";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { Suspense } from "react";
+
 export default function Page() {
   return (
     <div>
-      <h1 className="text-4xl font-bold text-center">Hello, Home Page</h1>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Home />
+      </Suspense>
     </div>
   );
 }
