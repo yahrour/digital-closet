@@ -1,3 +1,4 @@
+import { getColors } from "@/actions/db";
 import {
   MultiSelect,
   MultiSelectContent,
@@ -7,7 +8,9 @@ import {
   MultiSelectValue,
 } from "@/components/ui/multi-select";
 
-export default function CategorySelector() {
+export default async function CategorySelector() {
+  const colors = await getColors();
+
   return (
     <div className="border-b border-dashed pb-2 flex justify-between items-center w-full md:gap-12 sm:gap-8 max-sm:gap-4">
       <MultiSelect>
@@ -33,10 +36,10 @@ export default function CategorySelector() {
         </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectGroup>
-            <MultiSelectItem value="next.js">Next.js</MultiSelectItem>
-            <MultiSelectItem value="sveltekit">SvelteKit</MultiSelectItem>
-            <MultiSelectItem value="astro">Astro</MultiSelectItem>
-            <MultiSelectItem value="vue">Vue.js</MultiSelectItem>
+            <MultiSelectItem value="spring">Spring</MultiSelectItem>
+            <MultiSelectItem value="summer">Summer</MultiSelectItem>
+            <MultiSelectItem value="autumn">Autumn</MultiSelectItem>
+            <MultiSelectItem value="winter">Winter</MultiSelectItem>
           </MultiSelectGroup>
         </MultiSelectContent>
       </MultiSelect>
@@ -47,10 +50,11 @@ export default function CategorySelector() {
         </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectGroup>
-            <MultiSelectItem value="next.js">Next.js</MultiSelectItem>
-            <MultiSelectItem value="sveltekit">SvelteKit</MultiSelectItem>
-            <MultiSelectItem value="astro">Astro</MultiSelectItem>
-            <MultiSelectItem value="vue">Vue.js</MultiSelectItem>
+            {colors?.map((color) => (
+              <MultiSelectItem key={color} value={color}>
+                {color}
+              </MultiSelectItem>
+            ))}
           </MultiSelectGroup>
         </MultiSelectContent>
       </MultiSelect>
