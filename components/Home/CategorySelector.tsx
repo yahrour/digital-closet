@@ -7,9 +7,13 @@ import {
   MultiSelectTrigger,
   MultiSelectValue,
 } from "@/components/ui/multi-select";
+import { seasonsType } from "@/constants";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function CategorySelector() {
-  const colors = await getColors();
+  const session = await auth.api.getSession({ headers: await headers() });
+  const colors = await getColors({ user_id: session?.user.id });
 
   return (
     <div className="border-b border-dashed pb-2 flex justify-between items-center w-full md:gap-12 sm:gap-8 max-sm:gap-4">
@@ -36,10 +40,11 @@ export default async function CategorySelector() {
         </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectGroup>
-            <MultiSelectItem value="spring">Spring</MultiSelectItem>
-            <MultiSelectItem value="summer">Summer</MultiSelectItem>
-            <MultiSelectItem value="autumn">Autumn</MultiSelectItem>
-            <MultiSelectItem value="winter">Winter</MultiSelectItem>
+            {seasonsType.map((season) => (
+              <MultiSelectItem key={season} value={season}>
+                {season}
+              </MultiSelectItem>
+            ))}
           </MultiSelectGroup>
         </MultiSelectContent>
       </MultiSelect>

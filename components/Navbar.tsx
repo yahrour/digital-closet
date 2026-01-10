@@ -8,9 +8,11 @@ export default function Navbar() {
       <Link href="/">Closy</Link>
       <ul className="flex justify-between items-center gap-2">
         <li>
-          <Button className="cursor-pointer">
-            Add Item <Plus />
-          </Button>
+          <Link href="/garments/new">
+            <Button className="cursor-pointer">
+              Add Item <Plus />
+            </Button>
+          </Link>
         </li>
         <li>
           <Link href="/account" prefetch={false}>

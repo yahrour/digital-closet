@@ -1,3 +1,4 @@
+import { colorsType, seasonsType } from "@/constants";
 import z from "zod";
 
 export const signUpSchema = z
@@ -59,3 +60,12 @@ export const accountDetailsSchema = z
       }
     }
   });
+
+export const newGarmentSchema = z.object({
+  name: z.string().min(1, "please set a name").max(50, "name too long"),
+  season: z.enum(seasonsType, "please select a season"),
+  primaryColor: z.enum(colorsType, "please select a primary color"),
+  secondaryColors: z.array(z.enum(colorsType)).optional(),
+  brand: z.string().min(1, "please set a brand name"),
+  imageUrl: z.url(),
+});
