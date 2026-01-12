@@ -33,7 +33,7 @@ CREATE TABLE garments (
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(50) NOT NULL,
   category_id INTEGER REFERENCES garment_categories(id) ON DELETE CASCADE,
-  season season_type NOT NULL,
+  season season_type[] NOT NULL,
   primary_color color_type NOT NULL,
   secondary_colors color_type[],
   brand VARCHAR(50),

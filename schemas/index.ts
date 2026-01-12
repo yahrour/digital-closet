@@ -62,10 +62,14 @@ export const accountDetailsSchema = z
   });
 
 export const newGarmentSchema = z.object({
-  name: z.string().min(1, "please set a name").max(50, "name too long"),
-  season: z.enum(seasonsType, "please select a season"),
+  name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
+  seasons: z
+    .array(z.enum(seasonsType, "please select a season"))
+    .min(1, "please select a season(s)"),
   primaryColor: z.enum(colorsType, "please select a primary color"),
   secondaryColors: z.array(z.enum(colorsType)).optional(),
   brand: z.string().min(1, "please set a brand name"),
+  tags: z.array(z.string()).optional(),
+  tagInput: z.string("tag too short").max(25, "tag too long"),
   imageUrl: z.url(),
 });

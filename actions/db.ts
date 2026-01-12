@@ -1,5 +1,9 @@
+"use server";
+
+import { newGarmentSchemaType } from "@/app/garments/new/page";
 import { query } from "@/lib/db";
-import { cacheTag } from "next/cache";
+import { newGarmentSchema } from "@/schemas";
+import { cacheTag, updateTag } from "next/cache";
 
 export async function getColors({ user_id }: { user_id: string | undefined }) {
   "use cache";
@@ -32,4 +36,10 @@ export async function getColors({ user_id }: { user_id: string | undefined }) {
     console.log(`[ERROR] db error ${error}`);
     return null;
   }
+}
+
+export async function addNewGarment(formData: newGarmentSchemaType) {
+  console.log("data: ", formData);
+
+  updateTag("colors");
 }

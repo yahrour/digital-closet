@@ -27,8 +27,10 @@ import {
 } from "@/components/ui/multi-select";
 
 import { colorsType, seasonsType } from "@/constants";
+import { Badge } from "@/components/ui/badge";
+import { addNewGarment } from "@/actions/db";
 
-type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
+export type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
 
 export default function New() {
   const form = useForm<newGarmentSchemaType>({
@@ -36,10 +38,12 @@ export default function New() {
     mode: "onSubmit",
     defaultValues: {
       name: "",
-      season: "",
+      seasons: [],
       primaryColor: "",
       secondaryColors: [],
       brand: "",
+      tags: [],
+      tagInput: "",
       imageUrl: "",
     },
   });
@@ -49,8 +53,31 @@ export default function New() {
   } | null>(null);
   const [isPending, setIsPendig] = useState(false);
 
+  const handleAddTag = () => {
+    const tag = form.getValues("tagInput")?.trim();
+
+    if (!tag) {
+      form.setError("tagInput", { message: "tag cannot be empty" });
+      return;
+    }
+    if (tag.length > 25) {
+      form.setError("tagInput", { message: "tag too long" });
+      return;
+    }
+
+    const currentTags = form.getValues("tags") ?? [];
+    if (currentTags.includes(tag)) {
+      form.setError("tagInput", { message: "tag already exist" });
+      return;
+    }
+
+    form.setValue("tags", [...currentTags, tag]);
+    form.setValue("tagInput", "");
+    form.clearErrors("tagInput");
+  };
+
   const onSubmit = async (formData: newGarmentSchemaType) => {
-    console.log("formatdata: ", formData);
+    await addNewGarment(formData);
   };
 
   return (
@@ -87,26 +114,23 @@ export default function New() {
             )}
           />
           <Controller
-            name="season"
+            name="seasons"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="season">Season</FieldLabel>
+                <FieldLabel htmlFor="seasons">Season(s)</FieldLabel>
 
                 <MultiSelect
-                  single
-                  values={field.value ? [field.value] : []}
-                  onValuesChange={(values) => {
-                    field.onChange(values[0] ?? "");
-                  }}
+                  values={field.value}
+                  onValuesChange={field.onChange}
                 >
                   <MultiSelectTrigger className="flex-1">
                     <MultiSelectValue
-                      id="season"
+                      id="seasons"
                       {...field}
                       aria-invalid={fieldState.invalid}
                       overflowBehavior="cutoff"
-                      placeholder="Season"
+                      placeholder="Season(s)"
                     />
                   </MultiSelectTrigger>
                   <MultiSelectContent>
@@ -226,6 +250,46 @@ export default function New() {
               </Field>
             )}
           />
+
+          <div className="space-y-2">
+            <Controller
+              name="tagInput"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <>
+                  <div className="flex items-end gap-4 w-full">
+                    <Field className="flex-1" data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="tags">Tags</FieldLabel>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        id="tags"
+                        type="text"
+                        autoComplete="off"
+                        placeholder="Tags: dress, linen, formal…"
+                      />
+                    </Field>
+                    <Button
+                      variant="secondary"
+                      className="cursor-pointer px-4 py-2"
+                      onClick={handleAddTag}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </>
+              )}
+            />
+
+            <div className="flex gap-2">
+              {form.watch("tags")?.map((tag) => (
+                <Badge key={tag}>{tag}</Badge>
+              ))}
+            </div>
+          </div>
 
           <Controller
             name="imageUrl"
