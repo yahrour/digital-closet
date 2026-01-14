@@ -35,9 +35,11 @@ export default function SignUp() {
       confirmPassword: "",
     },
   });
-  const [error, setError] = useState<{ message: string | undefined }>({
-    message: undefined,
-  });
+
+  const [message, setMessage] = useState<{
+    message: string | undefined;
+    isError: boolean;
+  } | null>(null);
 
   const onSubmit = async (formData: signUpSchemaType) => {
     const { error } = await authClient.signUp.email(
@@ -50,10 +52,17 @@ export default function SignUp() {
       {
         onSuccess: () => {
           form.reset();
-          setError({ message: undefined });
         },
       },
     );
+
+    if (error === null) {
+      setMessage({
+        message:
+          "Your account has been created. Please check your email to verify your account.",
+        isError: false,
+      });
+    }
 
     if (error !== null) {
       switch (error?.code) {
@@ -70,9 +79,10 @@ export default function SignUp() {
           });
           break;
         default:
-          setError({
+          setMessage({
             message:
               "One or more input values are invalid. Please check and try again.",
+            isError: true,
           });
       }
     }
@@ -176,7 +186,14 @@ export default function SignUp() {
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
-                {error && <FieldError errors={[error]} />}
+                {message && message.isError && (
+                  <FieldError errors={[message]} />
+                )}
+                {message && !message.isError && (
+                  <p className="text-green-500 text-xs font-normal">
+                    {message.message}
+                  </p>
+                )}
               </Field>
             )}
           />
