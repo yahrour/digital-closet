@@ -4,6 +4,7 @@ import { Pool } from "pg";
 
 export const auth = betterAuth({
   emailVerification: {
+    autoSignInAfterVerification: true,
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
       void sendEmail({
