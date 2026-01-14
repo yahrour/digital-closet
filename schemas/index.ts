@@ -69,6 +69,7 @@ export const newGarmentSchema = z.object({
   primaryColor: z.enum(colorsType, "please select a primary color"),
   secondaryColors: z.array(z.enum(colorsType)).optional(),
   brand: z.string().min(1, "please set a brand name"),
+  category: z.string().min(1, "please select a category"),
   tags: z.array(z.string()).optional(),
   tagInput: z.string("tag too short").max(25, "tag too long"),
   imageUrl: z.url(),

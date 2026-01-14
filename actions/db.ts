@@ -2,7 +2,6 @@
 
 import { newGarmentSchemaType } from "@/app/garments/new/page";
 import { query } from "@/lib/db";
-import { newGarmentSchema } from "@/schemas";
 import { cacheTag, updateTag } from "next/cache";
 
 export async function getColors({ user_id }: { user_id: string | undefined }) {
@@ -42,4 +41,29 @@ export async function addNewGarment(formData: newGarmentSchemaType) {
   console.log("data: ", formData);
 
   updateTag("colors");
+}
+
+export async function getUserCategories({
+  user_id,
+}: {
+  user_id: string | undefined;
+}) {
+  "use cache";
+  cacheTag("categories");
+  if (!user_id) {
+    return null;
+  }
+  try {
+    const { rows } = await query(
+      "SELECT name FROM garment_categories WHERE user_id=$1",
+      [user_id],
+    );
+
+    const categories: string[] = [];
+    rows.map((value) => categories.push(value.name));
+    return categories;
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return null;
+  }
 }

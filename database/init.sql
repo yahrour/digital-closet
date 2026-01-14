@@ -25,6 +25,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE garment_categories (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(50)
 );
 

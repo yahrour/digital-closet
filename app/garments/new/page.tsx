@@ -15,7 +15,7 @@ import { newGarmentSchema } from "@/schemas";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   MultiSelect,
@@ -28,7 +28,8 @@ import {
 
 import { colorsType, seasonsType } from "@/constants";
 import { Badge } from "@/components/ui/badge";
-import { addNewGarment } from "@/actions/db";
+import { addNewGarment, getUserCategories } from "@/actions/db";
+import { authClient } from "@/lib/auth-client";
 
 export type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
 
@@ -42,11 +43,26 @@ export default function New() {
       primaryColor: "",
       secondaryColors: [],
       brand: "",
+      category: "",
       tags: [],
       tagInput: "",
       imageUrl: "",
     },
   });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  useEffect(() => {
+    const func = async () => {
+      const session = await authClient.getSession();
+      const result = await getUserCategories({
+        user_id: session.data?.user.id,
+      });
+      setCategories(result ?? []);
+      setIsLoadingCategories(false);
+    };
+    func();
+  }, []);
+
   const [message, setMessage] = useState<{
     message: string | undefined;
     isError: boolean;
@@ -77,7 +93,9 @@ export default function New() {
   };
 
   const onSubmit = async (formData: newGarmentSchemaType) => {
+    setIsPendig(true);
     await addNewGarment(formData);
+    setIsPendig(false);
   };
 
   return (
@@ -244,6 +262,49 @@ export default function New() {
                   autoComplete="off"
                   placeholder="levi's"
                 />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="category"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="category">Category</FieldLabel>
+                {isLoadingCategories ? (
+                  <div className="h-9 bg-gray-200 animate-pulse "></div>
+                ) : (
+                  <MultiSelect
+                    single
+                    values={field.value ? [field.value] : []}
+                    onValuesChange={(values) => {
+                      field.onChange(values[0] ?? "");
+                    }}
+                  >
+                    <MultiSelectTrigger className="flex-1">
+                      <MultiSelectValue
+                        id="category"
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        overflowBehavior="cutoff"
+                        placeholder="Categories"
+                      />
+                    </MultiSelectTrigger>
+                    <MultiSelectContent className="w-full">
+                      <MultiSelectGroup>
+                        {categories?.map((category) => (
+                          <MultiSelectItem key={category} value={category}>
+                            {category}
+                          </MultiSelectItem>
+                        ))}
+                      </MultiSelectGroup>
+                    </MultiSelectContent>
+                  </MultiSelect>
+                )}
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
