@@ -13,24 +13,49 @@ export async function getColors({ user_id }: { user_id: string | undefined }) {
   }
 
   try {
+    const primary_color =
+      "SELECT user_id, primary_color::text AS color FROM garments";
+    const secondary_colors =
+      "SELECT user_id, UNNEST(secondary_colors)::text AS color FROM garments WHERE secondary_colors IS NOT NULL";
     const { rows } = await query(
-      "SELECT primary_color, secondary_colors::text[] AS secondary_colors FROM garments WHERE user_id=$1",
+      `SELECT DISTINCT color 
+        FROM (${primary_color} UNION ALL ${secondary_colors}) colors 
+        WHERE user_id=$1 
+        ORDER BY color`,
       [user_id],
     );
 
     const colors: string[] = [];
     for (let i = 0; i < rows.length; i++) {
-      if (!colors.includes(rows[i].primary_color)) {
-        colors.push(rows[i].primary_color);
-      }
-      for (let j = 0; j < rows[i].secondary_colors.length; j++) {
-        if (!colors.includes(rows[i].secondary_colors[j])) {
-          colors.push(rows[i].secondary_colors[j]);
-        }
-      }
+      colors.push(rows[i].color);
     }
 
     return colors;
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return null;
+  }
+}
+
+export async function getTags({ user_id }: { user_id: string | undefined }) {
+  "use cache";
+  cacheTag("tags");
+
+  if (!user_id) {
+    return null;
+  }
+
+  try {
+    const { rows } = await query("SELECT name FROM tags WHERE user_id=$1", [
+      user_id,
+    ]);
+
+    const tags: string[] = [];
+    for (let i = 0; i < rows.length; i++) {
+      tags.push(rows[i].name);
+    }
+
+    return tags;
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
     return null;

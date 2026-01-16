@@ -1,4 +1,4 @@
-import { getColors } from "@/actions/db";
+import { getColors, getTags } from "@/actions/db";
 import {
   MultiSelect,
   MultiSelectContent,
@@ -10,10 +10,20 @@ import {
 import { seasonsType } from "@/constants";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import AuthGate from "@/components/AuthGate";
 
 export default async function CategorySelector() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const colors = await getColors({ user_id: session?.user.id });
+  const userId = session?.user.id;
+
+  if (!session) {
+    return <AuthGate />;
+  }
+
+  const [colors, tags] = await Promise.all([
+    getColors({ user_id: userId }),
+    getTags({ user_id: userId }),
+  ]);
 
   return (
     <div className="border-b border-dashed pb-2 flex justify-between items-center w-full md:gap-12 sm:gap-8 max-sm:gap-4">
@@ -70,10 +80,11 @@ export default async function CategorySelector() {
         </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectGroup>
-            <MultiSelectItem value="next.js">Next.js</MultiSelectItem>
-            <MultiSelectItem value="sveltekit">SvelteKit</MultiSelectItem>
-            <MultiSelectItem value="astro">Astro</MultiSelectItem>
-            <MultiSelectItem value="vue">Vue.js</MultiSelectItem>
+            {tags?.map((tag) => (
+              <MultiSelectItem key={tag} value={tag}>
+                {tag}
+              </MultiSelectItem>
+            ))}
           </MultiSelectGroup>
         </MultiSelectContent>
       </MultiSelect>
