@@ -1,4 +1,4 @@
-import { Plus, User } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -12,11 +12,6 @@ export default function Navbar() {
             <Button className="cursor-pointer">
               Add Item <Plus />
             </Button>
-          </Link>
-        </li>
-        <li>
-          <Link href="/account" prefetch={false}>
-            <User />
           </Link>
         </li>
       </ul>

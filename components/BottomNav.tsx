@@ -1,4 +1,4 @@
-import { Shirt } from "lucide-react";
+import { Settings, Shirt } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,6 +18,10 @@ export default function BottomNav() {
       <Link href="/outfits" className="flex flex-col items-center gap-1">
         <Shirt size={28} />
         <p>Outfits</p>
+      </Link>
+      <Link href="/settings" className="flex flex-col items-center gap-1">
+        <Settings size={28} />
+        <p>Settings</p>
       </Link>
     </nav>
   );

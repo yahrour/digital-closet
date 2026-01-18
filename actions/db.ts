@@ -3,7 +3,7 @@
 import { newGarmentSchemaType } from "@/app/garments/new/page";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
-import { cacheTag, updateTag } from "next/cache";
+import { cacheTag, revalidateTag } from "next/cache";
 import { DatabaseError } from "pg";
 
 export async function getColors({
@@ -76,8 +76,6 @@ export async function addNewGarment(
   formData: newGarmentSchemaType,
 ): Promise<ActionResult<null>> {
   console.log("data: ", formData);
-
-  updateTag("colors");
   return ok(null);
 }
 
@@ -118,14 +116,12 @@ export async function createNewCategory({
   }
 
   try {
-    const { rows, rowCount } = await query(
+    await query(
       "INSERT INTO garment_categories (user_id, name) VALUES ($1, $2);",
       [user_id, name],
     );
 
-    console.log("rows: ", rows);
-    console.log("row count: ", rowCount);
-    updateTag("categories");
+    revalidateTag("categories", { expire: 0 });
     return ok(null);
   } catch (error: unknown) {
     if (error instanceof DatabaseError) {

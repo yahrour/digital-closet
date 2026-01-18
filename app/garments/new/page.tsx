@@ -206,7 +206,7 @@ export default function New() {
                 >
                   <MultiSelectTrigger className="flex-1">
                     <MultiSelectValue
-                      id="primaryColors"
+                      id="primaryColor"
                       {...field}
                       aria-invalid={fieldState.invalid}
                       overflowBehavior="cutoff"
@@ -292,54 +292,48 @@ export default function New() {
             )}
           />
 
-          <div className="flex items-center justify-center gap-2">
-            <div className="flex-6">
-              <Controller
-                name="category"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="category">Category</FieldLabel>
-                    {isLoadingCategories ? (
-                      <div className="h-9 bg-gray-200 animate-pulse "></div>
-                    ) : (
-                      <MultiSelect
-                        single
-                        values={field.value ? [field.value] : []}
-                        onValuesChange={(values) => {
-                          field.onChange(values[0] ?? "");
-                        }}
-                      >
-                        <MultiSelectTrigger className="flex-1">
-                          <MultiSelectValue
-                            id="category"
-                            {...field}
-                            aria-invalid={fieldState.invalid}
-                            overflowBehavior="cutoff"
-                            placeholder="Categories"
-                          />
-                        </MultiSelectTrigger>
-                        <MultiSelectContent className="w-full">
-                          <MultiSelectGroup>
-                            {categories?.map((category) => (
-                              <MultiSelectItem key={category} value={category}>
-                                {category}
-                              </MultiSelectItem>
-                            ))}
-                          </MultiSelectGroup>
-                        </MultiSelectContent>
-                      </MultiSelect>
-                    )}
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
+          <Controller
+            name="category"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="category">Category</FieldLabel>
+                {isLoadingCategories ? (
+                  <div className="h-9 bg-gray-200 animate-pulse "></div>
+                ) : (
+                  <MultiSelect
+                    single
+                    values={field.value ? [field.value] : []}
+                    onValuesChange={(values) => {
+                      field.onChange(values[0] ?? "");
+                    }}
+                  >
+                    <MultiSelectTrigger className="flex-1">
+                      <MultiSelectValue
+                        id="category"
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        overflowBehavior="cutoff"
+                        placeholder="Categories"
+                      />
+                    </MultiSelectTrigger>
+                    <MultiSelectContent className="w-full">
+                      <MultiSelectGroup>
+                        {categories?.map((category) => (
+                          <MultiSelectItem key={category} value={category}>
+                            {category}
+                          </MultiSelectItem>
+                        ))}
+                      </MultiSelectGroup>
+                    </MultiSelectContent>
+                  </MultiSelect>
                 )}
-              />
-            </div>
-
-            <NewCategoryDialog />
-          </div>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
           <div className="space-y-2">
             <Controller
