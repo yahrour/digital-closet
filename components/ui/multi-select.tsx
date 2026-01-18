@@ -296,7 +296,7 @@ export function MultiSelectContent({
           <CommandList>
             {canSearch && (
               <CommandEmpty>
-                {typeof search === "object" ? search.emptyMessage : undefined}
+                {typeof search === "object" ? search.emptyMessage : "Not found"}
               </CommandEmpty>
             )}
             {children}

@@ -30,6 +30,8 @@ import { colorsType, seasonsType } from "@/constants";
 import { Badge } from "@/components/ui/badge";
 import { addNewGarment, getUserCategories } from "@/actions/db";
 import { authClient } from "@/lib/auth-client";
+import { NewCategoryDialog } from "@/components/NewCategoryDialog";
+import { redirect } from "next/navigation";
 
 export type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
 
@@ -49,24 +51,34 @@ export default function New() {
       imageUrl: "",
     },
   });
+  const [message, setMessage] = useState<{
+    message: string | undefined;
+    success: boolean;
+  } | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   useEffect(() => {
     const func = async () => {
       const session = await authClient.getSession();
+      if (!session.data) {
+        redirect("/signIn");
+      }
       const result = await getUserCategories({
-        user_id: session.data?.user.id,
+        user_id: session.data.user.id,
       });
-      setCategories(result ?? []);
+      if (result.success) {
+        setCategories(result.data);
+      } else {
+        setMessage({
+          message: result.error.message,
+          success: false,
+        });
+      }
       setIsLoadingCategories(false);
     };
     func();
   }, []);
 
-  const [message, setMessage] = useState<{
-    message: string | undefined;
-    isError: boolean;
-  } | null>(null);
   const [isPending, setIsPendig] = useState(false);
 
   const handleAddTag = () => {
@@ -94,7 +106,18 @@ export default function New() {
 
   const onSubmit = async (formData: newGarmentSchemaType) => {
     setIsPendig(true);
-    await addNewGarment(formData);
+    const result = await addNewGarment(formData);
+    if (result.success) {
+      setMessage({
+        message: "Garment added successfully",
+        success: true,
+      });
+    } else {
+      setMessage({
+        message: result.error.message,
+        success: false,
+      });
+    }
     setIsPendig(false);
   };
 
@@ -269,48 +292,54 @@ export default function New() {
             )}
           />
 
-          <Controller
-            name="category"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="category">Category</FieldLabel>
-                {isLoadingCategories ? (
-                  <div className="h-9 bg-gray-200 animate-pulse "></div>
-                ) : (
-                  <MultiSelect
-                    single
-                    values={field.value ? [field.value] : []}
-                    onValuesChange={(values) => {
-                      field.onChange(values[0] ?? "");
-                    }}
-                  >
-                    <MultiSelectTrigger className="flex-1">
-                      <MultiSelectValue
-                        id="category"
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        overflowBehavior="cutoff"
-                        placeholder="Categories"
-                      />
-                    </MultiSelectTrigger>
-                    <MultiSelectContent className="w-full">
-                      <MultiSelectGroup>
-                        {categories?.map((category) => (
-                          <MultiSelectItem key={category} value={category}>
-                            {category}
-                          </MultiSelectItem>
-                        ))}
-                      </MultiSelectGroup>
-                    </MultiSelectContent>
-                  </MultiSelect>
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex-6">
+              <Controller
+                name="category"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="category">Category</FieldLabel>
+                    {isLoadingCategories ? (
+                      <div className="h-9 bg-gray-200 animate-pulse "></div>
+                    ) : (
+                      <MultiSelect
+                        single
+                        values={field.value ? [field.value] : []}
+                        onValuesChange={(values) => {
+                          field.onChange(values[0] ?? "");
+                        }}
+                      >
+                        <MultiSelectTrigger className="flex-1">
+                          <MultiSelectValue
+                            id="category"
+                            {...field}
+                            aria-invalid={fieldState.invalid}
+                            overflowBehavior="cutoff"
+                            placeholder="Categories"
+                          />
+                        </MultiSelectTrigger>
+                        <MultiSelectContent className="w-full">
+                          <MultiSelectGroup>
+                            {categories?.map((category) => (
+                              <MultiSelectItem key={category} value={category}>
+                                {category}
+                              </MultiSelectItem>
+                            ))}
+                          </MultiSelectGroup>
+                        </MultiSelectContent>
+                      </MultiSelect>
+                    )}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
                 )}
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+              />
+            </div>
+
+            <NewCategoryDialog />
+          </div>
 
           <div className="space-y-2">
             <Controller
@@ -377,8 +406,8 @@ export default function New() {
       </FieldSet>
 
       <div>
-        {message && message.isError && <FieldError errors={[message]} />}
-        {message && !message.isError && (
+        {message && !message.success && <FieldError errors={[message]} />}
+        {message && message.success && (
           <p className="text-green-500 text-xs font-normal">
             {message.message}
           </p>

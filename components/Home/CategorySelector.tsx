@@ -1,4 +1,4 @@
-import { getColors, getTags } from "@/actions/db";
+import { getColors, getTags, getUserCategories } from "@/actions/db";
 import {
   MultiSelect,
   MultiSelectContent,
@@ -20,7 +20,8 @@ export default async function CategorySelector() {
     return <AuthGate />;
   }
 
-  const [colors, tags] = await Promise.all([
+  const [categories, colors, tags] = await Promise.all([
+    getUserCategories({ user_id: userId }),
     getColors({ user_id: userId }),
     getTags({ user_id: userId }),
   ]);
@@ -36,10 +37,12 @@ export default async function CategorySelector() {
         </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectGroup>
-            <MultiSelectItem value="next.js">Next.js</MultiSelectItem>
-            <MultiSelectItem value="sveltekit">SvelteKit</MultiSelectItem>
-            <MultiSelectItem value="astro">Astro</MultiSelectItem>
-            <MultiSelectItem value="vue">Vue.js</MultiSelectItem>
+            {categories.success &&
+              categories.data.map((category) => (
+                <MultiSelectItem key={category} value={category}>
+                  {category}
+                </MultiSelectItem>
+              ))}
           </MultiSelectGroup>
         </MultiSelectContent>
       </MultiSelect>
@@ -65,11 +68,12 @@ export default async function CategorySelector() {
         </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectGroup>
-            {colors?.map((color) => (
-              <MultiSelectItem key={color} value={color}>
-                {color}
-              </MultiSelectItem>
-            ))}
+            {colors.success &&
+              colors.data.map((color) => (
+                <MultiSelectItem key={color} value={color}>
+                  {color}
+                </MultiSelectItem>
+              ))}
           </MultiSelectGroup>
         </MultiSelectContent>
       </MultiSelect>
@@ -80,11 +84,12 @@ export default async function CategorySelector() {
         </MultiSelectTrigger>
         <MultiSelectContent>
           <MultiSelectGroup>
-            {tags?.map((tag) => (
-              <MultiSelectItem key={tag} value={tag}>
-                {tag}
-              </MultiSelectItem>
-            ))}
+            {tags.success &&
+              tags.data.map((tag) => (
+                <MultiSelectItem key={tag} value={tag}>
+                  {tag}
+                </MultiSelectItem>
+              ))}
           </MultiSelectGroup>
         </MultiSelectContent>
       </MultiSelect>

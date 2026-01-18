@@ -74,3 +74,11 @@ export const newGarmentSchema = z.object({
   tagInput: z.string("tag too short").max(25, "tag too long"),
   imageUrl: z.url(),
 });
+
+export const newCategorySchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "please set a category name")
+    .max(25, "category name too long"),
+});

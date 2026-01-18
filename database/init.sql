@@ -26,7 +26,8 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE garment_categories (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
-  name VARCHAR(50)
+  name VARCHAR(25),
+  CONSTRAINT unique_category_name UNIQUE (user_id, name)
 );
 
 CREATE TABLE garments (
@@ -46,7 +47,8 @@ CREATE TABLE garments (
 CREATE TABLE tags (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
-  name VARCHAR(25)
+  name VARCHAR(25),
+  CONSTRAINT unique_tag_name UNIQUE (user_id, name)
 );
 
 CREATE TABLE garment_tags (
