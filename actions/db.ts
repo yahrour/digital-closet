@@ -3,7 +3,7 @@
 import { newGarmentSchemaType } from "@/app/garments/new/page";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
-import { cacheTag, revalidateTag } from "next/cache";
+import { cacheTag, revalidateTag, updateTag } from "next/cache";
 import { DatabaseError } from "pg";
 
 export async function getColors({
@@ -104,6 +104,52 @@ export async function getUserCategories({
   }
 }
 
+export type categoryUsageCounts = {
+  id: number;
+  user_id: string;
+  name: string;
+  usageCount: number;
+  total: number;
+};
+export async function getUserCategoryUsageCounts({
+  user_id,
+  page,
+}: {
+  user_id: string | undefined;
+  page: number;
+}): Promise<ActionResult<categoryUsageCounts[]>> {
+  "use cache";
+  cacheTag("categoryUsageCounts");
+
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  if (!user_id) {
+    return fail("INVALID_USER", "User does not exist");
+  }
+  try {
+    const { rows } = await query(
+      "SELECT gc.id, gc.user_id, gc.name, COUNT(g.id), COUNT(*) OVER () AS total FROM garments g RIGHT JOIN garment_categories gc ON g.category_id=gc.id WHERE gc.user_id=$1 GROUP BY gc.name, gc.id ORDER BY gc.name LIMIT $2 OFFSET $3;",
+      [user_id, limit, offset],
+    );
+
+    const categories: categoryUsageCounts[] = [];
+    rows.map((category) =>
+      categories.push({
+        id: category.id,
+        user_id: category.user_id,
+        name: category.name,
+        usageCount: category.count,
+        total: Number(category.total),
+      }),
+    );
+    return ok(categories);
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to fetch categories");
+  }
+}
+
 export async function createNewCategory({
   user_id,
   name,
@@ -138,5 +184,66 @@ export async function createNewCategory({
     }
     console.log(`[ERROR] db error ${error}`);
     return fail("DB_ERROR", "Failed to create category");
+  }
+}
+
+export async function deleteUserCategory({
+  user_id,
+  category_id,
+}: {
+  user_id: string;
+  category_id: number;
+}): Promise<ActionResult<null>> {
+  if (!user_id) {
+    return fail("INVALID_USER", "User does not exist");
+  }
+  if (!category_id) {
+    return fail("INVALID_CATEGORY", "Invalid category name");
+  }
+  try {
+    await query("DELETE FROM garment_categories WHERE id=$1 AND user_id=$2", [
+      category_id,
+      user_id,
+    ]);
+    updateTag("categoryUsageCounts");
+    updateTag("categories");
+    return ok(null);
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to fetch tags");
+  }
+}
+
+export async function renameUserCategory({
+  newName,
+  user_id,
+  category_id,
+}: {
+  newName: string;
+  user_id: string;
+  category_id: number;
+}): Promise<ActionResult<null>> {
+  await new Promise((res) => setTimeout(res, 5000));
+
+  if (!newName) {
+    return fail("INVALID_CATEGORY", "Invalid category name");
+  }
+  if (!user_id) {
+    return fail("INVALID_USER", "User does not exist");
+  }
+  if (!category_id) {
+    return fail("INVALID_CATEGORY", "Invalid category name");
+  }
+  try {
+    await query(
+      "UPDATE garment_categories SET name=$1 WHERE id=$2 AND user_id=$3",
+      [newName, category_id, user_id],
+    );
+    updateTag("categoryUsageCounts");
+    updateTag("categories");
+    return ok(null);
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to fetch tags");
   }
 }

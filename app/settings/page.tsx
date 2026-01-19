@@ -1,25 +1,14 @@
-import { AccountDetails } from "@/components/Account/AccountDetails";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { NewCategoryDialog } from "@/components/NewCategoryDialog";
-import { FieldDescription, FieldLegend } from "@/components/ui/field";
-import { Suspense } from "react";
+import Link from "next/link";
 
 export default function Settings() {
   return (
-    <div className="space-y-6">
-      <Suspense fallback={<LoadingSpinner />}>
-        <AccountDetails />
-      </Suspense>
-      <div className="space-y-2">
-        <FieldLegend className="md:text-2xl! max-md:text-xl!">
-          New Category
-        </FieldLegend>
-        <FieldDescription className="md:text-base">
-          Create new category
-        </FieldDescription>
-
-        <NewCategoryDialog />
+    <div className="space-y-4">
+      <div>
+        <h1>Settings</h1>
+        <p>manage your settings</p>
       </div>
+      <Link href="/settings/account">Manage your account</Link>
+      <Link href="/settings/categories?page=1">Manage your categories</Link>
     </div>
   );
 }
