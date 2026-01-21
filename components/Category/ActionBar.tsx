@@ -33,7 +33,9 @@ export default function ActionBar() {
 
 
   const handleSearch = () => {
-    goTo(categoryName);
+    if (categoryName.length > 0) {
+      goTo(categoryName);
+    }
   };
 
   return (
