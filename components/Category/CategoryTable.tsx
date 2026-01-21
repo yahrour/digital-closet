@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  categoryUsageCounts,
+  categoryUsageCount,
   deleteUserCategory,
   renameUserCategory,
 } from "@/actions/db";
@@ -41,27 +41,29 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useRef, useState } from "react";
 import { renameCategorySchema } from "@/schemas";
-import { FieldError } from "@base-ui/react";
 
 export default function CategoryTable({
   categories,
 }: {
-  categories: categoryUsageCounts[];
+  categories: categoryUsageCount[];
 }) {
   return (
-    <Table className="min-h-[370px]">
+    <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Category</TableHead>
           <TableHead>Usage Count</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="h-fit">
         {categories.map((category) => (
-          <TableRow key={category.id}>
+          <TableRow
+            key={category.id}
+            className="min-sm:h-[50px] max-sm:h-[40px]"
+          >
             <TableCell className="font-medium">{category.name}</TableCell>
             <TableCell>{category.usageCount}</TableCell>
-            <TableCell className="flex justify-end items-center gap-4">
+            <TableCell className="flex justify-end items-center gap-4 min-sm:h-[50px] max-sm:h-[40px]">
               <Confirm categoryId={category.id} userId={category.user_id} />
               <Rename
                 categoryId={category.id}
@@ -102,7 +104,7 @@ function Confirm({
   return (
     <AlertDialog>
       <AlertDialogTrigger className="flex items-center justify-center gap-1 text-red-500 cursor-pointer">
-        <Trash size={16} /> Delete
+        <Trash size={16} /> <span className="max-sm:hidden">Delete</span>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -178,7 +180,7 @@ function Rename({
     <Dialog>
       <form>
         <DialogTrigger className="flex items-center justify-center gap-1 cursor-pointer">
-          <Pencil size={16} /> Rename
+          <Pencil size={16} /> <span className="max-sm:hidden">Rename</span>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

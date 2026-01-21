@@ -104,20 +104,20 @@ export async function getUserCategories({
   }
 }
 
-export type categoryUsageCounts = {
+export type categoryUsageCount = {
   id: number;
   user_id: string;
   name: string;
   usageCount: number;
   total: number;
 };
-export async function getUserCategoryUsageCounts({
+export async function getUserCategoriesUsageCount({
   user_id,
   page,
 }: {
   user_id: string | undefined;
   page: number;
-}): Promise<ActionResult<categoryUsageCounts[]>> {
+}): Promise<ActionResult<categoryUsageCount[]>> {
   "use cache";
   cacheTag("categoryUsageCounts");
 
@@ -133,7 +133,7 @@ export async function getUserCategoryUsageCounts({
       [user_id, limit, offset],
     );
 
-    const categories: categoryUsageCounts[] = [];
+    const categories: categoryUsageCount[] = [];
     rows.map((category) =>
       categories.push({
         id: category.id,
@@ -143,6 +143,48 @@ export async function getUserCategoryUsageCounts({
         total: Number(category.total),
       }),
     );
+    return ok(categories);
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to fetch categories");
+  }
+}
+
+export async function searchUserCategoriesUsageCount({
+  user_id,
+  page,
+  category,
+}: {
+  user_id: string | undefined;
+  page: number;
+  category: string;
+}): Promise<ActionResult<categoryUsageCount[]>> {
+  "use cache";
+  cacheTag("categoryUsageCounts");
+
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  if (!user_id) {
+    return fail("INVALID_USER", "User does not exist");
+  }
+  try {
+    const { rows } = await query(
+      "SELECT gc.id, gc.user_id, gc.name, COUNT(g.id), COUNT(*) OVER () AS total FROM garments g RIGHT JOIN garment_categories gc ON g.category_id=gc.id WHERE gc.user_id=$1 AND gc.name ILIKE $2 GROUP BY gc.name, gc.id ORDER BY gc.name LIMIT $3 OFFSET $4;",
+      [user_id, `%${category}%`, limit, offset],
+    );
+
+    const categories: categoryUsageCount[] = [];
+    rows.map((category) =>
+      categories.push({
+        id: category.id,
+        user_id: category.user_id,
+        name: category.name,
+        usageCount: category.count,
+        total: Number(category.total),
+      }),
+    );
+
     return ok(categories);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
@@ -167,7 +209,8 @@ export async function createNewCategory({
       [user_id, name],
     );
 
-    revalidateTag("categories", { expire: 0 });
+    updateTag("categories");
+    updateTag("categoryUsageCounts");
     return ok(null);
   } catch (error: unknown) {
     if (error instanceof DatabaseError) {

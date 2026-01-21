@@ -21,7 +21,7 @@ import { createNewCategory } from "@/actions/db";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 
-export function NewCategoryDialog() {
+export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [message, setMessage] = useState<{
     message: string | undefined;
@@ -63,7 +63,7 @@ export function NewCategoryDialog() {
 
   return (
     <Dialog>
-      <DialogTrigger className="flex-3 flex items-center justify-center gap-2 text-sm border h-fit px-4 py-2 self-end cursor-pointer">
+      <DialogTrigger className="flex-1 flex items-center justify-center gap-2 text-sm border h-fit px-4 py-2 cursor-pointer">
         <Plus size={16} /> <span>New Category</span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px]">
@@ -80,6 +80,7 @@ export function NewCategoryDialog() {
             id="name-1"
             name="name"
             placeholder="e.g. Tops, Outerwear, Shoes"
+            defaultValue={categoryName}
           />
           <div>
             {message && !message.success && <FieldError errors={[message]} />}

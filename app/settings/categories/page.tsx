@@ -1,17 +1,26 @@
 import CategoriesPage from "@/components/Category/CategoriesPage";
+import { renameCategorySchema } from "@/schemas";
 
 export default async function Categories({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  let page = Number((await searchParams).page) || 1;
+  const params = await searchParams;
+  let page = Number(params.page) || 1;
+  let category: string | null;
+
+  const { data, success } = renameCategorySchema.safeParse({
+    name: params.category,
+  });
+  if (!success) {
+    category = null;
+  } else {
+    category = data.name;
+  }
+
   if (page < 0) {
     page = 1;
   }
-  return (
-    <div className="w-full max-w-125">
-      <CategoriesPage page={page} />
-    </div>
-  );
+  return <CategoriesPage page={page} category={category} />;
 }
