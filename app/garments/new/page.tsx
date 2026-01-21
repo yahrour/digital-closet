@@ -30,7 +30,6 @@ import { colorsType, seasonsType } from "@/constants";
 import { Badge } from "@/components/ui/badge";
 import { addNewGarment, getUserCategories } from "@/actions/db";
 import { authClient } from "@/lib/auth-client";
-import { NewCategoryDialog } from "@/components/NewCategoryDialog";
 import { redirect } from "next/navigation";
 
 export type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
@@ -299,7 +298,7 @@ export default function New() {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="category">Category</FieldLabel>
                 {isLoadingCategories ? (
-                  <div className="h-9 bg-gray-200 animate-pulse "></div>
+                  <div className="h-9 bg-gray-200 animate-pulse"></div>
                 ) : (
                   <MultiSelect
                     single

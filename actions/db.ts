@@ -266,8 +266,6 @@ export async function renameUserCategory({
   user_id: string;
   category_id: number;
 }): Promise<ActionResult<null>> {
-  await new Promise((res) => setTimeout(res, 5000));
-
   if (!newName) {
     return fail("INVALID_CATEGORY", "Invalid category name");
   }

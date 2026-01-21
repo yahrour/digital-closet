@@ -152,9 +152,19 @@ function Rename({
   const [loading, setLoading] = useState(false);
   const handleRename = async () => {
     setLoading(true);
+
     const { data, success, error } = renameCategorySchema.safeParse({
       name: inputRef.current?.value,
     });
+
+    if (categoryName.toLocaleLowerCase() === data?.name.toLocaleLowerCase()) {
+      setMessage({
+        message: "Nothing changed",
+        success: false,
+      });
+      setLoading(false);
+      return;
+    }
 
     if (!success) {
       const parsedError = JSON.parse(error.message);
@@ -177,40 +187,38 @@ function Rename({
   };
 
   return (
-    <Dialog>
-      <form>
-        <DialogTrigger className="flex items-center justify-center gap-1 cursor-pointer">
-          <Pencil size={16} /> <span className="max-sm:hidden">Rename</span>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Rename category</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Input id="category" ref={inputRef} defaultValue={categoryName} />
-            {!message?.success && (
-              <p className="text-red-500 text-xs">{message?.message}</p>
-            )}
-            {message?.success && (
-              <p className="text-green-500 text-xs">{message.message}</p>
-            )}
-          </div>
+    <Dialog onOpenChange={() => setMessage(null)}>
+      <DialogTrigger className="flex items-center justify-center gap-1 cursor-pointer">
+        <Pencil size={16} /> <span className="max-sm:hidden">Rename</span>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Rename category</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <Input id="category" ref={inputRef} defaultValue={categoryName} />
+          {!message?.success && (
+            <p className="text-red-500 text-xs">{message?.message}</p>
+          )}
+          {message?.success && (
+            <p className="text-green-500 text-xs">{message.message}</p>
+          )}
+        </div>
 
-          <DialogFooter>
-            <DialogClose className="cursor-pointer" disabled={loading}>
-              Cancel
-            </DialogClose>
-            <Button
-              onClick={handleRename}
-              className="cursor-pointer"
-              disabled={loading}
-            >
-              {loading ? "Renaming..." : "Rename"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+        <DialogFooter>
+          <DialogClose className="cursor-pointer" disabled={loading}>
+            Cancel
+          </DialogClose>
+          <Button
+            onClick={handleRename}
+            className="cursor-pointer"
+            disabled={loading}
+          >
+            {loading ? "Renaming..." : "Rename"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }
