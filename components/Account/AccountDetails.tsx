@@ -13,7 +13,7 @@ export async function AccountDetails() {
     return <AuthGate />;
   }
   return (
-    <div className="space-y-8">
+    <div className="w-full max-w-125 mx-auto space-y-8">
       <AccountForm session={session} />
       <Logout />
     </div>

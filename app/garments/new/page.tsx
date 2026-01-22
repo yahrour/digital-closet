@@ -123,183 +123,193 @@ export default function New() {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-4 w-full max-w-125"
+      className="space-y-4 w-full max-w-125 mx-auto"
     >
       <FieldSet className="w-full">
         <FieldLegend className="md:text-2xl! max-md:text-xl!">
-          Add Garment
+          Add Item
         </FieldLegend>
         <FieldDescription className="md:text-base">
-          Add a new item to your digital closet with its details and image.
+          Add a new item to your digital closet with its details and image(s).
         </FieldDescription>
         <FieldGroup>
-          <Controller
-            name="name"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="name">Name</FieldLabel>
-                <Input
-                  {...field}
-                  aria-invalid={fieldState.invalid}
-                  id="name"
-                  autoComplete="off"
-                  placeholder="John Doe"
-                />
-
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name="seasons"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="seasons">Season(s)</FieldLabel>
-
-                <MultiSelect
-                  values={field.value}
-                  onValuesChange={field.onChange}
-                >
-                  <MultiSelectTrigger className="flex-1">
-                    <MultiSelectValue
-                      id="seasons"
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      overflowBehavior="cutoff"
-                      placeholder="Season(s)"
-                    />
-                  </MultiSelectTrigger>
-                  <MultiSelectContent>
-                    <MultiSelectGroup>
-                      {seasonsType?.map((season) => (
-                        <MultiSelectItem key={season} value={season}>
-                          {season}
-                        </MultiSelectItem>
-                      ))}
-                    </MultiSelectGroup>
-                  </MultiSelectContent>
-                </MultiSelect>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="primaryColor"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="primaryColor">Primary Color</FieldLabel>
-                <MultiSelect
-                  single
-                  values={field.value ? [field.value] : []}
-                  onValuesChange={(values) => {
-                    field.onChange(values[0] ?? "");
-                  }}
-                >
-                  <MultiSelectTrigger className="flex-1">
-                    <MultiSelectValue
-                      id="primaryColor"
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      overflowBehavior="cutoff"
-                      placeholder="Colors"
-                    />
-                  </MultiSelectTrigger>
-                  <MultiSelectContent>
-                    <MultiSelectGroup>
-                      {colorsType?.map((color) => (
-                        <MultiSelectItem key={color} value={color}>
-                          {color}
-                        </MultiSelectItem>
-                      ))}
-                    </MultiSelectGroup>
-                  </MultiSelectContent>
-                </MultiSelect>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="secondaryColors"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="secondaryColors">
-                  Secondary Colors
-                </FieldLabel>
-                <MultiSelect
-                  values={field.value}
-                  onValuesChange={field.onChange}
-                >
-                  <MultiSelectTrigger
-                    id="secondaryColors"
+          <div className="space-y-2">
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="name">Name</FieldLabel>
+                  <Input
                     {...field}
                     aria-invalid={fieldState.invalid}
-                    className="flex-1"
+                    id="name"
+                    autoComplete="off"
+                    placeholder="John Doe"
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="brand"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="brand">Brand</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    id="brand"
+                    value={undefined}
+                    type="text"
+                    autoComplete="off"
+                    placeholder="levi's"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+          <div className="space-y-2">
+            <Controller
+              name="seasons"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="seasons">Season(s)</FieldLabel>
+
+                  <MultiSelect
+                    values={field.value}
+                    onValuesChange={field.onChange}
                   >
-                    <MultiSelectValue
-                      overflowBehavior="cutoff"
-                      placeholder="Colors"
-                    />
-                  </MultiSelectTrigger>
-                  <MultiSelectContent>
-                    <MultiSelectGroup>
-                      {colorsType?.map((color) => (
-                        <MultiSelectItem key={color} value={color}>
-                          {color}
-                        </MultiSelectItem>
-                      ))}
-                    </MultiSelectGroup>
-                  </MultiSelectContent>
-                </MultiSelect>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+                    <MultiSelectTrigger className="flex-1">
+                      <MultiSelectValue
+                        id="seasons"
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        overflowBehavior="cutoff"
+                        placeholder="Season(s)"
+                      />
+                    </MultiSelectTrigger>
+                    <MultiSelectContent>
+                      <MultiSelectGroup>
+                        {seasonsType?.map((season) => (
+                          <MultiSelectItem key={season} value={season}>
+                            {season}
+                          </MultiSelectItem>
+                        ))}
+                      </MultiSelectGroup>
+                    </MultiSelectContent>
+                  </MultiSelect>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-          <Controller
-            name="brand"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="brand">Brand</FieldLabel>
-                <Input
-                  {...field}
-                  aria-invalid={fieldState.invalid}
-                  id="brand"
-                  value={undefined}
-                  type="text"
-                  autoComplete="off"
-                  placeholder="levi's"
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
+            <Controller
+              name="category"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="category">Category</FieldLabel>
+                  {isLoadingCategories ? (
+                    <div className="h-9 bg-gray-200 animate-pulse"></div>
+                  ) : (
+                    <MultiSelect
+                      single
+                      values={field.value ? [field.value] : []}
+                      onValuesChange={(values) => {
+                        field.onChange(values[0] ?? "");
+                      }}
+                    >
+                      <MultiSelectTrigger className="flex-1">
+                        <MultiSelectValue
+                          id="category"
+                          {...field}
+                          aria-invalid={fieldState.invalid}
+                          overflowBehavior="cutoff"
+                          placeholder="Categories"
+                        />
+                      </MultiSelectTrigger>
+                      <MultiSelectContent className="w-full">
+                        <MultiSelectGroup>
+                          {categories?.map((category) => (
+                            <MultiSelectItem key={category} value={category}>
+                              {category}
+                            </MultiSelectItem>
+                          ))}
+                        </MultiSelectGroup>
+                      </MultiSelectContent>
+                    </MultiSelect>
+                  )}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {/* <div className="space-y-1"> */}
+            <div
+              className={
+                (form.getValues("tags")?.length ?? 0) > 0 ? "space-y-1" : ""
+              }
+            >
+              <Controller
+                name="tagInput"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <>
+                    <div className="flex items-end gap-4 w-full">
+                      <Field
+                        className="flex-1"
+                        data-invalid={fieldState.invalid}
+                      >
+                        <FieldLabel htmlFor="tags">Tags</FieldLabel>
+                        <Input
+                          {...field}
+                          aria-invalid={fieldState.invalid}
+                          id="tags"
+                          type="text"
+                          autoComplete="off"
+                          placeholder="Tags: dress, linen, formal…"
+                        />
+                      </Field>
+                      <Button
+                        variant="secondary"
+                        className="cursor-pointer px-4 py-2"
+                        onClick={handleAddTag}
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </>
                 )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="category"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="category">Category</FieldLabel>
-                {isLoadingCategories ? (
-                  <div className="h-9 bg-gray-200 animate-pulse"></div>
-                ) : (
+              />
+              <div className="flex flex-wrap gap-1">
+                {form.watch("tags")?.map((tag) => (
+                  <Badge key={tag}>{tag}</Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Controller
+              name="primaryColor"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="primaryColor">Primary Color</FieldLabel>
                   <MultiSelect
                     single
                     values={field.value ? [field.value] : []}
@@ -309,92 +319,90 @@ export default function New() {
                   >
                     <MultiSelectTrigger className="flex-1">
                       <MultiSelectValue
-                        id="category"
+                        id="primaryColor"
                         {...field}
                         aria-invalid={fieldState.invalid}
                         overflowBehavior="cutoff"
-                        placeholder="Categories"
+                        placeholder="Colors"
                       />
                     </MultiSelectTrigger>
-                    <MultiSelectContent className="w-full">
+                    <MultiSelectContent>
                       <MultiSelectGroup>
-                        {categories?.map((category) => (
-                          <MultiSelectItem key={category} value={category}>
-                            {category}
+                        {colorsType?.map((color) => (
+                          <MultiSelectItem key={color} value={color}>
+                            {color}
                           </MultiSelectItem>
                         ))}
                       </MultiSelectGroup>
                     </MultiSelectContent>
                   </MultiSelect>
-                )}
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <div className="space-y-2">
-            <Controller
-              name="tagInput"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <>
-                  <div className="flex items-end gap-4 w-full">
-                    <Field className="flex-1" data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="tags">Tags</FieldLabel>
-                      <Input
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        id="tags"
-                        type="text"
-                        autoComplete="off"
-                        placeholder="Tags: dress, linen, formal…"
-                      />
-                    </Field>
-                    <Button
-                      variant="secondary"
-                      className="cursor-pointer px-4 py-2"
-                      onClick={handleAddTag}
-                    >
-                      Add
-                    </Button>
-                  </div>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
-                </>
+                </Field>
               )}
             />
-
-            <div className="flex gap-2">
-              {form.watch("tags")?.map((tag) => (
-                <Badge key={tag}>{tag}</Badge>
-              ))}
-            </div>
+            <Controller
+              name="secondaryColors"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="secondaryColors">
+                    Secondary Color(s)
+                  </FieldLabel>
+                  <MultiSelect
+                    values={field.value}
+                    onValuesChange={field.onChange}
+                  >
+                    <MultiSelectTrigger
+                      id="secondaryColors"
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                      className="flex-1"
+                    >
+                      <MultiSelectValue
+                        overflowBehavior="cutoff"
+                        placeholder="Colors"
+                      />
+                    </MultiSelectTrigger>
+                    <MultiSelectContent>
+                      <MultiSelectGroup>
+                        {colorsType?.map((color) => (
+                          <MultiSelectItem key={color} value={color}>
+                            {color}
+                          </MultiSelectItem>
+                        ))}
+                      </MultiSelectGroup>
+                    </MultiSelectContent>
+                  </MultiSelect>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="imageUrl"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="image">Image</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    id="image"
+                    value={undefined}
+                    type="text"
+                    autoComplete="off"
+                    placeholder=""
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
           </div>
-
-          <Controller
-            name="imageUrl"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="image">Image</FieldLabel>
-                <Input
-                  {...field}
-                  aria-invalid={fieldState.invalid}
-                  id="image"
-                  value={undefined}
-                  type="text"
-                  autoComplete="off"
-                  placeholder=""
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
         </FieldGroup>
       </FieldSet>
 

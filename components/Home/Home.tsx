@@ -21,15 +21,15 @@ export default async function Home() {
       </Suspense>
 
       <div className="flex flex-wrap justify-between gap-4">
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
-        <div className="w-[250px] h-[300px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+        <div className="w-[250px] h-[250px] bg-gray-300"></div>
       </div>
     </div>
   );

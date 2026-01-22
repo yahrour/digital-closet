@@ -15,11 +15,17 @@ export default function BottomNav() {
         />
         <p>Closet</p>
       </Link>
-      <Link href="/outfits" className="flex flex-col items-center gap-1">
+      <Link
+        href="/outfits"
+        className="flex flex-col items-center gap-1 select-none"
+      >
         <Shirt size={28} />
         <p>Outfits</p>
       </Link>
-      <Link href="/settings" className="flex flex-col items-center gap-1">
+      <Link
+        href="/settings"
+        className="flex flex-col items-center gap-1 select-none"
+      >
         <Settings size={28} />
         <p>Settings</p>
       </Link>
