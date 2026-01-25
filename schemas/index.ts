@@ -61,7 +61,7 @@ export const accountDetailsSchema = z
     }
   });
 
-export const newGarmentSchema = z.object({
+export const newGarmentFormSchema = z.object({
   name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
   seasons: z
     .array(z.enum(seasonsType, "please select a season"))
@@ -72,7 +72,19 @@ export const newGarmentSchema = z.object({
   category: z.string().min(1, "please select a category"),
   tags: z.array(z.string()).optional(),
   tagInput: z.string("tag too short").max(25, "tag too long"),
-  imageUrl: z.url(),
+  images: z.array(z.file()).min(1, "Upload at least one file."),
+});
+export const newGarmentSchema = z.object({
+  name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
+  seasons: z
+    .array(z.enum(seasonsType, "please select a season"))
+    .min(1, "please select a season(s)"),
+  primaryColor: z.enum(colorsType, "please select a primary color"),
+  secondaryColors: z.array(z.enum(colorsType)).optional(),
+  brand: z.string().min(1, "please set a brand name"),
+  category: z.string().min(1, "please select a category"),
+  tags: z.array(z.string()).optional(),
+  images: z.array(z.string()),
 });
 
 export const newCategorySchema = z.object({

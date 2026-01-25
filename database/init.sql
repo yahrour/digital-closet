@@ -41,7 +41,8 @@ CREATE TABLE garments (
   brand VARCHAR(50),
   image_url VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT unique_garment_name UNIQUE (user_id, name)
 );
 
 CREATE TABLE tags (

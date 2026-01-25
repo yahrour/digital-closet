@@ -1,10 +1,12 @@
 "use server";
 
-import { newGarmentSchemaType } from "@/app/garments/new/page";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
-import { cacheTag, revalidateTag, updateTag } from "next/cache";
+import { newGarmentSchema } from "@/schemas";
+import { cacheTag, updateTag } from "next/cache";
 import { DatabaseError } from "pg";
+import z from "zod";
+import { deleteImages } from "./serverUtils";
 
 export async function getColors({
   user_id,
@@ -72,11 +74,73 @@ export async function getTags({
   }
 }
 
-export async function addNewGarment(
-  formData: newGarmentSchemaType,
-): Promise<ActionResult<null>> {
-  console.log("data: ", formData);
-  return ok(null);
+type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
+export async function addNewGarment({
+  user_id,
+  formData,
+}: {
+  user_id: string;
+  formData: newGarmentSchemaType;
+}): Promise<ActionResult<null>> {
+  try {
+    if (!user_id) {
+      deleteImages(formData.images);
+      return fail("INVALID_USER", "User does not exist");
+    }
+
+    const { data, success, error } = newGarmentSchema.safeParse(formData);
+    if (!success) {
+      deleteImages(formData.images);
+      console.log("error: ", error);
+      return fail("INVALUD_INPUT", "Something went wrong !");
+    }
+
+    const { rows } = await query(
+      "SELECT id FROM garment_categories WHERE name=$1",
+      [data.category],
+    );
+
+    const category_id = rows[0].id;
+    if (!category_id) {
+      deleteImages(formData.images);
+      return fail("INVALID_CATEGORY", "Category not found");
+    }
+
+    await query(
+      `INSERT INTO garments (user_id, name, category_id, season, primary_color, secondary_colors, brand, image_url) VALUES
+      ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        user_id,
+        formData.name,
+        category_id,
+        formData.seasons,
+        formData.primaryColor,
+        formData.secondaryColors,
+        formData.brand,
+        formData.images,
+      ],
+    );
+
+    updateTag("tags");
+    updateTag("colors");
+    return ok(null);
+  } catch (error: unknown) {
+    deleteImages(formData.images);
+    if (error instanceof DatabaseError) {
+      switch (error.code) {
+        case "23505": // unique_violation
+          return fail(
+            "ITEM_ALREADY_EXIST",
+            "You already have an item with this name",
+          );
+
+        case "23503": // foreign_key_violation
+          return fail("INVALID_USER", "User does not exist");
+      }
+    }
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to add a new item");
+  }
 }
 
 export async function getUserCategories({
@@ -113,7 +177,7 @@ export type categoryUsageCount = {
 };
 export async function getUserCategoriesUsageCount({
   user_id,
-  page,
+  page = 1,
 }: {
   user_id: string | undefined;
   page: number;
@@ -152,7 +216,7 @@ export async function getUserCategoriesUsageCount({
 
 export async function searchUserCategoriesUsageCount({
   user_id,
-  page,
+  page = 1,
   category,
 }: {
   user_id: string | undefined;
@@ -168,6 +232,7 @@ export async function searchUserCategoriesUsageCount({
   if (!user_id) {
     return fail("INVALID_USER", "User does not exist");
   }
+
   try {
     const { rows } = await query(
       "SELECT gc.id, gc.user_id, gc.name, COUNT(g.id), COUNT(*) OVER () AS total FROM garments g RIGHT JOIN garment_categories gc ON g.category_id=gc.id WHERE gc.user_id=$1 AND gc.name ILIKE $2 GROUP BY gc.name, gc.id ORDER BY gc.name LIMIT $3 OFFSET $4;",
@@ -199,6 +264,10 @@ export async function createNewCategory({
   user_id: string;
   name: string;
 }): Promise<ActionResult<null>> {
+  if (!user_id) {
+    return fail("INVALID_USER", "User does not exist");
+  }
+
   if (!name) {
     return fail("INVALUD_INPUT", "Category name is required");
   }

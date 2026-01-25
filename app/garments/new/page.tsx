@@ -11,7 +11,6 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { newGarmentSchema } from "@/schemas";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,12 +30,18 @@ import { Badge } from "@/components/ui/badge";
 import { addNewGarment, getUserCategories } from "@/actions/db";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
+import { UploadDropzone } from "@/components/ui/upload-dropzone";
+import { useUploadFiles } from "@better-upload/client";
+import { Progress } from "@/components/ui/progress";
+import { newGarmentFormSchema } from "@/schemas";
+import { ImagePreview } from "@/components/ImagePreview";
 
-export type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
+export type newGarmentFormSchemaType = z.infer<typeof newGarmentFormSchema>;
 
 export default function New() {
-  const form = useForm<newGarmentSchemaType>({
-    resolver: zodResolver(newGarmentSchema),
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const form = useForm<newGarmentFormSchemaType>({
+    resolver: zodResolver(newGarmentFormSchema),
     mode: "onSubmit",
     defaultValues: {
       name: "",
@@ -47,7 +52,7 @@ export default function New() {
       category: "",
       tags: [],
       tagInput: "",
-      imageUrl: "",
+      images: [],
     },
   });
   const [message, setMessage] = useState<{
@@ -103,14 +108,40 @@ export default function New() {
     form.clearErrors("tagInput");
   };
 
-  const onSubmit = async (formData: newGarmentSchemaType) => {
+  const onSubmit = async (formData: newGarmentFormSchemaType) => {
     setIsPendig(true);
-    const result = await addNewGarment(formData);
+
+    const session = await authClient.getSession();
+    if (!session.data) {
+      redirect("/singIn");
+    }
+
+    const { files } = await uploader.upload(formData.images);
+    const images: string[] = [];
+    files.map((file) => images.push(file.objectInfo.key));
+
+    const data = {
+      name: formData.name,
+      brand: formData.brand,
+      seasons: formData.seasons,
+      category: formData.category,
+      tags: formData.tags,
+      primaryColor: formData.primaryColor,
+      secondaryColors: formData.secondaryColors,
+      images,
+    };
+    const result = await addNewGarment({
+      user_id: session.data.user.id,
+      formData: data,
+    });
+    console.log("result: ", result);
     if (result.success) {
       setMessage({
         message: "Garment added successfully",
         success: true,
       });
+      form.reset();
+      uploader.reset();
     } else {
       setMessage({
         message: result.error.message,
@@ -119,6 +150,18 @@ export default function New() {
     }
     setIsPendig(false);
   };
+
+  const uploader = useUploadFiles({
+    route: "form",
+    onUploadProgress: () => {
+      setUploadProgress(uploader.averageProgress * 100);
+    },
+    onError: (error) => {
+      form.setError("images", {
+        message: error.message || "An error occurred.",
+      });
+    },
+  });
 
   return (
     <form
@@ -164,7 +207,6 @@ export default function New() {
                     {...field}
                     aria-invalid={fieldState.invalid}
                     id="brand"
-                    value={undefined}
                     type="text"
                     autoComplete="off"
                     placeholder="levi's"
@@ -256,7 +298,6 @@ export default function New() {
                 </Field>
               )}
             />
-            {/* <div className="space-y-1"> */}
             <div
               className={
                 (form.getValues("tags")?.length ?? 0) > 0 ? "space-y-1" : ""
@@ -381,27 +422,42 @@ export default function New() {
                 </Field>
               )}
             />
-            <Controller
-              name="imageUrl"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="image">Image</FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    id="image"
-                    value={undefined}
-                    type="text"
-                    autoComplete="off"
-                    placeholder=""
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+
+            <div>
+              <Controller
+                name="images"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="images">Image(s)</FieldLabel>
+
+                    {form.getValues("images").length > 0 ? (
+                      <ImagePreview form={form} />
+                    ) : (
+                      <UploadDropzone
+                        id="images"
+                        control={uploader.control}
+                        description={{
+                          maxFiles: 2,
+                          maxFileSize: "5MB",
+                        }}
+                        uploadOverride={(files) => {
+                          field.onChange(Array.from(files));
+                        }}
+                      />
+                    )}
+
+                    {/* )} */}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              {uploadProgress > 0 && (
+                <Progress value={uploadProgress} className="mt-1 w-full" />
               )}
-            />
+            </div>
           </div>
         </FieldGroup>
       </FieldSet>
@@ -416,7 +472,7 @@ export default function New() {
       </div>
 
       <Button
-        disabled={!form.formState.isDirty || isPending}
+        disabled={!form.formState.isDirty || isPending || uploader.isPending}
         type="submit"
         className="w-full cursor-pointer"
       >

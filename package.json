@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
+    "@better-upload/client": "^3.0.12",
+    "@better-upload/server": "^3.0.12",
     "@hookform/resolvers": "^5.2.2",
     "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",
@@ -22,6 +24,7 @@
     "pg": "^8.16.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.70.0",
     "resend": "^6.6.0",
     "shadcn": "^3.6.2",
