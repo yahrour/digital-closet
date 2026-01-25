@@ -103,7 +103,7 @@ export default function New() {
       return;
     }
 
-    form.setValue("tags", [...currentTags, tag]);
+    form.setValue("tags", [...currentTags, tag.toLocaleLowerCase()]);
     form.setValue("tagInput", "");
     form.clearErrors("tagInput");
   };

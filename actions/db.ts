@@ -110,7 +110,7 @@ export async function addNewGarment({
 
     const { rows: garmentRows } = await query(
       `INSERT INTO garments (user_id, name, category_id, season, primary_color, secondary_colors, brand, image_url) VALUES
-      ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      ($1, lower($2), $3, $4, $5, $6, lower($7), $8) RETURNING id`,
       [
         user_id,
         formData.name,
@@ -125,7 +125,7 @@ export async function addNewGarment({
     const garmentId = garmentRows[0].id;
 
     const { rows: tagRows } = await query(
-      "INSERT INTO tags (name, user_id) SELECT unnest($1::text[]), $2 ON CONFLICT DO NOTHING RETURNING id",
+      "INSERT INTO tags (name, user_id) SELECT lower(tag), $2 FROM unnest($1::text[]) AS tag ON CONFLICT DO NOTHING RETURNING id",
       [data.tags, user_id],
     );
 
@@ -292,7 +292,7 @@ export async function createNewCategory({
 
   try {
     await query(
-      "INSERT INTO garment_categories (user_id, name) VALUES ($1, $2);",
+      "INSERT INTO garment_categories (user_id, name) VALUES ($1, lower($2));",
       [user_id, name],
     );
 
