@@ -95,20 +95,22 @@ export async function addNewGarment({
       return fail("INVALUD_INPUT", "Something went wrong !");
     }
 
-    const { rows } = await query(
+    await query("BEGIN");
+
+    const { rows: categoryRows } = await query(
       "SELECT id FROM garment_categories WHERE name=$1",
       [data.category],
     );
 
-    const category_id = rows[0].id;
+    const category_id = categoryRows[0].id;
     if (!category_id) {
       deleteImages(formData.images);
       return fail("INVALID_CATEGORY", "Category not found");
     }
 
-    await query(
+    const { rows: garmentRows } = await query(
       `INSERT INTO garments (user_id, name, category_id, season, primary_color, secondary_colors, brand, image_url) VALUES
-      ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
       [
         user_id,
         formData.name,
@@ -120,11 +122,27 @@ export async function addNewGarment({
         formData.images,
       ],
     );
+    const garmentId = garmentRows[0].id;
+
+    const { rows: tagRows } = await query(
+      "INSERT INTO tags (name, user_id) SELECT unnest($1::text[]), $2 ON CONFLICT DO NOTHING RETURNING id",
+      [data.tags, user_id],
+    );
+
+    await query(
+      `INSERT INTO garment_tags (tag_id, garment_id)
+     SELECT id, $1 FROM unnest($2::int[]) AS id
+      ON CONFLICT DO NOTHING;`,
+      [garmentId, tagRows.map((r) => r.id)],
+    );
+
+    await query("COMMIT");
 
     updateTag("tags");
     updateTag("colors");
     return ok(null);
   } catch (error: unknown) {
+    await query("ROLLBACK");
     deleteImages(formData.images);
     if (error instanceof DatabaseError) {
       switch (error.code) {
