@@ -48,7 +48,7 @@ CREATE TABLE garments (
 CREATE TABLE tags (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
-  name VARCHAR(25),
+  name VARCHAR(25) NOT NULL,
   CONSTRAINT unique_tag_name UNIQUE (user_id, name)
 );
 

@@ -130,11 +130,12 @@ export default function New() {
       secondaryColors: formData.secondaryColors,
       images,
     };
+
     const result = await addNewGarment({
       user_id: session.data.user.id,
       formData: data,
     });
-    console.log("result: ", result);
+
     if (result.success) {
       setMessage({
         message: "Garment added successfully",
@@ -148,6 +149,7 @@ export default function New() {
         success: false,
       });
     }
+
     setIsPendig(false);
   };
 

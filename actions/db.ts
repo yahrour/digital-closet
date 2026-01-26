@@ -124,11 +124,27 @@ export async function addNewGarment({
     );
     const garmentId = garmentRows[0].id;
 
-    const { rows: tagRows } = await query(
-      "INSERT INTO tags (name, user_id) SELECT lower(tag), $2 FROM unnest($1::text[]) AS tag ON CONFLICT DO NOTHING RETURNING id",
+    // Insert tags (ignore duplicate)
+    await query(
+      `INSERT INTO tags (name, user_id) 
+      SELECT lower(tag), $2 
+      FROM unnest($1::text[]) AS tag 
+      ON CONFLICT DO NOTHING
+    `,
       [data.tags, user_id],
     );
 
+    // Get all tag IDs (existing + new)
+    const { rows: tagRows } = await query(
+      `SELECT id FROM tags 
+      WHERE user_id=$1
+      AND name = ANY (
+        SELECT lower(tag) FROM unnest($2::text[]) AS tag
+      )`,
+      [user_id, data.tags],
+    );
+
+    // Insert into garment_tags
     await query(
       `INSERT INTO garment_tags (tag_id, garment_id)
      SELECT id, $1 FROM unnest($2::int[]) AS id
