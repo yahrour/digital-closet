@@ -27,7 +27,6 @@ import {
 
 import { colorsType, seasonsType } from "@/constants";
 import { Badge } from "@/components/ui/badge";
-import { addNewGarment, getUserCategories } from "@/actions/db";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
@@ -35,6 +34,8 @@ import { useUploadFiles } from "@better-upload/client";
 import { Progress } from "@/components/ui/progress";
 import { newGarmentFormSchema } from "@/schemas";
 import { ImagePreview } from "@/components/ImagePreview";
+import { getUserCategories } from "@/actions/categories.actions";
+import { addNewGarment } from "@/actions/items.actions";
 
 export type newGarmentFormSchemaType = z.infer<typeof newGarmentFormSchema>;
 

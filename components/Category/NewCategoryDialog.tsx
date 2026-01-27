@@ -17,9 +17,9 @@ import { newCategorySchema } from "@/schemas";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { FieldError } from "@/components/ui/field";
-import { createNewCategory } from "@/actions/db";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
+import { createNewCategory } from "@/actions/categories.actions";
 
 export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
   const inputRef = useRef<HTMLInputElement | null>(null);

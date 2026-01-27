@@ -27,8 +27,12 @@ export default async function Home() {
       </Suspense>
 
       <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
-        {[...(items || []), ...(items || []), ...(items || [])]?.map(
-          async (item, idx) => {
+        {items.success ? (
+          [
+            ...(items.data || []),
+            ...(items.data || []),
+            ...(items.data || []),
+          ]?.map(async (item, idx) => {
             const urls = await generateItemImageUrls({
               image_keys: item.image_keys,
             });
@@ -40,9 +44,9 @@ export default async function Home() {
                 className="group mx-auto max-w-[200px] w-full"
               >
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
-                  {urls ? (
+                  {urls.success ? (
                     <Image
-                      src={urls[0]}
+                      src={urls.data[0]}
                       alt={item.name}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -71,7 +75,9 @@ export default async function Home() {
                 </div>
               </Link>
             );
-          },
+          })
+        ) : (
+          <h1>{items.error.message}</h1>
         )}
       </div>
     </div>

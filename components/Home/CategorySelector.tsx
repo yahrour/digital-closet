@@ -1,4 +1,3 @@
-import { getColors, getTags, getUserCategories } from "@/actions/db";
 import {
   MultiSelect,
   MultiSelectContent,
@@ -11,6 +10,9 @@ import { seasonsType } from "@/constants";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import AuthGate from "@/components/AuthGate";
+import { getUserCategories } from "@/actions/categories.actions";
+import { getColors } from "@/actions/colors.actions";
+import { getTags } from "@/actions/tags.actions";
 
 export default async function CategorySelector() {
   const session = await auth.api.getSession({ headers: await headers() });

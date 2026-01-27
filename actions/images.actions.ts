@@ -1,24 +1,25 @@
 "use server";
 
 import { s3 } from "@/app/api/upload/route";
-import { presignGetObject } from "@better-upload/server/helpers";
+import { ActionResult, fail, ok } from "@/lib/actionsType";
+import { deleteObjects, presignGetObject } from "@better-upload/server/helpers";
 import { cacheTag } from "next/cache";
 
 export async function generateItemImageUrls({
   image_keys,
 }: {
   image_keys: string[];
-}) {
+}): Promise<ActionResult<string[]>> {
   "use cache";
   cacheTag("item_images");
 
   if (!image_keys || image_keys.length === 0) {
-    return null;
+    return fail("IMAGE_KEYS", "Images not found");
   }
 
   const bucketName = process.env.S3_BUCKET_NAME;
   if (!bucketName) {
-    return null;
+    return fail("BUCKET", "Images not found");
   }
 
   const urls = await Promise.all(
@@ -31,5 +32,13 @@ export async function generateItemImageUrls({
     ),
   );
 
-  return urls;
+  return ok(urls);
+}
+
+export async function deleteImages(images: string[]) {
+  const keys = images.map((value) => ({ key: value }));
+  await deleteObjects(s3, {
+    bucket: process.env.S3_BUCKET_NAME || "",
+    objects: keys,
+  });
 }

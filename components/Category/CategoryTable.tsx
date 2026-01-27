@@ -1,11 +1,6 @@
 "use client";
 
 import {
-  categoryUsageCount,
-  deleteUserCategory,
-  renameUserCategory,
-} from "@/actions/db";
-import {
   Table,
   TableBody,
   TableCell,
@@ -41,6 +36,11 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useRef, useState } from "react";
 import { renameCategorySchema } from "@/schemas";
+import {
+  categoryUsageCount,
+  deleteUserCategory,
+  renameUserCategory,
+} from "@/actions/categories.actions";
 
 export default function CategoryTable({
   categories,

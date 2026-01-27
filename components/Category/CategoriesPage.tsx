@@ -8,7 +8,7 @@ import ActionBar from "./ActionBar";
 import {
   getUserCategoriesUsageCount,
   searchUserCategoriesUsageCount,
-} from "@/actions/db";
+} from "@/actions/categories.actions";
 
 export default async function CategoriesPage({
   page,

@@ -6,7 +6,7 @@ import { Badge } from "./ui/badge";
 import { ArrowRightLeft, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { newGarmentFormSchemaType } from "@/app/garments/new/page";
+import { newGarmentFormSchemaType } from "@/app/items/new/page";
 
 export function ImagePreview({
   form,
