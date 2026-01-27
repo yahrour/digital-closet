@@ -4,15 +4,21 @@ import AuthGate from "@/components/AuthGate";
 import CategorySelector from "./CategorySelector";
 import { Suspense } from "react";
 import CategorySelectorSkeleton from "./CategorySelectorSkeleton";
+import Image from "next/image";
+import Link from "next/link";
+import { getItems } from "@/actions/items.actions";
+import { generateItemImageUrls } from "@/actions/images.actions";
 
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (!session) {
+  if (!session?.user) {
     return <AuthGate />;
   }
+
+  const items = await getItems({ user_id: session.user.id });
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -20,16 +26,53 @@ export default async function Home() {
         <CategorySelector />
       </Suspense>
 
-      <div className="flex flex-wrap justify-between gap-4">
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
-        <div className="w-[250px] h-[250px] bg-gray-300"></div>
+      <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
+        {[...(items || []), ...(items || []), ...(items || [])]?.map(
+          async (item, idx) => {
+            const urls = await generateItemImageUrls({
+              image_keys: item.image_keys,
+            });
+            return (
+              <Link
+                href={`/items/${item.id}`}
+                key={item.id + idx}
+                prefetch={false}
+                className="group mx-auto max-w-[200px] w-full"
+              >
+                <div className="relative aspect-square overflow-hidden bg-gray-100">
+                  {urls ? (
+                    <Image
+                      src={urls[0]}
+                      alt={item.name}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
+                      No image
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-2 space-y-0.5">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {item.name}
+                  </p>
+
+                  {item.brand && (
+                    <p className="text-xs text-gray-500 truncate">
+                      {item.brand}
+                    </p>
+                  )}
+
+                  <p className="text-xs text-gray-400">
+                    {item.category || "Uncategorized"}
+                  </p>
+                </div>
+              </Link>
+            );
+          },
+        )}
       </div>
     </div>
   );

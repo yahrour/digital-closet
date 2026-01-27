@@ -154,6 +154,7 @@ export async function addNewGarment({
 
     await query("COMMIT");
 
+    updateTag("items");
     updateTag("tags");
     updateTag("colors");
     return ok(null);
@@ -351,6 +352,8 @@ export async function deleteUserCategory({
       category_id,
       user_id,
     ]);
+
+    updateTag("items");
     updateTag("categoryUsageCounts");
     updateTag("categories");
     return ok(null);
@@ -383,6 +386,8 @@ export async function renameUserCategory({
       "UPDATE garment_categories SET name=$1 WHERE id=$2 AND user_id=$3",
       [newName, category_id, user_id],
     );
+
+    updateTag("items");
     updateTag("categoryUsageCounts");
     updateTag("categories");
     return ok(null);
