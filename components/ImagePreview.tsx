@@ -30,7 +30,6 @@ export function ImagePreview({
 
   const handleSwitch = () => {
     if (images.length === 2) {
-      console.log("Switch Images");
       form.setValue("images", [images[1], images[0]], { shouldDirty: true });
     }
   };

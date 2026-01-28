@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 export function Pagination({
   currentPage,
@@ -34,7 +34,7 @@ export function Pagination({
         variant="outline"
         size="sm"
         onClick={() => goTo(currentPage + 1)}
-        disabled={currentPage * 10 >= total || total === 0}
+        disabled={currentPage * 4 >= total || total === 0}
         className="cursor-pointer"
       >
         Next

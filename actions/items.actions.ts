@@ -17,12 +17,16 @@ type itemType = {
   brand: string;
   image_keys: string[];
   category: string;
+  tags: { id: number; name: string }[];
+  total: number;
 };
 
 export async function getItems({
   user_id,
+  page,
 }: {
   user_id: string;
+  page: number;
 }): Promise<ActionResult<itemType[]>> {
   "use cache";
   cacheTag("items");
@@ -31,23 +35,34 @@ export async function getItems({
     return fail("INVALID_USER", "User don't exist");
   }
 
+  const limit = 4;
+  const offset = (page - 1) * limit;
+
   const { rows } = await query(
-    `
-    SELECT g.id, g.name, g.season::text[] AS seasons, g.primary_color, g.secondary_colors::text[] AS secondary_colors, g.brand, g.image_url::text[] AS image_keys,gc.name AS category 
+    `SELECT g.id, g.name, g.season::text[] AS seasons, g.primary_color, g.secondary_colors::text[] AS secondary_colors, 
+      g.brand, g.image_url::text[] AS image_keys,gc.name AS category,
+      COUNT(*) OVER () AS total,
+      COALESCE(
+        json_agg(json_build_object('id', t.id, 'name', t.name)) FILTER (WHERE t.id IS NOT NULL),
+        '[]'
+      ) AS tags
     FROM garments g 
-    INNER JOIN garment_categories gc 
-    ON g.category_id=gc.id 
+    LEFT JOIN garment_categories gc ON g.category_id=gc.id
+    LEFT JOIN garment_tags gt ON gt.garment_id=g.id
+    LEFT JOIN tags t ON t.id=gt.tag_id
     WHERE g.user_id=$1
+    GROUP BY g.id, gc.name
     ORDER BY g.created_at DESC
+    LIMIT $2 OFFSET $3;
     `,
-    [user_id],
+    [user_id, limit, offset],
   );
 
   return ok(rows);
 }
 
 type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
-export async function addNewGarment({
+export async function addNewItem({
   user_id,
   formData,
 }: {

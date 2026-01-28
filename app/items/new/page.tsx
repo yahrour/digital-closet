@@ -35,7 +35,7 @@ import { Progress } from "@/components/ui/progress";
 import { newGarmentFormSchema } from "@/schemas";
 import { ImagePreview } from "@/components/ImagePreview";
 import { getUserCategories } from "@/actions/categories.actions";
-import { addNewGarment } from "@/actions/items.actions";
+import { addNewItem } from "@/actions/items.actions";
 
 export type newGarmentFormSchemaType = z.infer<typeof newGarmentFormSchema>;
 
@@ -132,7 +132,7 @@ export default function New() {
       images,
     };
 
-    const result = await addNewGarment({
+    const result = await addNewItem({
       user_id: session.data.user.id,
       formData: data,
     });

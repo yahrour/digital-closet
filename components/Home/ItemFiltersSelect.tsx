@@ -1,3 +1,5 @@
+"use client";
+
 import {
   MultiSelect,
   MultiSelectContent,
@@ -7,30 +9,44 @@ import {
   MultiSelectValue,
 } from "@/components/ui/multi-select";
 import { seasonsType } from "@/constants";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import AuthGate from "@/components/AuthGate";
-import { getUserCategories } from "@/actions/categories.actions";
-import { getColors } from "@/actions/colors.actions";
-import { getTags } from "@/actions/tags.actions";
+import { ActionResult } from "@/lib/actionsType";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default async function CategorySelector() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  const userId = session?.user.id;
+export function ItemFiltersSelect({
+  categories,
+  colors,
+  tags,
+}: {
+  categories: ActionResult<string[]>;
+  colors: ActionResult<string[]>;
+  tags: ActionResult<string[]>;
+}) {
+  const router = useRouter();
+  const params = useSearchParams();
 
-  if (!session) {
-    return <AuthGate />;
-  }
+  const categoriesParams = params.get("categories");
+  const seasonsParams = params.get("seasons");
+  const colorsParams = params.get("colors");
+  const tagsParams = params.get("tags");
 
-  const [categories, colors, tags] = await Promise.all([
-    getUserCategories({ user_id: userId }),
-    getColors({ user_id: userId }),
-    getTags({ user_id: userId }),
-  ]);
+  const goTo = (type: string, values: string[]) => {
+    const p = new URLSearchParams(params);
+    p.set(type, String(values));
+    router.push(`?${p.toString()}`);
+  };
+
+  const handleSetFilters = (type: string, values: string[]) => {
+    console.log("type: ", type);
+    console.log("values: ", values);
+    goTo(type, values);
+  };
 
   return (
     <div className="border-b border-dashed pb-2 flex justify-between items-center w-full md:gap-12 sm:gap-8 max-sm:gap-4">
-      <MultiSelect>
+      <MultiSelect
+        onValuesChange={(values) => handleSetFilters("categories", values)}
+        defaultValues={categoriesParams?.split(",")}
+      >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue
             overflowBehavior="cutoff"
@@ -49,7 +65,10 @@ export default async function CategorySelector() {
         </MultiSelectContent>
       </MultiSelect>
 
-      <MultiSelect>
+      <MultiSelect
+        onValuesChange={(values) => handleSetFilters("seasons", values)}
+        defaultValues={seasonsParams?.split(",")}
+      >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue overflowBehavior="cutoff" placeholder="Seasons" />
         </MultiSelectTrigger>
@@ -64,7 +83,10 @@ export default async function CategorySelector() {
         </MultiSelectContent>
       </MultiSelect>
 
-      <MultiSelect>
+      <MultiSelect
+        onValuesChange={(values) => handleSetFilters("colors", values)}
+        defaultValues={colorsParams?.split(",")}
+      >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue overflowBehavior="cutoff" placeholder="Colors" />
         </MultiSelectTrigger>
@@ -80,7 +102,10 @@ export default async function CategorySelector() {
         </MultiSelectContent>
       </MultiSelect>
 
-      <MultiSelect>
+      <MultiSelect
+        onValuesChange={(values) => handleSetFilters("tags", values)}
+        defaultValues={tagsParams?.split(",")}
+      >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue overflowBehavior="cutoff" placeholder="Tags" />
         </MultiSelectTrigger>
