@@ -24,9 +24,17 @@ type itemType = {
 export async function getItems({
   user_id,
   page,
+  categories,
+  seasons,
+  colors,
+  tags,
 }: {
   user_id: string;
   page: number;
+  categories: string[] | null;
+  seasons: string[] | null;
+  colors: string[] | null;
+  tags: string[] | null;
 }): Promise<ActionResult<itemType[]>> {
   "use cache";
   cacheTag("items");
@@ -51,11 +59,15 @@ export async function getItems({
     LEFT JOIN garment_tags gt ON gt.garment_id=g.id
     LEFT JOIN tags t ON t.id=gt.tag_id
     WHERE g.user_id=$1
+    AND ($2::text[] IS NULL OR gc.name = ANY($2::text[]))
+    AND ($3::season_type[] IS NULL OR g.season && $3::season_type[])
+    AND ($4::color_type[] IS NULL OR g.primary_color = ANY($4::color_type[]) OR g.secondary_colors && $4::color_type[])
+    AND ($5::text[] IS NULL OR t.name = ANY($5::text[]))
     GROUP BY g.id, gc.name
     ORDER BY g.created_at DESC
-    LIMIT $2 OFFSET $3;
+    LIMIT $6 OFFSET $7;
     `,
-    [user_id, limit, offset],
+    [user_id, categories, seasons, colors, tags, limit, offset],
   );
 
   return ok(rows);

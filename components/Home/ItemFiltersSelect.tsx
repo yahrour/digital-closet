@@ -12,6 +12,13 @@ import { seasonsType } from "@/constants";
 import { ActionResult } from "@/lib/actionsType";
 import { useRouter, useSearchParams } from "next/navigation";
 
+function buildFiltersDefaultValues(paramValue: string | null): string[] {
+  if (!paramValue || paramValue.length === 0) {
+    return [];
+  }
+  return paramValue.split(",");
+}
+
 export function ItemFiltersSelect({
   categories,
   colors,
@@ -24,10 +31,10 @@ export function ItemFiltersSelect({
   const router = useRouter();
   const params = useSearchParams();
 
-  const categoriesParams = params.get("categories");
-  const seasonsParams = params.get("seasons");
-  const colorsParams = params.get("colors");
-  const tagsParams = params.get("tags");
+  const categoriesParams = buildFiltersDefaultValues(params.get("categories"));
+  const seasonsParams = buildFiltersDefaultValues(params.get("seasons"));
+  const colorsParams = buildFiltersDefaultValues(params.get("colors"));
+  const tagsParams = buildFiltersDefaultValues(params.get("tags"));
 
   const goTo = (type: string, values: string[]) => {
     const p = new URLSearchParams(params);
@@ -36,8 +43,6 @@ export function ItemFiltersSelect({
   };
 
   const handleSetFilters = (type: string, values: string[]) => {
-    console.log("type: ", type);
-    console.log("values: ", values);
     goTo(type, values);
   };
 
@@ -45,7 +50,7 @@ export function ItemFiltersSelect({
     <div className="border-b border-dashed pb-2 flex justify-between items-center w-full md:gap-12 sm:gap-8 max-sm:gap-4">
       <MultiSelect
         onValuesChange={(values) => handleSetFilters("categories", values)}
-        defaultValues={categoriesParams?.split(",")}
+        defaultValues={categoriesParams}
       >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue
@@ -67,7 +72,7 @@ export function ItemFiltersSelect({
 
       <MultiSelect
         onValuesChange={(values) => handleSetFilters("seasons", values)}
-        defaultValues={seasonsParams?.split(",")}
+        defaultValues={seasonsParams}
       >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue overflowBehavior="cutoff" placeholder="Seasons" />
@@ -85,7 +90,7 @@ export function ItemFiltersSelect({
 
       <MultiSelect
         onValuesChange={(values) => handleSetFilters("colors", values)}
-        defaultValues={colorsParams?.split(",")}
+        defaultValues={colorsParams}
       >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue overflowBehavior="cutoff" placeholder="Colors" />
@@ -104,7 +109,7 @@ export function ItemFiltersSelect({
 
       <MultiSelect
         onValuesChange={(values) => handleSetFilters("tags", values)}
-        defaultValues={tagsParams?.split(",")}
+        defaultValues={tagsParams}
       >
         <MultiSelectTrigger className="flex-1">
           <MultiSelectValue overflowBehavior="cutoff" placeholder="Tags" />

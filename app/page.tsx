@@ -5,7 +5,7 @@ import { Suspense } from "react";
 export default function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   return (
     <div>

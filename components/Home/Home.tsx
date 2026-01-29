@@ -10,6 +10,15 @@ import { ItemFiltersSkeleton } from "./ItemFiltersSkeleton";
 import { ItemFiltersContainer } from "./ItemFiltersContainer";
 import { Pagination } from "./Pagination";
 
+function buildFiltersDefaultValues(
+  paramValue: string | undefined,
+): string[] | null {
+  if (!paramValue || paramValue.length === 0) {
+    return null;
+  }
+  return paramValue.split(",");
+}
+
 export default async function Home({
   searchParams,
 }: {
@@ -29,7 +38,19 @@ export default async function Home({
     return <AuthGate />;
   }
 
-  const items = await getItems({ user_id: session.user.id, page });
+  const categoriesParams = buildFiltersDefaultValues(params.categories);
+  const seasonsParams = buildFiltersDefaultValues(params.seasons);
+  const colorsParams = buildFiltersDefaultValues(params.colors);
+  const tagsParams = buildFiltersDefaultValues(params.tags);
+
+  const items = await getItems({
+    user_id: session.user.id,
+    categories: categoriesParams,
+    seasons: seasonsParams,
+    colors: colorsParams,
+    tags: tagsParams,
+    page,
+  });
 
   if (!items.success) {
     return <h1>{items.error.message}</h1>;
@@ -40,6 +61,12 @@ export default async function Home({
       <Suspense fallback={<ItemFiltersSkeleton />}>
         <ItemFiltersContainer />
       </Suspense>
+
+      {items.data.length === 0 && (
+        <h1 className="text-xl text-center text-gray-500 w-full">
+          No item found
+        </h1>
+      )}
 
       <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
         {items.data?.map(async (item) => {
@@ -63,7 +90,7 @@ export default async function Home({
                       (max-width: 640px) 50vw,
                       (max-width: 1024px) 33vw,
                       25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105 select-none"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
@@ -89,7 +116,10 @@ export default async function Home({
           );
         })}
       </div>
-      <Pagination currentPage={page} total={Number(items.data[0].total)} />
+      <Pagination
+        currentPage={page}
+        total={Number(items.data[0]?.total) || 0}
+      />
     </div>
   );
 }
