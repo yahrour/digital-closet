@@ -5,7 +5,10 @@ import Link from "next/link";
 export default function BottomNav() {
   return (
     <nav className="backdrop-blur-md max-w-sm py-2 fixed bottom-2 left-1/2 translate-x-[-50%] w-full bg-primary/70 text-white font-medium rounded m-0 flex justify-around">
-      <Link href="/" className="flex flex-col items-center gap-1 group">
+      <Link
+        href="/"
+        className="flex flex-col items-center gap-1 group select-none"
+      >
         <Image
           priority
           width={28}

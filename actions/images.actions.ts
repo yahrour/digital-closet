@@ -35,10 +35,26 @@ export async function generateItemImageUrls({
   return ok(urls);
 }
 
-export async function deleteImages(images: string[]) {
+type resp = {
+  deleted: {
+    deleteMarker: boolean | undefined;
+    deleteMarkerVersionId: string | undefined;
+    key: string;
+    versionId: string | undefined;
+  }[];
+  errors: {
+    code: string;
+    message: string;
+    key: string;
+    versionId: string | undefined;
+  }[];
+};
+
+export async function deleteImages(images: string[]): Promise<resp> {
   const keys = images.map((value) => ({ key: value }));
-  await deleteObjects(s3, {
+  const result = await deleteObjects(s3, {
     bucket: process.env.S3_BUCKET_NAME || "",
     objects: keys,
   });
+  return result;
 }

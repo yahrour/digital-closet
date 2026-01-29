@@ -8,7 +8,7 @@ import z from "zod";
 import { DatabaseError } from "pg";
 import { deleteImages } from "./images.actions";
 
-type itemType = {
+type itemsType = {
   id: number;
   name: string;
   seasons: string[];
@@ -35,7 +35,7 @@ export async function getItems({
   seasons: string[] | null;
   colors: string[] | null;
   tags: string[] | null;
-}): Promise<ActionResult<itemType[]>> {
+}): Promise<ActionResult<itemsType[]>> {
   "use cache";
   cacheTag("items");
 
@@ -46,8 +46,9 @@ export async function getItems({
   const limit = 4;
   const offset = (page - 1) * limit;
 
-  const { rows } = await query(
-    `SELECT g.id, g.name, g.season::text[] AS seasons, g.primary_color, g.secondary_colors::text[] AS secondary_colors, 
+  try {
+    const { rows } = await query(
+      `SELECT g.id, g.name, g.season::text[] AS seasons, g.primary_color, g.secondary_colors::text[] AS secondary_colors, 
       g.brand, g.image_url::text[] AS image_keys,gc.name AS category,
       COUNT(*) OVER () AS total,
       COALESCE(
@@ -67,10 +68,14 @@ export async function getItems({
     ORDER BY g.created_at DESC
     LIMIT $6 OFFSET $7;
     `,
-    [user_id, categories, seasons, colors, tags, limit, offset],
-  );
+      [user_id, categories, seasons, colors, tags, limit, offset],
+    );
 
-  return ok(rows);
+    return ok(rows);
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to fetch items");
+  }
 }
 
 type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
@@ -174,5 +179,84 @@ export async function addNewItem({
     }
     console.log(`[ERROR] db error ${error}`);
     return fail("DB_ERROR", "Failed to add a new item");
+  }
+}
+
+export type itemType = Omit<itemsType, "total">;
+export async function getItem({
+  user_id,
+  item_id,
+}: {
+  user_id: string;
+  item_id: string;
+}): Promise<ActionResult<itemType>> {
+  "use cache";
+  cacheTag("item");
+
+  if (!user_id) {
+    return fail("INVALID_USER", "User don't exist");
+  }
+  if (!item_id) {
+    return fail("INVALID_ITEM", "Item don't exist");
+  }
+
+  try {
+    const { rows } = await query(
+      `SELECT g.id, g.name, g.season::text[] AS seasons, g.primary_color, g.secondary_colors::text[] AS secondary_colors, 
+      g.brand, g.image_url::text[] AS image_keys,gc.name AS category,
+      COALESCE(
+        json_agg(json_build_object('id', t.id, 'name', t.name)) FILTER (WHERE t.id IS NOT NULL),
+        '[]'
+      ) AS tags
+    FROM garments g 
+    LEFT JOIN garment_categories gc ON g.category_id=gc.id
+    LEFT JOIN garment_tags gt ON gt.garment_id=g.id
+    LEFT JOIN tags t ON t.id=gt.tag_id
+    WHERE g.user_id=$1 AND g.id=$2
+    GROUP BY g.id, gc.name
+    ORDER BY g.created_at DESC
+    `,
+      [user_id, item_id],
+    );
+
+    return ok(rows[0]);
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to fetch items");
+  }
+}
+
+export async function deleteItem({
+  user_id,
+  item_id,
+  imageKeys,
+}: {
+  user_id: string;
+  item_id: number;
+  imageKeys: string[];
+}): Promise<ActionResult<null>> {
+  if (!user_id) {
+    return fail("INVALID_USER", "User don't exist");
+  }
+  if (!item_id) {
+    return fail("INVALID_ITEM", "Item don't exist");
+  }
+
+  try {
+    const result = await deleteImages(imageKeys);
+    if (result.errors.length > 0) {
+      return fail("ITEM", "Failed to delete item images");
+    }
+    await query("DELETE FROM garments WHERE id=$1 AND user_id=$2", [
+      item_id,
+      user_id,
+    ]);
+
+    updateTag("items");
+    updateTag("categoryUsageCounts");
+    return ok(null);
+  } catch (error) {
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to delete item");
   }
 }

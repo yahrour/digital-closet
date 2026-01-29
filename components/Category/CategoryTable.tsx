@@ -64,7 +64,7 @@ export default function CategoryTable({
             <TableCell className="font-medium">{category.name}</TableCell>
             <TableCell>{category.usageCount}</TableCell>
             <TableCell className="flex justify-end items-center gap-4 min-sm:h-[50px] max-sm:h-[40px]">
-              <Confirm categoryId={category.id} userId={category.user_id} />
+              <Delete categoryId={category.id} userId={category.user_id} />
               <Rename
                 categoryId={category.id}
                 categoryName={category.name}
@@ -78,7 +78,7 @@ export default function CategoryTable({
   );
 }
 
-function Confirm({
+function Delete({
   categoryId,
   userId,
 }: {
