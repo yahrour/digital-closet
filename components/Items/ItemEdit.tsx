@@ -35,11 +35,20 @@ import { getUserCategories } from "@/actions/categories.actions";
 import { itemType, updateItem } from "@/actions/items.actions";
 import { ItemEditImagePreview } from "./ItemEditImagePreview";
 import { editItemFormSchema } from "@/schemas";
+import { XIcon } from "lucide-react";
 
 export type editItemFormSchemaType = z.infer<typeof editItemFormSchema>;
 type itemEditType = itemType & {
   imageUrls: string[];
 };
+
+function getDeletedTags(arr1: string[], arr2: string[] | undefined): string[] {
+  if (!arr2) {
+    return [];
+  }
+  const deletedTags = arr1.filter((val) => !arr2.includes(val));
+  return deletedTags;
+}
 
 export default function ItemEdit({
   item,
@@ -123,7 +132,15 @@ export default function ItemEdit({
     form.clearErrors("tagInput");
   };
 
+  const handleDeleteTag = (tag: string) => {
+    const newTags = form.getValues("tags")?.filter((t) => tag !== t);
+    form.setValue("tags", newTags, { shouldDirty: true });
+  };
+
   const onSubmit = async (formData: editItemFormSchemaType) => {
+    const oldTags = item.tags.map((tag) => tag.name);
+    const deletedTags = getDeletedTags(oldTags, formData.tags);
+
     if (existImageUrls?.length === 0 && uploadedImages?.length === 0) {
       form.setError("images", { message: "Upload at least one image." });
     }
@@ -153,6 +170,7 @@ export default function ItemEdit({
       user_id: userId,
       item_id: item.id,
       formData: data,
+      deletedTags,
     });
 
     if (result.success) {
@@ -359,7 +377,19 @@ export default function ItemEdit({
               />
               <div className="flex flex-wrap gap-1">
                 {form.watch("tags")?.map((tag) => (
-                  <Badge key={tag}>{tag}</Badge>
+                  <Badge
+                    key={tag}
+                    className="group inline-flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-3 text-sm font-medium select-none transition-colors hover:bg-primary/20"
+                  >
+                    <span className="truncate">{tag}</span>
+
+                    <button
+                      onClick={() => handleDeleteTag(tag)}
+                      className="ml-0.5 inline-flex items-center justify-center rounded-full p-1 text-primary/60 transition hover:bg-red-500/10 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+                    >
+                      <XIcon size={12} />
+                    </button>
+                  </Badge>
                 ))}
               </div>
             </div>

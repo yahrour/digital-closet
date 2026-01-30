@@ -267,10 +267,12 @@ export async function updateItem({
   user_id,
   item_id,
   formData,
+  deletedTags,
 }: {
   user_id: string;
   item_id: number;
   formData: editItemSchemaType;
+  deletedTags: string[];
 }): Promise<ActionResult<null>> {
   try {
     if (!user_id) {
@@ -360,6 +362,18 @@ export async function updateItem({
       [itemId, tagRows.map((r) => r.id)],
     );
 
+    // Get removed tags id
+    const { rows: deletedTagsRows } = await query(
+      "SELECT id FROM tags WHERE name=ANY($1::text[])",
+      [deletedTags],
+    );
+    const deletedTagsIds = deletedTagsRows.map((tag) => tag.id);
+    // Delete removed tags
+    await query(
+      `DELETE FROM garment_tags WHERE tag_id=ANY($1::int[]) AND garment_id=$2`,
+      [deletedTagsIds, itemId],
+    );
+
     await query("COMMIT");
 
     updateTag("item");
@@ -385,6 +399,6 @@ export async function updateItem({
       }
     }
     console.log(`[ERROR] db error ${error}`);
-    return fail("DB_ERROR", "Failed to add a new item");
+    return fail("DB_ERROR", "Failed to add update item");
   }
 }

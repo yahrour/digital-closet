@@ -354,15 +354,15 @@ export default function New() {
                 {form.watch("tags")?.map((tag) => (
                   <Badge
                     key={tag}
-                    className="space-x-1 bg-primary/70 px-2 py-3! select-none"
+                    className="group inline-flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-3 text-sm font-medium select-none transition-colors hover:bg-primary/20"
                   >
-                    <span>{tag}</span>
+                    <span className="truncate">{tag}</span>
+
                     <button
-                      data-icon="inline-end"
-                      className="cursor-pointer"
                       onClick={() => handleDeleteTag(tag)}
+                      className="ml-0.5 inline-flex items-center justify-center rounded-full p-1 text-primary/60 transition hover:bg-red-500/10 hover:text-red-500"
                     >
-                      <XIcon size={12} className="bg-white text-red-500" />
+                      <XIcon size={12} />
                     </button>
                   </Badge>
                 ))}
