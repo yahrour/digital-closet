@@ -72,8 +72,9 @@ export const newGarmentFormSchema = z.object({
   category: z.string().min(1, "please select a category"),
   tags: z.array(z.string()).optional(),
   tagInput: z.string("tag too short").max(25, "tag too long"),
-  images: z.array(z.file()).min(1, "Upload at least one file."),
+  images: z.array(z.file()).min(1, "Upload at least one image."),
 });
+
 export const newGarmentSchema = z.object({
   name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
   seasons: z
@@ -101,4 +102,35 @@ export const renameCategorySchema = z.object({
     .trim()
     .min(1, "please set a category name")
     .max(25, "category name is too long"),
+});
+
+export const editItemFormSchema = z.object({
+  name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
+  seasons: z
+    .array(z.enum(seasonsType, "please select a season"))
+    .min(1, "please select a season(s)"),
+  primaryColor: z.enum(colorsType, "please select a primary color"),
+  secondaryColors: z.array(z.enum(colorsType)).optional(),
+  brand: z.string().min(1, "please set a brand name"),
+  category: z.string().min(1, "please select a category"),
+  tags: z.array(z.string()).optional(),
+  tagInput: z.string("tag too short").max(25, "tag too long"),
+  imageKeys: z.array(z.string()).optional(),
+  imageUrls: z.array(z.string()).optional(),
+  images: z.array(z.file()).optional(),
+});
+
+export const editItemSchema = z.object({
+  name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
+  seasons: z
+    .array(z.enum(seasonsType, "please select a season"))
+    .min(1, "please select a season(s)"),
+  primaryColor: z.enum(colorsType, "please select a primary color"),
+  secondaryColors: z.array(z.enum(colorsType)).optional(),
+  brand: z.string().min(1, "please set a brand name"),
+  category: z.string().min(1, "please select a category"),
+  tags: z.array(z.string()).optional(),
+  existImageKeys: z.array(z.string()).optional(),
+  existImages: z.array(z.string()).optional(),
+  newImages: z.array(z.string()).optional(),
 });

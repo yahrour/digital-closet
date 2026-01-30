@@ -2,7 +2,7 @@
 
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
-import { newGarmentSchema } from "@/schemas";
+import { editItemSchema, newGarmentSchema } from "@/schemas";
 import { cacheTag, updateTag } from "next/cache";
 import z from "zod";
 import { DatabaseError } from "pg";
@@ -258,5 +258,133 @@ export async function deleteItem({
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
     return fail("DB_ERROR", "Failed to delete item");
+  }
+}
+
+////////////// UPDATE ITEM
+type editItemSchemaType = z.infer<typeof editItemSchema>;
+export async function updateItem({
+  user_id,
+  item_id,
+  formData,
+}: {
+  user_id: string;
+  item_id: number;
+  formData: editItemSchemaType;
+}): Promise<ActionResult<null>> {
+  try {
+    if (!user_id) {
+      if (formData.newImages && formData.newImages.length > 0) {
+        deleteImages(formData.newImages);
+      }
+      return fail("INVALID_USER", "User does not exist");
+    }
+
+    console.log("formData: ", formData);
+    const { data, success, error } = editItemSchema.safeParse(formData);
+    if (!success) {
+      if (formData.newImages && formData.newImages.length > 0) {
+        console.log("delete new images");
+        deleteImages(formData.newImages);
+      }
+      console.log("error: ", error);
+      return fail("INVALUD_INPUT", "Something went wrong !");
+    }
+
+    await query("BEGIN");
+
+    const { rows: categoryRows } = await query(
+      "SELECT id FROM garment_categories WHERE name=$1",
+      [data.category],
+    );
+
+    const category_id = categoryRows[0].id;
+    if (!category_id) {
+      if (formData.newImages && formData.newImages.length > 0) {
+        deleteImages(formData.newImages);
+      }
+      return fail("INVALID_CATEGORY", "Category not found");
+    }
+
+    let imageKeys: string[] = [];
+    if (formData.newImages && formData.newImages.length > 0) {
+      imageKeys = formData.newImages;
+    } else if (formData.existImageKeys && formData.existImageKeys.length > 0) {
+      imageKeys = formData.existImageKeys;
+    } else {
+      return fail("IMAGES", "Upload at least one image.");
+    }
+
+    const { rows: itemRows } = await query(
+      `UPDATE garments SET name=$1, category_id=$2, season=$3, primary_color=$4, secondary_colors=$5, brand=$6, image_url=$7
+      WHERE user_id=$8 AND id=$9 RETURNING id`,
+      [
+        formData.name,
+        category_id,
+        formData.seasons,
+        formData.primaryColor,
+        formData.secondaryColors,
+        formData.brand,
+        imageKeys,
+        user_id,
+        item_id,
+      ],
+    );
+    const itemId = itemRows[0].id;
+
+    // Insert tags (ignore duplicate)
+    await query(
+      `INSERT INTO tags (name, user_id) 
+      SELECT lower(tag), $2 
+      FROM unnest($1::text[]) AS tag 
+      ON CONFLICT DO NOTHING
+    `,
+      [data.tags, user_id],
+    );
+
+    // Get all tag IDs (existing + new)
+    const { rows: tagRows } = await query(
+      `SELECT id FROM tags 
+      WHERE user_id=$1
+      AND name = ANY (
+        SELECT lower(tag) FROM unnest($2::text[]) AS tag
+      )`,
+      [user_id, data.tags],
+    );
+
+    // Insert into garment_tags
+    await query(
+      `INSERT INTO garment_tags (tag_id, garment_id)
+     SELECT id, $1 FROM unnest($2::int[]) AS id
+      ON CONFLICT DO NOTHING;`,
+      [itemId, tagRows.map((r) => r.id)],
+    );
+
+    await query("COMMIT");
+
+    updateTag("item");
+    updateTag("items");
+    updateTag("tags");
+    updateTag("colors");
+    return ok(null);
+  } catch (error: unknown) {
+    await query("ROLLBACK");
+    if (formData.newImages && formData.newImages.length > 0) {
+      deleteImages(formData.newImages);
+    }
+    if (error instanceof DatabaseError) {
+      switch (error.code) {
+        case "23505": // unique_violation
+          return fail(
+            "ITEM_ALREADY_EXIST",
+            "You already have an item with this name",
+          );
+
+        case "23503": // foreign_key_violation
+          return fail("INVALID_USER", "User does not exist");
+      }
+    }
+    console.log(`[ERROR] db error ${error}`);
+    return fail("DB_ERROR", "Failed to add a new item");
   }
 }

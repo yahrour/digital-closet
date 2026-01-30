@@ -3,7 +3,6 @@
 import { deleteItem, itemType } from "@/actions/items.actions";
 import Image from "next/image";
 import { useState } from "react";
-import { Button } from "../ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,8 +16,9 @@ import {
 } from "../ui/alert-dialog";
 import { Pencil, Trash } from "lucide-react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
-export function ItemPage({
+export function ItemShow({
   item,
   imageUrls,
   userId,
@@ -42,27 +42,29 @@ export function ItemPage({
             className="object-cover"
           />
         </div>
-        <div className="flex gap-3 overflow-x-auto">
-          {imageUrls.map((url, idx) => (
-            <button
-              key={url}
-              className={`relative w-20 h-20 overflow-hidden ${activeIndex === idx ? "border-2 border-gray-400" : ""}`}
-              onClick={() => {
-                if (activeIndex !== idx) {
-                  setActiveIndex(idx);
-                }
-              }}
-            >
-              <Image
-                src={url}
-                alt=""
-                fill
-                sizes="80px"
-                className="object-cover"
-              />
-            </button>
-          ))}
-        </div>
+        {imageUrls.length === 2 && (
+          <div className="flex gap-3 overflow-x-auto">
+            {imageUrls.map((url, idx) => (
+              <button
+                key={url}
+                className={`relative w-20 h-20 overflow-hidden ${activeIndex === idx ? "border-2 border-gray-400" : ""}`}
+                onClick={() => {
+                  if (activeIndex !== idx) {
+                    setActiveIndex(idx);
+                  }
+                }}
+              >
+                <Image
+                  src={url}
+                  alt=""
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {/* Identity */}
       <div className="space-y-1 text-center">
@@ -96,7 +98,13 @@ export function ItemPage({
 
       {/* Actions */}
       <div className="max-w-sm mx-auto flex gap-2">
-        <Edit />
+        <Link
+          href={`/items/${item.id}/edit`}
+          className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition duration-200 border px-4 py-1.5"
+        >
+          <Pencil size={16} />
+          Edit
+        </Link>
         <Delete itemId={item.id} userId={userId} imageKeys={item.image_keys} />
       </div>
     </div>
@@ -138,15 +146,6 @@ function ColorDot({ color }: { color: string }) {
   );
 }
 
-function Edit() {
-  return (
-    <Button variant="secondary" className="px-4 py-2 text-sm">
-      <Pencil size={16} />
-      Edit
-    </Button>
-  );
-}
-
 function Delete({
   itemId,
   userId,
@@ -176,7 +175,7 @@ function Delete({
   };
   return (
     <AlertDialog>
-      <AlertDialogTrigger className="flex items-center justify-center gap-1 bg-red-200 px-4 py-2 text-sm text-red-500 cursor-pointer">
+      <AlertDialogTrigger className="flex items-center justify-center gap-1 bg-red-100 hover:bg-red-200 transition duration-200 px-4 py-1.5 text-sm text-red-500 cursor-pointer">
         <Trash size={16} /> Delete
       </AlertDialogTrigger>
       <AlertDialogContent>

@@ -1,11 +1,11 @@
 import { generateItemImageUrls } from "@/actions/images.actions";
 import { getItem } from "@/actions/items.actions";
 import AuthGate from "@/components/AuthGate";
-import { ItemShow } from "@/components/Items/ItemShow";
+import ItemEdit from "@/components/Items/ItemEdit";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-export default async function Item({
+export default async function Edit({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -20,11 +20,9 @@ export default async function Item({
   }
 
   const item = await getItem({ user_id: session.user.id, item_id: id });
-
-  if (!item.success || !item.data) {
-    return <div>Item don&apos;t exist</div>;
+  if (!item.success) {
+    return <div>Failed to fetch item</div>;
   }
-
   const imageUrls = await generateItemImageUrls({
     image_keys: item.data.image_keys,
   });
@@ -32,11 +30,6 @@ export default async function Item({
     return <div>Failed to fetch item images</div>;
   }
 
-  return (
-    <ItemShow
-      item={item.data}
-      imageUrls={imageUrls.data}
-      userId={session.user.id}
-    />
-  );
+  const completeItemInfo = { ...item.data, imageUrls: imageUrls.data };
+  return <ItemEdit item={completeItemInfo} userId={session.user.id} />;
 }
