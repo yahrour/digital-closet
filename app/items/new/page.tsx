@@ -36,6 +36,7 @@ import { newGarmentFormSchema } from "@/schemas";
 import { ImagePreview } from "@/components/ImagePreview";
 import { getUserCategories } from "@/actions/categories.actions";
 import { addNewItem } from "@/actions/items.actions";
+import { XIcon } from "lucide-react";
 
 export type newGarmentFormSchemaType = z.infer<typeof newGarmentFormSchema>;
 
@@ -81,6 +82,10 @@ export default function New() {
       }
       setIsLoadingCategories(false);
     };
+    setMessage({
+      message: undefined,
+      success: true,
+    });
     func();
   }, []);
 
@@ -107,6 +112,11 @@ export default function New() {
     form.setValue("tags", [...currentTags, tag.toLocaleLowerCase()]);
     form.setValue("tagInput", "");
     form.clearErrors("tagInput");
+  };
+
+  const handleDeleteTag = (tag: string) => {
+    const newTags = form.getValues("tags")?.filter((t) => tag !== t);
+    form.setValue("tags", newTags);
   };
 
   const onSubmit = async (formData: newGarmentFormSchemaType) => {
@@ -342,7 +352,19 @@ export default function New() {
               />
               <div className="flex flex-wrap gap-1">
                 {form.watch("tags")?.map((tag) => (
-                  <Badge key={tag}>{tag}</Badge>
+                  <Badge
+                    key={tag}
+                    className="space-x-1 bg-primary/70 px-2 py-3! select-none"
+                  >
+                    <span>{tag}</span>
+                    <button
+                      data-icon="inline-end"
+                      className="cursor-pointer"
+                      onClick={() => handleDeleteTag(tag)}
+                    >
+                      <XIcon size={12} className="bg-white text-red-500" />
+                    </button>
+                  </Badge>
                 ))}
               </div>
             </div>
