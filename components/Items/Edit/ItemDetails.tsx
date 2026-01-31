@@ -167,11 +167,12 @@ function Delete({
       user_id: userId,
       imageKeys,
     });
+    setLoading(false);
     if (!result.success) {
       setMessage({ message: result.error.message, success: false });
+    } else {
+      redirect("/");
     }
-    setLoading(false);
-    redirect("/");
   };
   return (
     <AlertDialog>

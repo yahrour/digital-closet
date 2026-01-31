@@ -374,6 +374,14 @@ export async function updateItem({
       [deletedTagsIds, itemId],
     );
 
+    // Delete removed images
+    if (formData.deletedImageKeys && formData.deletedImageKeys?.length > 0) {
+      console.log("deletedImageKeys: ", formData.deletedImageKeys);
+      await deleteImages(formData.deletedImageKeys);
+    } else {
+      console.log("No Deleted Image Keys");
+    }
+
     await query("COMMIT");
 
     updateTag("item");

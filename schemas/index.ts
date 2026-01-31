@@ -116,6 +116,7 @@ export const editItemFormSchema = z.object({
   tags: z.array(z.string()).optional(),
   tagInput: z.string("tag too short").max(25, "tag too long"),
   imageKeys: z.array(z.string()).optional(),
+  deletedImageKeys: z.array(z.string()).optional(),
   imageUrls: z.array(z.string()).optional(),
   images: z.array(z.file()).optional(),
 });
@@ -133,4 +134,5 @@ export const editItemSchema = z.object({
   existImageKeys: z.array(z.string()).optional(),
   existImages: z.array(z.string()).optional(),
   newImages: z.array(z.string()).optional(),
+  deletedImageKeys: z.array(z.string()).optional(),
 });

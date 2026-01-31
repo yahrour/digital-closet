@@ -36,6 +36,7 @@ import { ExistingItemImagesPreview } from "./ExistingItemImagesPreview";
 import { editItemFormSchema } from "@/schemas";
 import { XIcon } from "lucide-react";
 import { UploadedImagesPreview } from "./UploadedImagesPreview";
+import { deleteImages } from "@/actions/images.actions";
 
 export type editItemFormSchemaType = z.infer<typeof editItemFormSchema>;
 type itemEditType = itemType & {
@@ -71,6 +72,7 @@ export default function ItemEdit({
       tags: item?.tags.map((tag) => tag.name),
       tagInput: "",
       imageKeys: item.image_keys,
+      deletedImageKeys: [],
       imageUrls: item.imageUrls,
       images: [],
     },
@@ -143,6 +145,7 @@ export default function ItemEdit({
 
     if (existImageUrls?.length === 0 && uploadedImages?.length === 0) {
       form.setError("images", { message: "Upload at least one image." });
+      return;
     }
 
     setIsPendig(true);
@@ -164,6 +167,7 @@ export default function ItemEdit({
       existImageKeys: formData.imageKeys,
       existImages: formData.imageUrls || [],
       newImages: images || [],
+      deletedImageKeys: formData.deletedImageKeys,
     };
 
     const result = await updateItem({

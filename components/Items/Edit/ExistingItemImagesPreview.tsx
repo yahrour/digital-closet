@@ -27,10 +27,25 @@ export function ExistingItemImagesPreview({
   };
 
   const handleDelete = (index: number) => {
-    if (images) {
+    if (images && imageKeys) {
       form.setValue(
         "imageUrls",
         images.filter((_, i) => i !== index),
+        { shouldDirty: true },
+      );
+
+      let deletedImageKeys = form.getValues("deletedImageKeys");
+      if (deletedImageKeys && deletedImageKeys.length > 0) {
+        deletedImageKeys?.push(imageKeys[index]);
+      } else {
+        deletedImageKeys = [imageKeys[index]];
+      }
+
+      form.setValue("deletedImageKeys", deletedImageKeys);
+
+      form.setValue(
+        "imageKeys",
+        imageKeys.filter((_, i) => i !== index),
         { shouldDirty: true },
       );
     }
