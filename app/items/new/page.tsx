@@ -32,18 +32,18 @@ import { redirect } from "next/navigation";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { useUploadFiles } from "@better-upload/client";
 import { Progress } from "@/components/ui/progress";
-import { newGarmentFormSchema } from "@/schemas";
-import { ImagePreview } from "@/components/ImagePreview";
 import { getUserCategories } from "@/actions/categories.actions";
 import { addNewItem } from "@/actions/items.actions";
 import { XIcon } from "lucide-react";
+import { newItemFormSchema } from "@/schemas";
+import { NewItemImagesPreview } from "@/components/Items/New/NewItemImagesPreview";
 
-export type newGarmentFormSchemaType = z.infer<typeof newGarmentFormSchema>;
+export type newItemFormSchemaType = z.infer<typeof newItemFormSchema>;
 
 export default function New() {
   const [uploadProgress, setUploadProgress] = useState(0);
-  const form = useForm<newGarmentFormSchemaType>({
-    resolver: zodResolver(newGarmentFormSchema),
+  const form = useForm<newItemFormSchemaType>({
+    resolver: zodResolver(newItemFormSchema),
     mode: "onSubmit",
     defaultValues: {
       name: "",
@@ -119,7 +119,7 @@ export default function New() {
     form.setValue("tags", newTags);
   };
 
-  const onSubmit = async (formData: newGarmentFormSchemaType) => {
+  const onSubmit = async (formData: newItemFormSchemaType) => {
     setIsPendig(true);
 
     const session = await authClient.getSession();
@@ -149,7 +149,7 @@ export default function New() {
 
     if (result.success) {
       setMessage({
-        message: "Garment added successfully",
+        message: "Item added successfully",
         success: true,
       });
       form.reset();
@@ -457,7 +457,7 @@ export default function New() {
                     <FieldLabel htmlFor="images">Image(s)</FieldLabel>
 
                     {form.getValues("images").length > 0 ? (
-                      <ImagePreview form={form} />
+                      <NewItemImagesPreview form={form} />
                     ) : (
                       <UploadDropzone
                         id="images"

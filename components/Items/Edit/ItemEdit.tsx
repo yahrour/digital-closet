@@ -30,12 +30,12 @@ import { Badge } from "@/components/ui/badge";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { useUploadFiles } from "@better-upload/client";
 import { Progress } from "@/components/ui/progress";
-import { ImagePreview } from "@/components/ImagePreview";
 import { getUserCategories } from "@/actions/categories.actions";
 import { itemType, updateItem } from "@/actions/items.actions";
-import { ItemEditImagePreview } from "./ItemEditImagePreview";
+import { ExistingItemImagesPreview } from "./ExistingItemImagesPreview";
 import { editItemFormSchema } from "@/schemas";
 import { XIcon } from "lucide-react";
+import { UploadedImagesPreview } from "./UploadedImagesPreview";
 
 export type editItemFormSchemaType = z.infer<typeof editItemFormSchema>;
 type itemEditType = itemType & {
@@ -482,9 +482,9 @@ export default function ItemEdit({
                     <FieldLabel htmlFor="images">Image(s)</FieldLabel>
 
                     {existImageUrls && existImageUrls.length > 0 ? (
-                      <ItemEditImagePreview form={form} />
+                      <ExistingItemImagesPreview form={form} />
                     ) : uploadedImages && uploadedImages.length > 0 ? (
-                      <ImagePreview form={form} />
+                      <UploadedImagesPreview form={form} />
                     ) : (
                       <UploadDropzone
                         id="images"

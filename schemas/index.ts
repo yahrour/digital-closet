@@ -61,7 +61,7 @@ export const accountDetailsSchema = z
     }
   });
 
-export const newGarmentFormSchema = z.object({
+export const newItemFormSchema = z.object({
   name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
   seasons: z
     .array(z.enum(seasonsType, "please select a season"))
@@ -75,7 +75,7 @@ export const newGarmentFormSchema = z.object({
   images: z.array(z.file()).min(1, "Upload at least one image."),
 });
 
-export const newGarmentSchema = z.object({
+export const newItemSchema = z.object({
   name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
   seasons: z
     .array(z.enum(seasonsType, "please select a season"))

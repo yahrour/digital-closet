@@ -2,7 +2,7 @@
 
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
-import { editItemSchema, newGarmentSchema } from "@/schemas";
+import { editItemSchema, newItemSchema } from "@/schemas";
 import { cacheTag, updateTag } from "next/cache";
 import z from "zod";
 import { DatabaseError } from "pg";
@@ -48,24 +48,24 @@ export async function getItems({
 
   try {
     const { rows } = await query(
-      `SELECT g.id, g.name, g.season::text[] AS seasons, g.primary_color, g.secondary_colors::text[] AS secondary_colors, 
-      g.brand, g.image_url::text[] AS image_keys,gc.name AS category,
+      `SELECT i.id, i.name, i.seasons::text[], i.primary_color, i.secondary_colors::text[], 
+      i.brand, i.image_keys::text[],ic.name AS category,
       COUNT(*) OVER () AS total,
       COALESCE(
         json_agg(json_build_object('id', t.id, 'name', t.name)) FILTER (WHERE t.id IS NOT NULL),
         '[]'
       ) AS tags
-    FROM garments g 
-    LEFT JOIN garment_categories gc ON g.category_id=gc.id
-    LEFT JOIN garment_tags gt ON gt.garment_id=g.id
-    LEFT JOIN tags t ON t.id=gt.tag_id
-    WHERE g.user_id=$1
-    AND ($2::text[] IS NULL OR gc.name = ANY($2::text[]))
-    AND ($3::season_type[] IS NULL OR g.season && $3::season_type[])
-    AND ($4::color_type[] IS NULL OR g.primary_color = ANY($4::color_type[]) OR g.secondary_colors && $4::color_type[])
+    FROM items i 
+    LEFT JOIN item_categories ic ON ic.id=i.category_id
+    LEFT JOIN item_tags it ON it.item_id=i.id
+    LEFT JOIN tags t ON t.id=it.tag_id
+    WHERE i.user_id=$1
+    AND ($2::text[] IS NULL OR ic.name = ANY($2::text[]))
+    AND ($3::season_type[] IS NULL OR i.seasons && $3::season_type[])
+    AND ($4::color_type[] IS NULL OR i.primary_color = ANY($4::color_type[]) OR i.secondary_colors && $4::color_type[])
     AND ($5::text[] IS NULL OR t.name = ANY($5::text[]))
-    GROUP BY g.id, gc.name
-    ORDER BY g.created_at DESC
+    GROUP BY i.id, ic.name
+    ORDER BY i.created_at DESC
     LIMIT $6 OFFSET $7;
     `,
       [user_id, categories, seasons, colors, tags, limit, offset],
@@ -78,13 +78,13 @@ export async function getItems({
   }
 }
 
-type newGarmentSchemaType = z.infer<typeof newGarmentSchema>;
+type newItemSchemaType = z.infer<typeof newItemSchema>;
 export async function addNewItem({
   user_id,
   formData,
 }: {
   user_id: string;
-  formData: newGarmentSchemaType;
+  formData: newItemSchemaType;
 }): Promise<ActionResult<null>> {
   try {
     if (!user_id) {
@@ -92,7 +92,7 @@ export async function addNewItem({
       return fail("INVALID_USER", "User does not exist");
     }
 
-    const { data, success, error } = newGarmentSchema.safeParse(formData);
+    const { data, success, error } = newItemSchema.safeParse(formData);
     if (!success) {
       deleteImages(formData.images);
       console.log("error: ", error);
@@ -102,7 +102,7 @@ export async function addNewItem({
     await query("BEGIN");
 
     const { rows: categoryRows } = await query(
-      "SELECT id FROM garment_categories WHERE name=$1",
+      "SELECT id FROM item_categories WHERE name=$1",
       [data.category],
     );
 
@@ -112,8 +112,8 @@ export async function addNewItem({
       return fail("INVALID_CATEGORY", "Category not found");
     }
 
-    const { rows: garmentRows } = await query(
-      `INSERT INTO garments (user_id, name, category_id, season, primary_color, secondary_colors, brand, image_url) VALUES
+    const { rows: itemRows } = await query(
+      `INSERT INTO items (user_id, name, category_id, seasons, primary_color, secondary_colors, brand, image_keys) VALUES
       ($1, lower($2), $3, $4, $5, $6, lower($7), $8) RETURNING id`,
       [
         user_id,
@@ -126,7 +126,7 @@ export async function addNewItem({
         formData.images,
       ],
     );
-    const garmentId = garmentRows[0].id;
+    const itemId = itemRows[0].id;
 
     // Insert tags (ignore duplicate)
     await query(
@@ -148,12 +148,12 @@ export async function addNewItem({
       [user_id, data.tags],
     );
 
-    // Insert into garment_tags
+    // Insert into item_tags
     await query(
-      `INSERT INTO garment_tags (tag_id, garment_id)
+      `INSERT INTO item_tags (tag_id, item_id)
      SELECT id, $1 FROM unnest($2::int[]) AS id
       ON CONFLICT DO NOTHING;`,
-      [garmentId, tagRows.map((r) => r.id)],
+      [itemId, tagRows.map((r) => r.id)],
     );
 
     await query("COMMIT");
@@ -202,19 +202,19 @@ export async function getItem({
 
   try {
     const { rows } = await query(
-      `SELECT g.id, g.name, g.season::text[] AS seasons, g.primary_color, g.secondary_colors::text[] AS secondary_colors, 
-      g.brand, g.image_url::text[] AS image_keys,gc.name AS category,
+      `SELECT i.id, i.name, i.seasons::text[], i.primary_color, i.secondary_colors::text[], 
+      i.brand, i.image_keys::text[],ic.name AS category,
       COALESCE(
         json_agg(json_build_object('id', t.id, 'name', t.name)) FILTER (WHERE t.id IS NOT NULL),
         '[]'
       ) AS tags
-    FROM garments g 
-    LEFT JOIN garment_categories gc ON g.category_id=gc.id
-    LEFT JOIN garment_tags gt ON gt.garment_id=g.id
-    LEFT JOIN tags t ON t.id=gt.tag_id
-    WHERE g.user_id=$1 AND g.id=$2
-    GROUP BY g.id, gc.name
-    ORDER BY g.created_at DESC
+    FROM items i 
+    LEFT JOIN item_categories ic ON ic.id=i.category_id
+    LEFT JOIN item_tags it ON it.item_id=i.id
+    LEFT JOIN tags t ON t.id=it.tag_id
+    WHERE i.user_id=$1 AND i.id=$2
+    GROUP BY i.id, ic.name
+    ORDER BY i.created_at DESC
     `,
       [user_id, item_id],
     );
@@ -247,11 +247,13 @@ export async function deleteItem({
     if (result.errors.length > 0) {
       return fail("ITEM", "Failed to delete item images");
     }
-    await query("DELETE FROM garments WHERE id=$1 AND user_id=$2", [
+
+    await query("DELETE FROM items WHERE id=$1 AND user_id=$2", [
       item_id,
       user_id,
     ]);
 
+    updateTag("colors");
     updateTag("items");
     updateTag("categoryUsageCounts");
     return ok(null);
@@ -282,11 +284,9 @@ export async function updateItem({
       return fail("INVALID_USER", "User does not exist");
     }
 
-    console.log("formData: ", formData);
     const { data, success, error } = editItemSchema.safeParse(formData);
     if (!success) {
       if (formData.newImages && formData.newImages.length > 0) {
-        console.log("delete new images");
         deleteImages(formData.newImages);
       }
       console.log("error: ", error);
@@ -296,7 +296,7 @@ export async function updateItem({
     await query("BEGIN");
 
     const { rows: categoryRows } = await query(
-      "SELECT id FROM garment_categories WHERE name=$1",
+      "SELECT id FROM item_categories WHERE name=$1",
       [data.category],
     );
 
@@ -318,7 +318,7 @@ export async function updateItem({
     }
 
     const { rows: itemRows } = await query(
-      `UPDATE garments SET name=$1, category_id=$2, season=$3, primary_color=$4, secondary_colors=$5, brand=$6, image_url=$7
+      `UPDATE items SET name=$1, category_id=$2, seasons=$3, primary_color=$4, secondary_colors=$5, brand=$6, image_keys=$7
       WHERE user_id=$8 AND id=$9 RETURNING id`,
       [
         formData.name,
@@ -354,9 +354,9 @@ export async function updateItem({
       [user_id, data.tags],
     );
 
-    // Insert into garment_tags
+    // Insert into item_tags
     await query(
-      `INSERT INTO garment_tags (tag_id, garment_id)
+      `INSERT INTO item_tags (tag_id, item_id)
      SELECT id, $1 FROM unnest($2::int[]) AS id
       ON CONFLICT DO NOTHING;`,
       [itemId, tagRows.map((r) => r.id)],
@@ -370,7 +370,7 @@ export async function updateItem({
     const deletedTagsIds = deletedTagsRows.map((tag) => tag.id);
     // Delete removed tags
     await query(
-      `DELETE FROM garment_tags WHERE tag_id=ANY($1::int[]) AND garment_id=$2`,
+      `DELETE FROM item_tags WHERE tag_id=ANY($1::int[]) AND item_id=$2`,
       [deletedTagsIds, itemId],
     );
 
@@ -382,6 +382,7 @@ export async function updateItem({
     updateTag("colors");
     return ok(null);
   } catch (error: unknown) {
+    console.log(`[ERROR] db error ${error}`);
     await query("ROLLBACK");
     if (formData.newImages && formData.newImages.length > 0) {
       deleteImages(formData.newImages);
@@ -398,7 +399,6 @@ export async function updateItem({
           return fail("INVALID_USER", "User does not exist");
       }
     }
-    console.log(`[ERROR] db error ${error}`);
     return fail("DB_ERROR", "Failed to add update item");
   }
 }

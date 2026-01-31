@@ -2,34 +2,45 @@
 
 import Image from "next/image";
 import { ArrowRightLeft, XIcon } from "lucide-react";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { editItemFormSchemaType } from "./ItemEdit";
 
-export function ItemEditImagePreview({
+export function UploadedImagesPreview({
   form,
 }: {
   form: UseFormReturn<editItemFormSchemaType>;
 }) {
   "use no memo";
-  const images = form.watch("imageUrls");
-  const imageKeys = form.watch("imageKeys");
+  const images = form.watch("images");
+  const imagesUrlRef = useRef<string[]>([]);
+  const [imagesUrl, setImagesUrl] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!images) {
+      return;
+    }
+    const urls = images.map((image) => URL.createObjectURL(image));
+    imagesUrlRef.current = urls;
+    setImagesUrl(imagesUrlRef.current);
+
+    return () => {
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [images]);
+
   const handleSwitch = () => {
-    if (imageKeys && imageKeys.length === 2 && images && images.length === 2) {
-      form.setValue("imageKeys", [imageKeys[1], imageKeys[0]], {
-        shouldDirty: true,
-      });
-      form.setValue("imageUrls", [images[1], images[0]], {
-        shouldDirty: true,
-      });
+    if (images && images.length === 2) {
+      form.setValue("images", [images[1], images[0]], { shouldDirty: true });
     }
   };
 
   const handleDelete = (index: number) => {
     if (images) {
       form.setValue(
-        "imageUrls",
+        "images",
         images.filter((_, i) => i !== index),
         { shouldDirty: true },
       );
@@ -39,13 +50,12 @@ export function ItemEditImagePreview({
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_40px_minmax(0,1fr)] items-center gap-2">
       {/* Primary Image */}
-      {images && images[0] && (
+      {images && images[0] && imagesUrl[0] && (
         <div className="relative aspect-square overflow-hidden border bg-neutral-50">
           <Image
-            src={images[0]}
-            alt=""
+            src={imagesUrl[0]}
+            alt={images[0].name}
             fill
-            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
             className="object-cover"
           />
           <Badge
@@ -71,13 +81,12 @@ export function ItemEditImagePreview({
       )}
 
       {/* Secondary Image */}
-      {images && images[1] && (
+      {images && images[1] && imagesUrl[1] && (
         <div className="relative aspect-square overflow-hidden border bg-neutral-50">
           <Image
-            src={images[1]}
-            alt=""
+            src={imagesUrl[1]}
+            alt={images[1].name}
             fill
-            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
             className="object-cover"
           />
           <Badge

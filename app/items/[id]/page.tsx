@@ -1,7 +1,7 @@
 import { generateItemImageUrls } from "@/actions/images.actions";
 import { getItem } from "@/actions/items.actions";
 import AuthGate from "@/components/AuthGate";
-import { ItemShow } from "@/components/Items/ItemShow";
+import { ItemDetails } from "@/components/Items/Edit/ItemDetails";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -33,7 +33,7 @@ export default async function Item({
   }
 
   return (
-    <ItemShow
+    <ItemDetails
       item={item.data}
       imageUrls={imageUrls.data}
       userId={session.user.id}

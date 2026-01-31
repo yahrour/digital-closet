@@ -17,7 +17,7 @@ export async function getUserCategories({
   }
   try {
     const { rows } = await query(
-      "SELECT name FROM garment_categories WHERE user_id=$1",
+      "SELECT name FROM item_categories WHERE user_id=$1",
       [user_id],
     );
 
@@ -55,7 +55,16 @@ export async function getUserCategoriesUsageCount({
   }
   try {
     const { rows } = await query(
-      "SELECT gc.id, gc.user_id, gc.name, COUNT(g.id), COUNT(*) OVER () AS total FROM garments g RIGHT JOIN garment_categories gc ON g.category_id=gc.id WHERE gc.user_id=$1 GROUP BY gc.name, gc.id ORDER BY gc.name LIMIT $2 OFFSET $3;",
+      `
+      SELECT ic.id, ic.user_id, ic.name, COUNT(i.id), 
+      COUNT(*) OVER () AS total 
+      FROM items i 
+      RIGHT JOIN item_categories ic 
+      ON i.category_id=ic.id 
+      WHERE ic.user_id=$1 
+      GROUP BY ic.name, ic.id 
+      ORDER BY ic.name 
+      LIMIT $2 OFFSET $3;`,
       [user_id, limit, offset],
     );
 
@@ -97,7 +106,15 @@ export async function searchUserCategoriesUsageCount({
 
   try {
     const { rows } = await query(
-      "SELECT gc.id, gc.user_id, gc.name, COUNT(g.id), COUNT(*) OVER () AS total FROM garments g RIGHT JOIN garment_categories gc ON g.category_id=gc.id WHERE gc.user_id=$1 AND gc.name ILIKE $2 GROUP BY gc.name, gc.id ORDER BY gc.name LIMIT $3 OFFSET $4;",
+      `
+      SELECT ic.id, ic.user_id, ic.name, COUNT(i.id), COUNT(*) OVER () AS total 
+      FROM items i 
+      RIGHT JOIN item_categories ic 
+      ON i.category_id=ic.id 
+      WHERE ic.user_id=$1 AND ic.name ILIKE $2 
+      GROUP BY ic.name, ic.id 
+      ORDER BY ic.name 
+      LIMIT $3 OFFSET $4;`,
       [user_id, `%${category}%`, limit, offset],
     );
 
@@ -136,7 +153,7 @@ export async function createNewCategory({
 
   try {
     await query(
-      "INSERT INTO garment_categories (user_id, name) VALUES ($1, lower($2));",
+      "INSERT INTO item_categories (user_id, name) VALUES ($1, lower($2));",
       [user_id, name],
     );
 
@@ -144,6 +161,7 @@ export async function createNewCategory({
     updateTag("categoryUsageCounts");
     return ok(null);
   } catch (error: unknown) {
+    console.log(`[ERROR] db error ${error}`);
     if (error instanceof DatabaseError) {
       switch (error.code) {
         case "23505": // unique_violation
@@ -156,7 +174,6 @@ export async function createNewCategory({
           return fail("INVALID_USER", "User does not exist");
       }
     }
-    console.log(`[ERROR] db error ${error}`);
     return fail("DB_ERROR", "Failed to create category");
   }
 }
@@ -175,7 +192,7 @@ export async function deleteUserCategory({
     return fail("INVALID_CATEGORY", "Invalid category name");
   }
   try {
-    await query("DELETE FROM garment_categories WHERE id=$1 AND user_id=$2", [
+    await query("DELETE FROM item_categories WHERE id=$1 AND user_id=$2", [
       category_id,
       user_id,
     ]);
@@ -210,7 +227,7 @@ export async function renameUserCategory({
   }
   try {
     await query(
-      "UPDATE garment_categories SET name=$1 WHERE id=$2 AND user_id=$3",
+      "UPDATE item_categories SET name=$1 WHERE id=$2 AND user_id=$3",
       [newName, category_id, user_id],
     );
 

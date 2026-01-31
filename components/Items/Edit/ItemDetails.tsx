@@ -13,12 +13,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { Pencil, Trash } from "lucide-react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-export function ItemShow({
+export function ItemDetails({
   item,
   imageUrls,
   userId,

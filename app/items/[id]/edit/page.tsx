@@ -1,7 +1,7 @@
 import { generateItemImageUrls } from "@/actions/images.actions";
 import { getItem } from "@/actions/items.actions";
 import AuthGate from "@/components/AuthGate";
-import ItemEdit from "@/components/Items/ItemEdit";
+import ItemEdit from "@/components/Items/Edit/ItemEdit";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 

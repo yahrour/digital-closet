@@ -18,9 +18,9 @@ export async function getColors({
 
   try {
     const primary_color =
-      "SELECT user_id, primary_color::text AS color FROM garments";
+      "SELECT user_id, primary_color::text AS color FROM items";
     const secondary_colors =
-      "SELECT user_id, UNNEST(secondary_colors)::text AS color FROM garments WHERE secondary_colors IS NOT NULL";
+      "SELECT user_id, UNNEST(secondary_colors)::text AS color FROM items WHERE secondary_colors IS NOT NULL";
     const { rows } = await query(
       `SELECT DISTINCT color 
         FROM (${primary_color} UNION ALL ${secondary_colors}) colors 

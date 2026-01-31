@@ -1,47 +1,35 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
 import { ArrowRightLeft, XIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { newGarmentFormSchemaType } from "@/app/items/new/page";
-import { editItemSchemaType } from "./Items/ItemEdit";
+import { editItemFormSchemaType } from "./ItemEdit";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-export function ImagePreview({
+export function ExistingItemImagesPreview({
   form,
 }: {
-  form: UseFormReturn<newGarmentFormSchemaType | editItemSchemaType>;
+  form: UseFormReturn<editItemFormSchemaType>;
 }) {
   "use no memo";
-  const images = form.watch("images");
-  const imagesUrlRef = useRef<string[]>([]);
-  const [imagesUrl, setImagesUrl] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!images) {
-      return;
-    }
-    const urls = images.map((image) => URL.createObjectURL(image));
-    imagesUrlRef.current = urls;
-    setImagesUrl(imagesUrlRef.current);
-
-    return () => {
-      urls.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [images]);
-
+  const images = form.watch("imageUrls");
+  const imageKeys = form.watch("imageKeys");
   const handleSwitch = () => {
-    if (images && images.length === 2) {
-      form.setValue("images", [images[1], images[0]], { shouldDirty: true });
+    if (imageKeys && imageKeys.length === 2 && images && images.length === 2) {
+      form.setValue("imageKeys", [imageKeys[1], imageKeys[0]], {
+        shouldDirty: true,
+      });
+      form.setValue("imageUrls", [images[1], images[0]], {
+        shouldDirty: true,
+      });
     }
   };
 
   const handleDelete = (index: number) => {
     if (images) {
       form.setValue(
-        "images",
+        "imageUrls",
         images.filter((_, i) => i !== index),
         { shouldDirty: true },
       );
@@ -51,12 +39,13 @@ export function ImagePreview({
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_40px_minmax(0,1fr)] items-center gap-2">
       {/* Primary Image */}
-      {images && images[0] && imagesUrl[0] && (
+      {images && images[0] && (
         <div className="relative aspect-square overflow-hidden border bg-neutral-50">
           <Image
-            src={imagesUrl[0]}
-            alt={images[0].name}
+            src={images[0]}
+            alt=""
             fill
+            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
             className="object-cover"
           />
           <Badge
@@ -82,12 +71,13 @@ export function ImagePreview({
       )}
 
       {/* Secondary Image */}
-      {images && images[1] && imagesUrl[1] && (
+      {images && images[1] && (
         <div className="relative aspect-square overflow-hidden border bg-neutral-50">
           <Image
-            src={imagesUrl[1]}
-            alt={images[1].name}
+            src={images[1]}
+            alt=""
             fill
+            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
             className="object-cover"
           />
           <Badge

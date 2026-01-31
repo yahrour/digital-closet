@@ -23,23 +23,23 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE TABLE garment_categories (
+CREATE TABLE item_categories (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(25),
   CONSTRAINT unique_category_name UNIQUE (user_id, name)
 );
 
-CREATE TABLE garments (
+CREATE TABLE items (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(50) NOT NULL,
-  category_id INTEGER REFERENCES garment_categories(id) ON DELETE SET NULL,
-  season season_type[] NOT NULL,
+  category_id INTEGER REFERENCES item_categories(id) ON DELETE SET NULL,
+  seasons season_type[] NOT NULL,
   primary_color color_type NOT NULL,
   secondary_colors color_type[],
-  brand VARCHAR(50),
-  image_url VARCHAR(255),
+  brand VARCHAR(50) NOT NULL,
+  image_keys text[],
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT unique_garment_name UNIQUE (user_id, name)
@@ -52,11 +52,11 @@ CREATE TABLE tags (
   CONSTRAINT unique_tag_name UNIQUE (user_id, name)
 );
 
-CREATE TABLE garment_tags (
+CREATE TABLE item_tags (
   tag_id INTEGER REFERENCES tags(id) ON DELETE CASCADE,
-  garment_id INTEGER REFERENCES garments(id) ON DELETE CASCADE,
+  item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
 
-  PRIMARY KEY (tag_id, garment_id)
+  PRIMARY KEY (tag_id, item_id)
 );
 
 CREATE TABLE outfits (
@@ -68,17 +68,17 @@ CREATE TABLE outfits (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE outfit_garments (
+CREATE TABLE outfit_items (
   outfit_id INTEGER REFERENCES outfits(id) ON DELETE CASCADE,
-  garment_id INTEGER REFERENCES garments(id) ON DELETE CASCADE,
+  item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
 
-  PRIMARY KEY (outfit_id, garment_id)
+  PRIMARY KEY (outfit_id, item_id)
 );
 
 
-DROP TRIGGER IF EXISTS trg_set_updated_at_garments ON garments;
-CREATE TRIGGER trg_set_updated_at_garments
-BEFORE UPDATE ON garments
+DROP TRIGGER IF EXISTS trg_set_updated_at_items ON items;
+CREATE TRIGGER trg_set_updated_at_items
+BEFORE UPDATE ON items
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
