@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/multi-select";
 import { seasonsType } from "@/constants";
 import { ActionResult } from "@/lib/actionsType";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 function buildFiltersDefaultValues(paramValue: string | null): string[] {
   if (!paramValue || paramValue.length === 0) {
@@ -30,6 +30,7 @@ export function ItemFiltersSelect({
 }) {
   const router = useRouter();
   const params = useSearchParams();
+  const pathname = usePathname();
 
   const categoriesParams = buildFiltersDefaultValues(params.get("categories"));
   const seasonsParams = buildFiltersDefaultValues(params.get("seasons"));
@@ -37,9 +38,16 @@ export function ItemFiltersSelect({
   const tagsParams = buildFiltersDefaultValues(params.get("tags"));
 
   const goTo = (type: string, values: string[]) => {
-    const p = new URLSearchParams(params);
-    p.set(type, String(values));
-    router.push(`?${p.toString()}`);
+    if (values.length > 0) {
+      const p = new URLSearchParams(params);
+      p.set(type, String(values));
+      router.push(`?${p.toString()}`);
+    } else {
+      const p = new URLSearchParams(params);
+      p.delete(type);
+      const newUrl = `${pathname}?${p.toString()}`;
+      router.replace(newUrl);
+    }
   };
 
   const handleSetFilters = (type: string, values: string[]) => {
