@@ -22,14 +22,14 @@ type itemsType = {
 };
 
 export async function getItems({
-  user_id,
+  userId,
   page,
   categories,
   seasons,
   colors,
   tags,
 }: {
-  user_id: string;
+  userId: string;
   page: number;
   categories: string[] | null;
   seasons: string[] | null;
@@ -39,7 +39,7 @@ export async function getItems({
   "use cache";
   cacheTag("items");
 
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User don't exist");
   }
 
@@ -68,7 +68,7 @@ export async function getItems({
     ORDER BY i.created_at DESC
     LIMIT $6 OFFSET $7;
     `,
-      [user_id, categories, seasons, colors, tags, limit, offset],
+      [userId, categories, seasons, colors, tags, limit, offset],
     );
 
     return ok(rows);
@@ -80,14 +80,14 @@ export async function getItems({
 
 type newItemSchemaType = z.infer<typeof newItemSchema>;
 export async function addNewItem({
-  user_id,
+  userId,
   formData,
 }: {
-  user_id: string;
+  userId: string;
   formData: newItemSchemaType;
 }): Promise<ActionResult<null>> {
   try {
-    if (!user_id) {
+    if (!userId) {
       deleteImages(formData.images);
       return fail("INVALID_USER", "User does not exist");
     }
@@ -116,7 +116,7 @@ export async function addNewItem({
       `INSERT INTO items (user_id, name, category_id, seasons, primary_color, secondary_colors, brand, image_keys) VALUES
       ($1, lower($2), $3, $4, $5, $6, lower($7), $8) RETURNING id`,
       [
-        user_id,
+        userId,
         formData.name,
         category_id,
         formData.seasons,
@@ -135,7 +135,7 @@ export async function addNewItem({
       FROM unnest($1::text[]) AS tag 
       ON CONFLICT DO NOTHING
     `,
-      [data.tags, user_id],
+      [data.tags, userId],
     );
 
     // Get all tag IDs (existing + new)
@@ -145,7 +145,7 @@ export async function addNewItem({
       AND name = ANY (
         SELECT lower(tag) FROM unnest($2::text[]) AS tag
       )`,
-      [user_id, data.tags],
+      [userId, data.tags],
     );
 
     // Insert into item_tags
@@ -184,19 +184,19 @@ export async function addNewItem({
 
 export type itemType = Omit<itemsType, "total">;
 export async function getItem({
-  user_id,
-  item_id,
+  userId,
+  itemId,
 }: {
-  user_id: string;
-  item_id: string;
+  userId: string;
+  itemId: string;
 }): Promise<ActionResult<itemType>> {
   "use cache";
   cacheTag("item");
 
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User don't exist");
   }
-  if (!item_id) {
+  if (!itemId) {
     return fail("INVALID_ITEM", "Item don't exist");
   }
 
@@ -216,7 +216,7 @@ export async function getItem({
     GROUP BY i.id, ic.name
     ORDER BY i.created_at DESC
     `,
-      [user_id, item_id],
+      [userId, itemId],
     );
 
     return ok(rows[0]);
@@ -227,18 +227,18 @@ export async function getItem({
 }
 
 export async function deleteItem({
-  user_id,
-  item_id,
+  userId,
+  itemId,
   imageKeys,
 }: {
-  user_id: string;
-  item_id: number;
+  userId: string;
+  itemId: number;
   imageKeys: string[];
 }): Promise<ActionResult<null>> {
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User don't exist");
   }
-  if (!item_id) {
+  if (!itemId) {
     return fail("INVALID_ITEM", "Item don't exist");
   }
 
@@ -249,8 +249,8 @@ export async function deleteItem({
     }
 
     await query("DELETE FROM items WHERE id=$1 AND user_id=$2", [
-      item_id,
-      user_id,
+      itemId,
+      userId,
     ]);
 
     updateTag("colors");
@@ -266,18 +266,18 @@ export async function deleteItem({
 ////////////// UPDATE ITEM
 type editItemSchemaType = z.infer<typeof editItemSchema>;
 export async function updateItem({
-  user_id,
-  item_id,
+  userId,
+  itemId,
   formData,
   deletedTags,
 }: {
-  user_id: string;
-  item_id: number;
+  userId: string;
+  itemId: number;
   formData: editItemSchemaType;
   deletedTags: string[];
 }): Promise<ActionResult<null>> {
   try {
-    if (!user_id) {
+    if (!userId) {
       if (formData.newImages && formData.newImages.length > 0) {
         deleteImages(formData.newImages);
       }
@@ -300,8 +300,8 @@ export async function updateItem({
       [data.category],
     );
 
-    const category_id = categoryRows[0].id;
-    if (!category_id) {
+    const categoryId = categoryRows[0].id;
+    if (!categoryId) {
       if (formData.newImages && formData.newImages.length > 0) {
         deleteImages(formData.newImages);
       }
@@ -322,17 +322,17 @@ export async function updateItem({
       WHERE user_id=$8 AND id=$9 RETURNING id`,
       [
         formData.name,
-        category_id,
+        categoryId,
         formData.seasons,
         formData.primaryColor,
         formData.secondaryColors,
         formData.brand,
         imageKeys,
-        user_id,
-        item_id,
+        userId,
+        itemId,
       ],
     );
-    const itemId = itemRows[0].id;
+    const insertedItemId = itemRows[0].id;
 
     // Insert tags (ignore duplicate)
     await query(
@@ -341,7 +341,7 @@ export async function updateItem({
       FROM unnest($1::text[]) AS tag 
       ON CONFLICT DO NOTHING
     `,
-      [data.tags, user_id],
+      [data.tags, userId],
     );
 
     // Get all tag IDs (existing + new)
@@ -351,7 +351,7 @@ export async function updateItem({
       AND name = ANY (
         SELECT lower(tag) FROM unnest($2::text[]) AS tag
       )`,
-      [user_id, data.tags],
+      [userId, data.tags],
     );
 
     // Insert into item_tags
@@ -359,7 +359,7 @@ export async function updateItem({
       `INSERT INTO item_tags (tag_id, item_id)
      SELECT id, $1 FROM unnest($2::int[]) AS id
       ON CONFLICT DO NOTHING;`,
-      [itemId, tagRows.map((r) => r.id)],
+      [insertedItemId, tagRows.map((r) => r.id)],
     );
 
     // Get removed tags id
@@ -376,10 +376,7 @@ export async function updateItem({
 
     // Delete removed images
     if (formData.deletedImageKeys && formData.deletedImageKeys?.length > 0) {
-      console.log("deletedImageKeys: ", formData.deletedImageKeys);
       await deleteImages(formData.deletedImageKeys);
-    } else {
-      console.log("No Deleted Image Keys");
     }
 
     await query("COMMIT");

@@ -19,12 +19,12 @@ export default async function Edit({
     return <AuthGate />;
   }
 
-  const item = await getItem({ user_id: session.user.id, item_id: id });
+  const item = await getItem({ userId: session.user.id, itemId: id });
   if (!item.success) {
     return <div>Failed to fetch item</div>;
   }
   const imageUrls = await generateItemImageUrls({
-    image_keys: item.data.image_keys,
+    imageKeys: item.data.image_keys,
   });
   if (!imageUrls.success) {
     return <div>Failed to fetch item images</div>;

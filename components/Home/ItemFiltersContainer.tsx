@@ -16,9 +16,9 @@ export async function ItemFiltersContainer() {
   }
 
   const [categories, colors, tags] = await Promise.all([
-    getUserCategories({ user_id: userId }),
-    getColors({ user_id: userId }),
-    getTags({ user_id: userId }),
+    getUserCategories({ userId: userId }),
+    getColors({ userId: userId }),
+    getTags({ userId: userId }),
   ]);
 
   return (

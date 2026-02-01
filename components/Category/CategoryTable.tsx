@@ -64,11 +64,11 @@ export default function CategoryTable({
             <TableCell className="font-medium">{category.name}</TableCell>
             <TableCell>{category.usageCount}</TableCell>
             <TableCell className="flex justify-end items-center gap-4 min-sm:h-[50px] max-sm:h-[40px]">
-              <Delete categoryId={category.id} userId={category.user_id} />
+              <Delete categoryId={category.id} userId={category.userId} />
               <Rename
                 categoryId={category.id}
                 categoryName={category.name}
-                userId={category.user_id}
+                userId={category.userId}
               />
             </TableCell>
           </TableRow>
@@ -93,8 +93,8 @@ function Delete({
   const handleDelete = async () => {
     setLoading(true);
     const result = await deleteUserCategory({
-      category_id: categoryId,
-      user_id: userId,
+      categoryId: categoryId,
+      userId: userId,
     });
     if (!result.success) {
       setMessage({ message: result.error.message, success: false });
@@ -174,8 +174,8 @@ function Rename({
     }
 
     const result = await renameUserCategory({
-      user_id: userId,
-      category_id: categoryId,
+      userId: userId,
+      categoryId: categoryId,
       newName: data.name,
     });
 

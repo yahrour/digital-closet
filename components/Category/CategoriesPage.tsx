@@ -28,12 +28,12 @@ export default async function CategoriesPage({
   let categories;
   if (!category) {
     categories = await getUserCategoriesUsageCount({
-      user_id: session.user.id,
+      userId: session.user.id,
       page,
     });
   } else {
     categories = await searchUserCategoriesUsageCount({
-      user_id: session.user.id,
+      userId: session.user.id,
       category,
       page,
     });

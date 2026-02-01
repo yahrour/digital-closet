@@ -163,8 +163,8 @@ function Delete({
   const handleDelete = async () => {
     setLoading(true);
     const result = await deleteItem({
-      item_id: itemId,
-      user_id: userId,
+      itemId: itemId,
+      userId: userId,
       imageKeys,
     });
     setLoading(false);

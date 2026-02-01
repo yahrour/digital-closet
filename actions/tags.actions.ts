@@ -5,20 +5,20 @@ import { query } from "@/lib/db";
 import { cacheTag } from "next/cache";
 
 export async function getTags({
-  user_id,
+  userId,
 }: {
-  user_id: string | undefined;
+  userId: string | undefined;
 }): Promise<ActionResult<string[]>> {
   "use cache";
   cacheTag("tags");
 
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
 
   try {
     const { rows } = await query("SELECT name FROM tags WHERE user_id=$1", [
-      user_id,
+      userId,
     ]);
 
     const tags: string[] = [];

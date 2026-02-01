@@ -47,7 +47,7 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
       redirect("/signIn");
     }
     const result = await createNewCategory({
-      user_id: session.data.user.id,
+      userId: session.data.user.id,
       name: data.name,
     });
     if (!result.success) {

@@ -44,7 +44,7 @@ export default async function Home({
   const tagsParams = buildFiltersDefaultValues(params.tags);
 
   const items = await getItems({
-    user_id: session.user.id,
+    userId: session.user.id,
     categories: categoriesParams,
     seasons: seasonsParams,
     colors: colorsParams,
@@ -71,7 +71,7 @@ export default async function Home({
       <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
         {items.data?.map(async (item) => {
           const urls = await generateItemImageUrls({
-            image_keys: item.image_keys,
+            imageKeys: item.image_keys,
           });
           return (
             <Link

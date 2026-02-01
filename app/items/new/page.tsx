@@ -70,7 +70,7 @@ export default function New() {
         redirect("/signIn");
       }
       const result = await getUserCategories({
-        user_id: session.data.user.id,
+        userId: session.data.user.id,
       });
       if (result.success) {
         setCategories(result.data);
@@ -143,7 +143,7 @@ export default function New() {
     };
 
     const result = await addNewItem({
-      user_id: session.data.user.id,
+      userId: session.data.user.id,
       formData: data,
     });
 

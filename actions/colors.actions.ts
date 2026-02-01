@@ -5,14 +5,14 @@ import { query } from "@/lib/db";
 import { cacheTag } from "next/cache";
 
 export async function getColors({
-  user_id,
+  userId,
 }: {
-  user_id: string | undefined;
+  userId: string | undefined;
 }): Promise<ActionResult<string[]>> {
   "use cache";
   cacheTag("colors");
 
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
 
@@ -26,7 +26,7 @@ export async function getColors({
         FROM (${primary_color} UNION ALL ${secondary_colors}) colors 
         WHERE user_id=$1 
         ORDER BY color`,
-      [user_id],
+      [userId],
     );
 
     const colors: string[] = [];

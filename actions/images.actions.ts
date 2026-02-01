@@ -6,14 +6,14 @@ import { deleteObjects, presignGetObject } from "@better-upload/server/helpers";
 import { cacheTag } from "next/cache";
 
 export async function generateItemImageUrls({
-  image_keys,
+  imageKeys,
 }: {
-  image_keys: string[];
+  imageKeys: string[];
 }): Promise<ActionResult<string[]>> {
   "use cache";
   cacheTag("item_images");
 
-  if (!image_keys || image_keys.length === 0) {
+  if (!imageKeys || imageKeys.length === 0) {
     return fail("IMAGE_KEYS", "Images not found");
   }
 
@@ -23,10 +23,10 @@ export async function generateItemImageUrls({
   }
 
   const urls = await Promise.all(
-    image_keys.map((image_key) =>
+    imageKeys.map((imageKey) =>
       presignGetObject(s3, {
         bucket: bucketName,
-        key: image_key,
+        key: imageKey,
         expiresIn: 3600,
       }),
     ),

@@ -6,19 +6,19 @@ import { cacheTag, updateTag } from "next/cache";
 import { DatabaseError } from "pg";
 
 export async function getUserCategories({
-  user_id,
+  userId,
 }: {
-  user_id: string | undefined;
+  userId: string | undefined;
 }): Promise<ActionResult<string[]>> {
   "use cache";
   cacheTag("categories");
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
   try {
     const { rows } = await query(
       "SELECT name FROM item_categories WHERE user_id=$1",
-      [user_id],
+      [userId],
     );
 
     const categories: string[] = [];
@@ -32,16 +32,16 @@ export async function getUserCategories({
 
 export type categoryUsageCount = {
   id: number;
-  user_id: string;
+  userId: string;
   name: string;
   usageCount: number;
   total: number;
 };
 export async function getUserCategoriesUsageCount({
-  user_id,
+  userId,
   page = 1,
 }: {
-  user_id: string | undefined;
+  userId: string | undefined;
   page: number;
 }): Promise<ActionResult<categoryUsageCount[]>> {
   "use cache";
@@ -50,7 +50,7 @@ export async function getUserCategoriesUsageCount({
   const limit = 10;
   const offset = (page - 1) * limit;
 
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
   try {
@@ -65,14 +65,14 @@ export async function getUserCategoriesUsageCount({
       GROUP BY ic.name, ic.id 
       ORDER BY ic.name 
       LIMIT $2 OFFSET $3;`,
-      [user_id, limit, offset],
+      [userId, limit, offset],
     );
 
     const categories: categoryUsageCount[] = [];
     rows.map((category) =>
       categories.push({
         id: category.id,
-        user_id: category.user_id,
+        userId: category.user_id,
         name: category.name,
         usageCount: category.count,
         total: Number(category.total),
@@ -86,11 +86,11 @@ export async function getUserCategoriesUsageCount({
 }
 
 export async function searchUserCategoriesUsageCount({
-  user_id,
+  userId,
   page = 1,
   category,
 }: {
-  user_id: string | undefined;
+  userId: string | undefined;
   page: number;
   category: string;
 }): Promise<ActionResult<categoryUsageCount[]>> {
@@ -100,7 +100,7 @@ export async function searchUserCategoriesUsageCount({
   const limit = 10;
   const offset = (page - 1) * limit;
 
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
 
@@ -115,14 +115,14 @@ export async function searchUserCategoriesUsageCount({
       GROUP BY ic.name, ic.id 
       ORDER BY ic.name 
       LIMIT $3 OFFSET $4;`,
-      [user_id, `%${category}%`, limit, offset],
+      [userId, `%${category}%`, limit, offset],
     );
 
     const categories: categoryUsageCount[] = [];
     rows.map((category) =>
       categories.push({
         id: category.id,
-        user_id: category.user_id,
+        userId: category.user_id,
         name: category.name,
         usageCount: category.count,
         total: Number(category.total),
@@ -137,13 +137,13 @@ export async function searchUserCategoriesUsageCount({
 }
 
 export async function createNewCategory({
-  user_id,
+  userId,
   name,
 }: {
-  user_id: string;
+  userId: string;
   name: string;
 }): Promise<ActionResult<null>> {
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
 
@@ -154,7 +154,7 @@ export async function createNewCategory({
   try {
     await query(
       "INSERT INTO item_categories (user_id, name) VALUES ($1, lower($2));",
-      [user_id, name],
+      [userId, name],
     );
 
     updateTag("categories");
@@ -179,22 +179,22 @@ export async function createNewCategory({
 }
 
 export async function deleteUserCategory({
-  user_id,
-  category_id,
+  userId,
+  categoryId,
 }: {
-  user_id: string;
-  category_id: number;
+  userId: string;
+  categoryId: number;
 }): Promise<ActionResult<null>> {
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
-  if (!category_id) {
+  if (!categoryId) {
     return fail("INVALID_CATEGORY", "Invalid category name");
   }
   try {
     await query("DELETE FROM item_categories WHERE id=$1 AND user_id=$2", [
-      category_id,
-      user_id,
+      categoryId,
+      userId,
     ]);
 
     updateTag("items");
@@ -209,26 +209,26 @@ export async function deleteUserCategory({
 
 export async function renameUserCategory({
   newName,
-  user_id,
-  category_id,
+  userId,
+  categoryId,
 }: {
   newName: string;
-  user_id: string;
-  category_id: number;
+  userId: string;
+  categoryId: number;
 }): Promise<ActionResult<null>> {
   if (!newName) {
     return fail("INVALID_CATEGORY", "Invalid category name");
   }
-  if (!user_id) {
+  if (!userId) {
     return fail("INVALID_USER", "User does not exist");
   }
-  if (!category_id) {
+  if (!categoryId) {
     return fail("INVALID_CATEGORY", "Invalid category name");
   }
   try {
     await query(
       "UPDATE item_categories SET name=$1 WHERE id=$2 AND user_id=$3",
-      [newName, category_id, user_id],
+      [newName, categoryId, userId],
     );
 
     updateTag("items");
