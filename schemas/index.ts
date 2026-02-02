@@ -136,3 +136,9 @@ export const editItemSchema = z.object({
   newImages: z.array(z.string()).optional(),
   deletedImageKeys: z.array(z.string()).optional(),
 });
+
+export const newOutfitSchema = z.object({
+  name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
+  note: z.string().trim().max(255, "note too long").optional(),
+  selectedItemIds: z.array(z.number()).min(1, "please select at least an item"),
+});

@@ -9,6 +9,7 @@ import { generateItemImageUrls } from "@/actions/images.actions";
 import { ItemFiltersSkeleton } from "./ItemFiltersSkeleton";
 import { ItemFiltersContainer } from "./ItemFiltersContainer";
 import { Pagination } from "./Pagination";
+import { ColorDot } from "../ColorDot";
 
 function buildFiltersDefaultValues(
   paramValue: string | undefined,
@@ -99,18 +100,28 @@ export default async function Home({
                 )}
               </div>
 
-              <div className="mt-2 space-y-0.5">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {item.name}
-                </p>
+              <div className="flex justify-between mt-2">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium text-gray-900 truncate w-[90px]">
+                    {item.name}
+                  </p>
 
-                {item.brand && (
-                  <p className="text-xs text-gray-500 truncate">{item.brand}</p>
-                )}
+                  {item.brand && (
+                    <p className="text-xs text-gray-500 truncate">
+                      {item.brand}
+                    </p>
+                  )}
 
-                <p className="text-xs text-gray-400">
-                  {item.category || "Uncategorized"}
-                </p>
+                  <p className="text-xs text-gray-400">
+                    {item.category || "Uncategorized"}
+                  </p>
+                </div>
+                <div className="flex self-end space-x-0.5">
+                  <ColorDot color={item.primary_color} />
+                  {item.secondary_colors.map((c) => (
+                    <ColorDot key={c} color={c} />
+                  ))}
+                </div>
               </div>
             </Link>
           );

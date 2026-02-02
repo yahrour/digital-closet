@@ -8,7 +8,7 @@ import z from "zod";
 import { DatabaseError } from "pg";
 import { deleteImages } from "./images.actions";
 
-type itemsType = {
+export type itemsType = {
   id: number;
   name: string;
   seasons: string[];

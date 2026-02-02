@@ -17,6 +17,7 @@ import {
 import { Pencil, Trash } from "lucide-react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ColorDot } from "@/components/ColorDot";
 
 export function ItemDetails({
   item,
@@ -133,16 +134,6 @@ function Pill({ children }: { children: React.ReactNode }) {
     <span className="px-3 py-1 rounded-full bg-neutral-100 text-xs">
       {children}
     </span>
-  );
-}
-
-function ColorDot({ color }: { color: string }) {
-  return (
-    <span
-      className="inline-block h-4 w-4 rounded-full border border-neutral-300"
-      style={{ backgroundColor: color }}
-      title={color}
-    />
   );
 }
 

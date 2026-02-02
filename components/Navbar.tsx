@@ -14,6 +14,13 @@ export default function Navbar() {
             </Button>
           </Link>
         </li>
+        <li>
+          <Link href="/outfits/new">
+            <Button className="cursor-pointer">
+              New Outfit <Plus />
+            </Button>
+          </Link>
+        </li>
       </ul>
     </nav>
   );
