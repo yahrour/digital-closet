@@ -70,11 +70,7 @@ export default async function View({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
           {outfit.data.items.map((item, idx) => (
-            <Link
-              key={outfit.data.item_ids[idx]}
-              href={`/items/${outfit.data.item_ids[idx]}`}
-              className="space-y-2"
-            >
+            <div key={outfit.data.item_ids[idx]} className="space-y-2">
               <div className="relative aspect-square bg-neutral-50 overflow-hidden">
                 <Image
                   src={outfit.data.primary_image_keys[idx]}
@@ -84,8 +80,17 @@ export default async function View({
                   className="object-cover"
                 />
               </div>
-              <p className="text-sm text-neutral-700 leading-tight">{item}</p>
-            </Link>
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-neutral-700 leading-tight truncate max-sm:max-w-[150px]">
+                  {item}
+                </p>
+                <Link href={`/items/${outfit.data.item_ids[idx]}`}>
+                  <Button variant="outline" className="cursor-pointer">
+                    View
+                  </Button>
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
       </div>

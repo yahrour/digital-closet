@@ -166,7 +166,6 @@ export async function deleteOutfit({
   outfitId: number;
   userId: string;
 }): Promise<ActionResult<null>> {
-  await new Promise((res) => setTimeout(res, 5000));
   try {
     if (!userId) {
       return fail("INVALID_USER", "User don't exist");
