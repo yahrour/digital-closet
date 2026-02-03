@@ -142,3 +142,9 @@ export const newOutfitSchema = z.object({
   note: z.string().trim().max(255, "note too long").optional(),
   selectedItemIds: z.array(z.number()).min(1, "please select at least an item"),
 });
+
+export const updateOutfitSchema = z.object({
+  name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
+  note: z.string().trim().max(255, "note too long").optional(),
+  selectedItemIds: z.array(z.number()).min(1, "please select at least an item"),
+});

@@ -3,9 +3,10 @@
 import { newOutfitSchemaType } from "@/components/Outfits/New/CreateOutfitDialog";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
-import { newOutfitSchema } from "@/schemas";
+import { newOutfitSchema, updateOutfitSchema } from "@/schemas";
 import { generateItemImageUrls } from "./images.actions";
 import { cacheTag, updateTag } from "next/cache";
+import z from "zod";
 
 export async function createNewOutfit({
   formData,
@@ -185,5 +186,78 @@ export async function deleteOutfit({
   } catch (error) {
     console.log("[ERROR] db error: ", error);
     return fail("DB_ERROR", "Failed to delete outfit");
+  }
+}
+
+export async function getOutfitItemIds(
+  outfitId: string,
+): Promise<ActionResult<number[]>> {
+  "use cache";
+  cacheTag("outfit");
+  try {
+    if (!outfitId) {
+      return fail("INVALID_OUTFIT", "Outfit don't exist");
+    }
+
+    const { rows } = await query(
+      "SELECT item_id FROM outfit_items WHERE outfit_id=$1",
+      [outfitId],
+    );
+
+    const itemIds = rows.map((row) => row.item_id);
+
+    return ok(itemIds);
+  } catch (error) {
+    console.log("[ERROR] db error: ", error);
+    return fail("DB_ERROR", "Failed to get outfit");
+  }
+}
+
+type updateOutfitSchemaType = z.infer<typeof updateOutfitSchema>;
+export async function updateOutfit({
+  formData,
+  userId,
+  removedItemIds,
+  outfitId,
+}: {
+  formData: updateOutfitSchemaType;
+  userId: string;
+  removedItemIds: number[];
+  outfitId: number;
+}): Promise<ActionResult<null>> {
+  try {
+    const { data, success, error } = newOutfitSchema.safeParse(formData);
+    if (!success) {
+      console.log("error: ", error);
+      return fail("INVALUD_INPUT", "Something went wrong !");
+    }
+
+    await query("BEGIN");
+
+    await query(
+      "UPDATE outfits SET name=$1, note=$2 WHERE user_id=$3 AND id=$4",
+      [data.name, data.note, userId, outfitId],
+    );
+
+    await query(
+      "INSERT INTO outfit_items (outfit_id, item_id) SELECT $1, itemId FROM unnest($2::int[]) AS itemId ON CONFLICT DO NOTHING",
+      [outfitId, data.selectedItemIds],
+    );
+
+    if (removedItemIds.length > 0) {
+      await query(
+        "DELETE FROM outfit_items WHERE outfit_id=$1 AND item_id=ANY($2)",
+        [outfitId, removedItemIds],
+      );
+    }
+
+    await query("COMMIT");
+    updateTag("outfit");
+    updateTag("outfits");
+    return ok(null);
+  } catch (error) {
+    await query("ROLLBACK");
+    console.log("[ERROR] db error: ", error);
+    return fail("DB_ERROR", "Failed to update outfit");
   }
 }
