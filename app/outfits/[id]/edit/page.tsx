@@ -2,12 +2,10 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import AuthGate from "@/components/AuthGate";
 import { Suspense } from "react";
-import { getItems } from "@/actions/items.actions";
-import { generateItemImageUrls } from "@/actions/images.actions";
 import { ItemFiltersSkeleton } from "@/components/Home/ItemFiltersSkeleton";
 import { ItemFiltersContainer } from "@/components/Home/ItemFiltersContainer";
-import { Items } from "@/components/Outfits/Edit/Items";
-import { getOutfit, getOutfitItemIds } from "@/actions/outfits.actions";
+import { OutfitItemSelector } from "@/components/Outfits/Edit/OutfitItemSelector";
+import { OutfitItemSelectorSkeleton } from "@/components/Outfits/New/OutfitItemSelectorSkeleton";
 
 export default async function Edit({
   params,
@@ -31,68 +29,22 @@ export default async function Edit({
     return <AuthGate />;
   }
 
-  const items = await getItems({
-    userId: session.user.id,
-    categories: buildFiltersDefaultValues(searchParams_.categories),
-    seasons: buildFiltersDefaultValues(searchParams_.seasons),
-    colors: buildFiltersDefaultValues(searchParams_.colors),
-    tags: buildFiltersDefaultValues(searchParams_.tags),
-    page,
-  });
-
-  if (!items.success) {
-    return <h1>{items.error.message}</h1>;
-  }
-
-  const outfit = await getOutfit({
-    userId: session.user.id,
-    outfitId: outfitId,
-  });
-  if (!outfit.success) {
-    return <h1>{outfit.error.message}</h1>;
-  }
-
-  // Genereate Items Images
-  const itemsWithImages = await Promise.all(
-    items.data.map(async (item) => {
-      const res = await generateItemImageUrls({
-        imageKeys: item.image_keys,
-      });
-      if (res.success) {
-        const imageUrls = res.data;
-        return { ...item, imageUrls };
-      } else {
-        return { ...item, imageUrls: null };
-      }
-    }),
-  );
-
-  const existOutfitItemIdsImages = outfit.data.item_ids.map((id, idx) => {
-    return {
-      id: id,
-      imageUrl: outfit.data.primary_image_keys[idx],
-    };
-  });
-
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <Suspense fallback={<ItemFiltersSkeleton />}>
         <ItemFiltersContainer />
       </Suspense>
-
-      {items.data.length === 0 && (
-        <h1 className="text-xl text-center text-gray-500 w-full">
-          No item found
-        </h1>
-      )}
-      <Items
-        outfitId={outfit.data.id}
-        outfitName={outfit.data.name}
-        outfitNote={outfit.data.note}
-        items={itemsWithImages}
-        existOutfitItemIdsImages={existOutfitItemIdsImages}
-        page={page}
-      />
+      <Suspense fallback={<OutfitItemSelectorSkeleton />}>
+        <OutfitItemSelector
+          userId={session.user.id}
+          outfitId={outfitId}
+          page={page}
+          paramsCategories={buildFiltersDefaultValues(searchParams_.categories)}
+          paramsSeasons={buildFiltersDefaultValues(searchParams_.seasons)}
+          paramsColors={buildFiltersDefaultValues(searchParams_.colors)}
+          paramsTags={buildFiltersDefaultValues(searchParams_.tags)}
+        />
+      </Suspense>
     </div>
   );
 }

@@ -5,11 +5,11 @@ export function OutfitItemSelectorSkeleton() {
         <span className="h-fit text-sm text-neutral-600">0 selected</span>
         <div className="w-20 h-8 bg-gray-200 rounded animate-pulse"></div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="aspect-square bg-gray-200 rounded animate-pulse"
+            className="aspect-square max-w-[200px] w-full bg-gray-200 animate-pulse"
           />
         ))}
       </div>
