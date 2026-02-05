@@ -31,17 +31,12 @@ export default async function Edit({
     return <AuthGate />;
   }
 
-  const categoriesParams = buildFiltersDefaultValues(searchParams_.categories);
-  const seasonsParams = buildFiltersDefaultValues(searchParams_.seasons);
-  const colorsParams = buildFiltersDefaultValues(searchParams_.colors);
-  const tagsParams = buildFiltersDefaultValues(searchParams_.tags);
-
   const items = await getItems({
     userId: session.user.id,
-    categories: categoriesParams,
-    seasons: seasonsParams,
-    colors: colorsParams,
-    tags: tagsParams,
+    categories: buildFiltersDefaultValues(searchParams_.categories),
+    seasons: buildFiltersDefaultValues(searchParams_.seasons),
+    colors: buildFiltersDefaultValues(searchParams_.colors),
+    tags: buildFiltersDefaultValues(searchParams_.tags),
     page,
   });
 

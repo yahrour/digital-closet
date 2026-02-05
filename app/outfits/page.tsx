@@ -31,14 +31,14 @@ export default async function ShowOutfits({
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
+      <div className="grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 gap-6 justify-center items-center">
         {outfits.data.map((outfit) => (
           <Outfit key={outfit.id} outfit={outfit} />
         ))}
       </div>
       <Pagination
         currentPage={page}
-        total={Number(outfits.data[0].total) || 0}
+        total={Number(outfits.data[0]?.total) || 0}
         limit={2}
       />
     </div>
@@ -53,7 +53,7 @@ function Outfit({ outfit }: { outfit: outfit }) {
     <Link
       href={`/outfits/${outfit.id}`}
       prefetch={false}
-      className="group inline-block space-y-8"
+      className="group inline-block space-y-8 w-fit mx-auto"
     >
       <div
         className="relative mx-auto"

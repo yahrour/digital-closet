@@ -42,7 +42,6 @@ export default async function View({
   }
   return (
     <div className="max-w-4xl mx-auto px-4 space-y-10">
-      {/* Top bar */}
       <Link
         href="/outfits"
         className="text-sm text-neutral-500 flex items-center gap-1 cursor-pointer"
@@ -50,7 +49,6 @@ export default async function View({
         <MoveLeft size={12} /> Back
       </Link>
 
-      {/* Identity */}
       <div className="space-y-1">
         <h1 className="text-xl font-medium text-neutral-900">
           {outfit.data.name}
@@ -62,7 +60,6 @@ export default async function View({
         )}
       </div>
 
-      {/* Garments */}
       <div className="space-y-4">
         <h2 className="text-xs uppercase tracking-wide text-neutral-500">
           Garments
