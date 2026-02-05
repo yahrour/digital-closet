@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import CreateOutfitDialog from "./CreateOutfitDialog";
-import { XIcon } from "lucide-react";
+import { SelectedItemsBar } from "./SelectedItemsBar";
 
 type itemsWithImageUrls = itemsType & {
   imageUrls: string[] | null;
@@ -35,123 +34,96 @@ export function Items({
     );
   };
 
-  const handleRemoveItem = (itemId: number) => {
-    console.log("remove: ", itemId);
-    setSelectedItems((prev) =>
-      prev.filter((existItem) => existItem.id != itemId),
-    );
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex max-sm:flex-wrap items-center gap-3">
-        <div className="flex gap-2 overflow-x-auto w-fit">
-          {selectedItems.map((item) => (
-            <div
-              key={item.id}
-              className="relative w-12 h-12"
-              onClick={() => handleRemoveItem(item.id)}
-            >
-              {item.imageUrl ? (
-                <div className="group">
-                  <Image
-                    src={item.imageUrl}
-                    fill
-                    alt=""
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center bg-white shadow-md opacity-0 transition-all duration-200 ease-out group-hover:opacity-100 hover:bg-gray-100"
-                  >
-                    <XIcon size={12} className="text-red-500" />
-                  </button>
-                </div>
-              ) : (
-                <span>No Image</span>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="flex justify-between items-center w-full">
-          <span className="h-fit text-sm text-neutral-600">
-            {selectedItems.length} selected
-          </span>
-          <CreateOutfitDialog
-            selectedItems={selectedItems}
-            setSelectedItems={setSelectedItems}
-          />
-        </div>
-      </div>
+      <SelectedItemsBar
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
         {items.map((item) => {
           return (
-            <div
+            <Item
               key={item.id}
-              className={`group mx-auto max-w-[200px] w-full p-1 ${selectedItems.find((obj) => obj.id === item.id) ? "bg-gray-200" : "hover:bg-gray-100"}`}
-              onClick={() =>
-                toggleSelectItem({
-                  id: item.id,
-                  imageUrl: item.imageUrls && item.imageUrls[0],
-                })
-              }
-            >
-              <div className="relative aspect-square overflow-hidden bg-gray-100">
-                {item.imageUrls ? (
-                  <Image
-                    src={item.imageUrls[0]}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105 select-none"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
-                    No image
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-between mt-2">
-                <div className="space-y-0.5">
-                  <p
-                    title={item.name}
-                    className="text-sm font-medium text-gray-900 truncate max-w-[90px]"
-                  >
-                    {item.name}
-                  </p>
-
-                  {item.brand && (
-                    <p className="text-xs text-gray-500 truncate">
-                      {item.brand}
-                    </p>
-                  )}
-
-                  <p className="text-xs text-gray-400">
-                    {item.category || "Uncategorized"}
-                  </p>
-                </div>
-                <div className="flex flex-col justify-end items-end">
-                  <div className="space-x-0.5">
-                    <ColorDot color={item.primary_color} />
-                    {item.secondary_colors.map((c) => (
-                      <ColorDot key={c} color={c} />
-                    ))}
-                  </div>
-                  <Link href={`/items/${item.id}`}>
-                    <Button variant="outline" className="cursor-pointer">
-                      View
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+              item={item}
+              selectedItems={selectedItems}
+              toggleSelectItem={toggleSelectItem}
+            />
           );
         })}
       </div>
       <Pagination currentPage={page} total={Number(items[0]?.total) || 0} />
+    </div>
+  );
+}
+
+function Item({
+  item,
+  toggleSelectItem,
+  selectedItems,
+}: {
+  item: itemsWithImageUrls;
+  selectedItems: selectedItem[];
+  toggleSelectItem: (item: selectedItem) => void;
+}) {
+  return (
+    <div
+      className={`group mx-auto max-w-[200px] w-full p-1 ${selectedItems.find((obj) => obj.id === item.id) ? "bg-gray-200" : "hover:bg-gray-100"}`}
+      onClick={() =>
+        toggleSelectItem({
+          id: item.id,
+          imageUrl: item.imageUrls && item.imageUrls[0],
+        })
+      }
+    >
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
+        {item.imageUrls ? (
+          <Image
+            src={item.imageUrls[0]}
+            alt={item.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105 select-none"
+            loading="eager"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
+            No image
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-between mt-2">
+        <div className="space-y-0.5">
+          <p
+            title={item.name}
+            className="text-sm font-medium text-gray-900 truncate max-w-[90px]"
+          >
+            {item.name}
+          </p>
+
+          {item.brand && (
+            <p className="text-xs text-gray-500 truncate">{item.brand}</p>
+          )}
+
+          <p className="text-xs text-gray-400">
+            {item.category || "Uncategorized"}
+          </p>
+        </div>
+        <div className="flex flex-col justify-end items-end">
+          <div className="space-x-0.5">
+            <ColorDot color={item.primary_color} />
+            {item.secondary_colors.map((c) => (
+              <ColorDot key={c} color={c} />
+            ))}
+          </div>
+          <Link href={`/items/${item.id}`}>
+            <Button variant="outline" className="cursor-pointer">
+              View
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

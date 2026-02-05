@@ -52,11 +52,16 @@ export type outfit = {
   item_ids: number[];
   items: string[];
   primary_image_keys: string[];
+  total?: string;
 };
 
-export async function getOutfits(
-  userId: string,
-): Promise<ActionResult<outfit[]>> {
+export async function getOutfits({
+  userId,
+  page,
+}: {
+  userId: string;
+  page: number;
+}): Promise<ActionResult<outfit[]>> {
   "use cache";
   cacheTag("outfits");
 
@@ -65,9 +70,13 @@ export async function getOutfits(
       return fail("INVALID_USER", "User don't exist");
     }
 
+    const limit = 2;
+    const offset = (page - 1) * limit;
+
     const { rows } = await query(
       `
-      SELECT o.id, o.name, o.note, array_agg(i.id) AS item_ids, array_agg(i.name) AS items, array_agg(i.image_keys[1]) AS primary_image_keys
+      SELECT o.id, o.name, o.note, array_agg(i.id) AS item_ids, array_agg(i.name) AS items, array_agg(i.image_keys[1]) AS primary_image_keys,
+        COUNT(*) OVER () AS total
       FROM outfits o 
       INNER JOIN outfit_items oi 
       ON o.id=oi.outfit_id 
@@ -76,8 +85,9 @@ export async function getOutfits(
       WHERE o.user_id=$1
       GROUP BY o.id, o.name, o.note 
       ORDER BY o.created_at DESC
+      LIMIT $2 OFFSET $3
     `,
-      [userId],
+      [userId, limit, offset],
     );
 
     await Promise.all(
