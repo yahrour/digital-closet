@@ -3,12 +3,12 @@ import CategoryTable from "./CategoryTable";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Pagination } from "./Pagination";
 import ActionBar from "./ActionBar";
 import {
   getUserCategoriesUsageCount,
   searchUserCategoriesUsageCount,
 } from "@/actions/categories.actions";
+import { Pagination } from "../Pagination";
 
 export default async function CategoriesPage({
   page,
@@ -55,7 +55,11 @@ export default async function CategoriesPage({
       <div className="min-h-[400px] flex flex-col gap-4">
         <ActionBar />
         <CategoryTable categories={categories.data} />
-        <Pagination currentPage={page} total={categories.data[0]?.total || 0} />
+        <Pagination
+          currentPage={page}
+          total={categories.data[0]?.total || 0}
+          limit={4}
+        />
       </div>
     </div>
   );

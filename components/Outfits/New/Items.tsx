@@ -2,12 +2,12 @@
 
 import { itemsType } from "@/actions/items.actions";
 import { ColorDot } from "@/components/ColorDot";
-import { Pagination } from "@/components/Home/Pagination";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { SelectedItemsBar } from "./SelectedItemsBar";
+import { Pagination } from "@/components/Pagination";
 
 type itemsWithImageUrls = itemsType & {
   imageUrls: string[] | null;
@@ -52,7 +52,11 @@ export function Items({
           );
         })}
       </div>
-      <Pagination currentPage={page} total={Number(items[0]?.total) || 0} />
+      <Pagination
+        currentPage={page}
+        total={Number(items[0]?.total) || 0}
+        limit={4}
+      />
     </div>
   );
 }

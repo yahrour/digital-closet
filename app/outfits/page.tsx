@@ -4,7 +4,7 @@ import { getOutfits, outfit } from "@/actions/outfits.actions";
 import Link from "next/link";
 import Image from "next/image";
 import AuthGate from "@/components/AuthGate";
-import { Pagination } from "@/components/Outfits/Pagination";
+import { Pagination } from "@/components/Pagination";
 
 export default async function ShowOutfits({
   searchParams,

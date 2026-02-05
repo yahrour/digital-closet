@@ -8,8 +8,8 @@ import { getItems } from "@/actions/items.actions";
 import { generateItemImageUrls } from "@/actions/images.actions";
 import { ItemFiltersSkeleton } from "./ItemFiltersSkeleton";
 import { ItemFiltersContainer } from "./ItemFiltersContainer";
-import { Pagination } from "./Pagination";
 import { ColorDot } from "../ColorDot";
+import { Pagination } from "../Pagination";
 
 function buildFiltersDefaultValues(
   paramValue: string | undefined,
@@ -130,6 +130,7 @@ export default async function Home({
       <Pagination
         currentPage={page}
         total={Number(items.data[0]?.total) || 0}
+        limit={4}
       />
     </div>
   );
