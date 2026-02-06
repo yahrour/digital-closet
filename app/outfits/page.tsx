@@ -39,7 +39,6 @@ export default async function ShowOutfits({
       <Pagination
         currentPage={page}
         total={Number(outfits.data[0]?.total) || 0}
-        limit={2}
       />
     </div>
   );

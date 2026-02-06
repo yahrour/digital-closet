@@ -13,13 +13,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { newCategorySchema } from "@/schemas";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { FieldError } from "@/components/ui/field";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 import { createNewCategory } from "@/actions/categories.actions";
+import { categoryNameSchema } from "@/schemas";
 
 export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -30,7 +30,7 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
   const [isPending, setIsPendig] = useState(false);
 
   const handleCreateCategory = async () => {
-    const { data, success, error } = newCategorySchema.safeParse({
+    const { data, success, error } = categoryNameSchema.safeParse({
       name: inputRef.current?.value.toLocaleLowerCase(),
     });
     if (!success) {

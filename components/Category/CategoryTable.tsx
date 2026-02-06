@@ -35,12 +35,12 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useRef, useState } from "react";
-import { renameCategorySchema } from "@/schemas";
 import {
   categoryUsageCount,
   deleteUserCategory,
   renameUserCategory,
 } from "@/actions/categories.actions";
+import { categoryNameSchema } from "@/schemas";
 
 export default function CategoryTable({
   categories,
@@ -153,7 +153,7 @@ function Rename({
   const handleRename = async () => {
     setLoading(true);
 
-    const { data, success, error } = renameCategorySchema.safeParse({
+    const { data, success, error } = categoryNameSchema.safeParse({
       name: inputRef.current?.value,
     });
 

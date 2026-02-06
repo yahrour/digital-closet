@@ -88,20 +88,12 @@ export const newItemSchema = z.object({
   images: z.array(z.string()),
 });
 
-export const newCategorySchema = z.object({
+export const categoryNameSchema = z.object({
   name: z
     .string()
     .trim()
     .min(1, "please set a category name")
     .max(25, "category name too long"),
-});
-
-export const renameCategorySchema = z.object({
-  name: z
-    .string("please set a category name")
-    .trim()
-    .min(1, "please set a category name")
-    .max(25, "category name is too long"),
 });
 
 export const editItemFormSchema = z.object({

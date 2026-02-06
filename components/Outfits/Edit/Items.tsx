@@ -152,7 +152,7 @@ export function Items({
                   </p>
                 </div>
                 <div className="flex flex-col justify-end items-end">
-                  <div className="space-x-0.5">
+                  <div className="-space-x-1">
                     <ColorDot color={item.primary_color} />
                     {item.secondary_colors.map((c) => (
                       <ColorDot key={c} color={c} />
@@ -169,11 +169,7 @@ export function Items({
           );
         })}
       </div>
-      <Pagination
-        currentPage={page}
-        total={Number(items[0]?.total) || 0}
-        limit={4}
-      />
+      <Pagination currentPage={page} total={Number(items[0]?.total) || 0} />
     </div>
   );
 }

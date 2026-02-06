@@ -7,6 +7,7 @@ import { newOutfitSchema, updateOutfitSchema } from "@/schemas";
 import { generateItemImageUrls } from "./images.actions";
 import { cacheTag, updateTag } from "next/cache";
 import z from "zod";
+import { DEFAULT_PAGE_LIMIT } from "@/constants";
 
 export async function createNewOutfit({
   formData,
@@ -70,8 +71,7 @@ export async function getOutfits({
       return fail("INVALID_USER", "User don't exist");
     }
 
-    const limit = 2;
-    const offset = (page - 1) * limit;
+    const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
 
     const { rows } = await query(
       `
@@ -87,24 +87,24 @@ export async function getOutfits({
       ORDER BY o.created_at DESC
       LIMIT $2 OFFSET $3
     `,
-      [userId, limit, offset],
+      [userId, DEFAULT_PAGE_LIMIT, offset],
     );
 
     await Promise.all(
       rows.map(
         async (outfit) =>
-          (outfit.primary_image_keys = await Promise.all(
-            outfit.primary_image_keys.map(async (key: string) => {
-              if (!key) {
-                return null;
-              }
-              const res = await generateItemImageUrls({ imageKeys: [key] });
-              if (res.success) {
-                return res.data[0];
-              }
+        (outfit.primary_image_keys = await Promise.all(
+          outfit.primary_image_keys.map(async (key: string) => {
+            if (!key) {
               return null;
-            }),
-          )),
+            }
+            const res = await generateItemImageUrls({ imageKeys: [key] });
+            if (res.success) {
+              return res.data[0];
+            }
+            return null;
+          }),
+        )),
       ),
     );
 
@@ -148,18 +148,18 @@ export async function getOutfit({
     await Promise.all(
       rows.map(
         async (outfit) =>
-          (outfit.primary_image_keys = await Promise.all(
-            outfit.primary_image_keys.map(async (key: string) => {
-              if (!key) {
-                return null;
-              }
-              const res = await generateItemImageUrls({ imageKeys: [key] });
-              if (res.success) {
-                return res.data[0];
-              }
+        (outfit.primary_image_keys = await Promise.all(
+          outfit.primary_image_keys.map(async (key: string) => {
+            if (!key) {
               return null;
-            }),
-          )),
+            }
+            const res = await generateItemImageUrls({ imageKeys: [key] });
+            if (res.success) {
+              return res.data[0];
+            }
+            return null;
+          }),
+        )),
       ),
     );
 

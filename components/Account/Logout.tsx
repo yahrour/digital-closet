@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { redirect } from "next/navigation";
 import { FieldDescription, FieldLegend } from "../ui/field";
 
-export default function Logout() {
+export function Logout() {
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {

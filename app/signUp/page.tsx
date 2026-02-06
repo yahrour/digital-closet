@@ -24,7 +24,6 @@ import { redirect } from "next/navigation";
 type signUpSchemaType = z.infer<typeof signUpSchema>;
 
 export default function SignUp() {
-  const { data: session, isPending } = authClient.useSession();
   const form = useForm<signUpSchemaType>({
     resolver: zodResolver(signUpSchema),
     mode: "onSubmit",
@@ -88,10 +87,11 @@ export default function SignUp() {
     }
   };
 
+  const { data: session, isPending } = authClient.useSession();
+
   if (isPending) {
     return <LoadingSpinner />;
   }
-
   if (session?.user) {
     redirect("/");
   }
@@ -99,7 +99,7 @@ export default function SignUp() {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="w-full max-w-125 space-y-4 absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]"
+      className="px-4 w-full max-w-125 space-y-4 absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]"
     >
       <FieldSet>
         <FieldLegend>Sign Up</FieldLegend>

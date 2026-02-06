@@ -2,15 +2,14 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { DEFAULT_PAGE_LIMIT } from "@/constants";
 
 export function Pagination({
   currentPage,
   total,
-  limit,
 }: {
   currentPage: number;
   total: number;
-  limit: number;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -36,7 +35,7 @@ export function Pagination({
         variant="outline"
         size="sm"
         onClick={() => goTo(currentPage + 1)}
-        disabled={currentPage * limit >= total || total === 0}
+        disabled={currentPage * DEFAULT_PAGE_LIMIT >= total || total === 0}
         className="cursor-pointer"
       >
         Next

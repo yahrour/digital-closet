@@ -4,12 +4,14 @@ import AuthGate from "@/components/AuthGate";
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getItems } from "@/actions/items.actions";
+import { getItems, itemType } from "@/actions/items.actions";
 import { generateItemImageUrls } from "@/actions/images.actions";
 import { ItemFiltersSkeleton } from "./ItemFiltersSkeleton";
 import { ItemFiltersContainer } from "./ItemFiltersContainer";
 import { ColorDot } from "../ColorDot";
 import { Pagination } from "../Pagination";
+import { ActionResult } from "@/lib/actionsType";
+import { DEFAULT_PAGE_LIMIT } from "@/constants";
 
 function buildFiltersDefaultValues(
   paramValue: string | undefined,
@@ -39,17 +41,12 @@ export default async function Home({
     return <AuthGate />;
   }
 
-  const categoriesParams = buildFiltersDefaultValues(params.categories);
-  const seasonsParams = buildFiltersDefaultValues(params.seasons);
-  const colorsParams = buildFiltersDefaultValues(params.colors);
-  const tagsParams = buildFiltersDefaultValues(params.tags);
-
   const items = await getItems({
     userId: session.user.id,
-    categories: categoriesParams,
-    seasons: seasonsParams,
-    colors: colorsParams,
-    tags: tagsParams,
+    categories: buildFiltersDefaultValues(params.categories),
+    seasons: buildFiltersDefaultValues(params.seasons),
+    colors: buildFiltersDefaultValues(params.colors),
+    tags: buildFiltersDefaultValues(params.tags),
     page,
   });
 
@@ -71,67 +68,76 @@ export default async function Home({
 
       <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
         {items.data?.map(async (item) => {
-          const urls = await generateItemImageUrls({
+          const imageUrls = await generateItemImageUrls({
             imageKeys: item.image_keys,
           });
-          return (
-            <Link
-              href={`/items/${item.id}`}
-              key={item.id}
-              prefetch={false}
-              className="group mx-auto max-w-[200px] w-full"
-            >
-              <div className="relative aspect-square overflow-hidden bg-gray-100">
-                {urls.success ? (
-                  <Image
-                    src={urls.data[0]}
-                    alt={item.name}
-                    fill
-                    sizes="
-                      (max-width: 640px) 50vw,
-                      (max-width: 1024px) 33vw,
-                      25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105 select-none"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
-                    No image
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-between mt-2">
-                <div className="space-y-0.5">
-                  <p className="text-sm font-medium text-gray-900 truncate w-[90px]">
-                    {item.name}
-                  </p>
-
-                  {item.brand && (
-                    <p className="text-xs text-gray-500 truncate">
-                      {item.brand}
-                    </p>
-                  )}
-
-                  <p className="text-xs text-gray-400">
-                    {item.category || "Uncategorized"}
-                  </p>
-                </div>
-                <div className="flex self-end space-x-0.5">
-                  <ColorDot color={item.primary_color} />
-                  {item.secondary_colors.map((c) => (
-                    <ColorDot key={c} color={c} />
-                  ))}
-                </div>
-              </div>
-            </Link>
-          );
+          return <Item key={item.id} item={item} imageUrls={imageUrls} />;
         })}
       </div>
       <Pagination
         currentPage={page}
         total={Number(items.data[0]?.total) || 0}
-        limit={4}
       />
     </div>
+  );
+}
+
+function Item({
+  item,
+  imageUrls,
+}: {
+  item: itemType;
+  imageUrls: ActionResult<string[]>;
+}) {
+  return (
+    <Link
+      href={`/items/${item.id}`}
+      prefetch={false}
+      className="group mx-auto max-w-[200px] w-full"
+    >
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
+        {imageUrls.success ? (
+          <Image
+            src={imageUrls.data[0]}
+            alt={item.name}
+            fill
+            sizes="
+                      (max-width: 640px) 50vw,
+                      (max-width: 1024px) 33vw,
+                      25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105 select-none"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
+            No image
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-between mt-2">
+        <div className="space-y-0.5">
+          <p
+            className="text-sm font-medium text-gray-900 truncate w-[90px]"
+            title={item.name}
+          >
+            {item.name}
+          </p>
+
+          {item.brand && (
+            <p className="text-xs text-gray-500 truncate">{item.brand}</p>
+          )}
+
+          <p className="text-xs text-gray-400">
+            {item.category || "Uncategorized"}
+          </p>
+        </div>
+        <div className="flex self-end -space-x-1">
+          <ColorDot color={item.primary_color} />
+          {item.secondary_colors.map((c) => (
+            <ColorDot key={c} color={c} />
+          ))}
+        </div>
+      </div>
+    </Link>
   );
 }

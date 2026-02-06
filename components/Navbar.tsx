@@ -9,14 +9,14 @@ export default function Navbar() {
       <ul className="flex justify-between items-center gap-2">
         <li>
           <Link href="/items/new">
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               Add Item <Plus />
             </Button>
           </Link>
         </li>
         <li>
           <Link href="/outfits/new">
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               New Outfit <Plus />
             </Button>
           </Link>

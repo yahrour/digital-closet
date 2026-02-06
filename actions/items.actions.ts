@@ -7,6 +7,7 @@ import { cacheTag, updateTag } from "next/cache";
 import z from "zod";
 import { DatabaseError } from "pg";
 import { deleteImages } from "./images.actions";
+import { DEFAULT_PAGE_LIMIT } from "@/constants";
 
 export type itemsType = {
   id: number;
@@ -43,8 +44,7 @@ export async function getItems({
     return fail("INVALID_USER", "User don't exist");
   }
 
-  const limit = 4;
-  const offset = (page - 1) * limit;
+  const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
 
   try {
     const { rows } = await query(
@@ -68,7 +68,7 @@ export async function getItems({
     ORDER BY i.created_at DESC
     LIMIT $6 OFFSET $7;
     `,
-      [userId, categories, seasons, colors, tags, limit, offset],
+      [userId, categories, seasons, colors, tags, DEFAULT_PAGE_LIMIT, offset],
     );
 
     return ok(rows);

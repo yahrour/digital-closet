@@ -120,6 +120,8 @@ export default function New() {
   };
 
   const onSubmit = async (formData: newItemFormSchemaType) => {
+    console.log("formData: ", formData);
+
     setIsPendig(true);
 
     const session = await authClient.getSession();
@@ -131,6 +133,14 @@ export default function New() {
     const images: string[] = [];
     files.map((file) => images.push(file.objectInfo.key));
 
+    if (images.length === 0) {
+      setMessage({
+        message: "Image upload failed. Please try again.",
+        success: false,
+      });
+      return;
+    }
+
     const data = {
       name: formData.name,
       brand: formData.brand,
@@ -141,6 +151,8 @@ export default function New() {
       secondaryColors: formData.secondaryColors,
       images,
     };
+
+    console.log("data: ", data);
 
     const result = await addNewItem({
       userId: session.data.user.id,

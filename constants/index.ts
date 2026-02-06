@@ -14,3 +14,5 @@ export const colorsType = [
 ];
 
 export const seasonsType = ["spring", "summer", "autumn", "winter"];
+
+export const DEFAULT_PAGE_LIMIT = 12 as const;
