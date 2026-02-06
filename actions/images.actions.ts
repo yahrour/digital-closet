@@ -14,12 +14,12 @@ export async function generateItemImageUrls({
   cacheTag("item_images");
 
   if (!imageKeys || imageKeys.length === 0) {
-    return fail("IMAGE_KEYS", "Images not found");
+    return fail("Images not found");
   }
 
   const bucketName = process.env.S3_BUCKET_NAME;
   if (!bucketName) {
-    return fail("BUCKET", "Images not found");
+    return fail("Images not found");
   }
 
   const urls = await Promise.all(
@@ -35,26 +35,14 @@ export async function generateItemImageUrls({
   return ok(urls);
 }
 
-type resp = {
-  deleted: {
-    deleteMarker: boolean | undefined;
-    deleteMarkerVersionId: string | undefined;
-    key: string;
-    versionId: string | undefined;
-  }[];
-  errors: {
-    code: string;
-    message: string;
-    key: string;
-    versionId: string | undefined;
-  }[];
-};
-
-export async function deleteImages(images: string[]): Promise<resp> {
+export async function deleteImages(images: string[]) {
   const keys = images.map((value) => ({ key: value }));
-  const result = await deleteObjects(s3, {
-    bucket: process.env.S3_BUCKET_NAME || "",
+  const bucketName = process.env.S3_BUCKET_NAME;
+  if (!bucketName) {
+    return fail("Server misconfiguration: S3 bucket is missing");
+  }
+  await deleteObjects(s3, {
+    bucket: bucketName,
     objects: keys,
   });
-  return result;
 }

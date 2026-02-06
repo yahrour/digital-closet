@@ -56,8 +56,10 @@ export default async function Categories({
 
   if (!categories.success) {
     return (
-      <div className="w-full flex justify-center items-center">
-        <h1>{categories.error.message}</h1>
+      <div className="space-y-6 max-w-4xl mx-auto">
+        <h1 className="text-xl text-center text-gray-500 w-full">
+          {categories.error.message}
+        </h1>
       </div>
     );
   }
@@ -70,7 +72,19 @@ export default async function Categories({
       <div className="min-h-[400px] flex flex-col gap-4">
         <ActionBar />
         <CategoryTable categories={categories.data} />
-        <Pagination currentPage={page} total={categories.data[0]?.total || 0} />
+        {
+          categories.data.length > 0 
+          ?
+          <>
+            <Pagination currentPage={page} total={categories.data[0]?.total || 0} />
+          </>
+          :
+          <div className="mt-6 mx-auto">
+            <h1 className="text-base text-center text-gray-500">
+              No categories found
+            </h1>
+          </div>
+        }
       </div>
     </div>
   );

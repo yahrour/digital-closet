@@ -42,7 +42,7 @@ CREATE TABLE items (
   image_keys text[],
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT unique_garment_name UNIQUE (user_id, name)
+  CONSTRAINT unique_item_name UNIQUE (user_id, name)
 );
 
 CREATE TABLE tags (

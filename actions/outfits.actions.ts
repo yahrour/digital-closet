@@ -20,7 +20,7 @@ export async function createNewOutfit({
     const { data, success, error } = newOutfitSchema.safeParse(formData);
     if (!success) {
       console.log("error: ", error);
-      return fail("INVALUD_INPUT", "Something went wrong !");
+      return fail("Something went wrong !");
     }
 
     await query("BEGIN");
@@ -42,7 +42,7 @@ export async function createNewOutfit({
   } catch (error) {
     await query("ROLLBACK");
     console.log("[ERROR] db error: ", error);
-    return fail("DB_ERROR", "Failed to create outfit");
+    return fail("Failed to create outfit");
   }
 }
 
@@ -68,7 +68,7 @@ export async function getOutfits({
 
   try {
     if (!userId) {
-      return fail("INVALID_USER", "User don't exist");
+      return fail("User don't exist");
     }
 
     const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
@@ -111,7 +111,7 @@ export async function getOutfits({
     return ok(rows);
   } catch (error) {
     console.log("[ERROR] db error: ", error);
-    return fail("DB_ERROR", "Failed to fetch outfits");
+    return fail("Failed to fetch outfits");
   }
 }
 
@@ -127,7 +127,7 @@ export async function getOutfit({
 
   try {
     if (!userId) {
-      return fail("INVALID_USER", "User don't exist");
+      return fail("User don't exist");
     }
 
     const { rows } = await query(
@@ -166,7 +166,7 @@ export async function getOutfit({
     return ok(rows[0]);
   } catch (error) {
     console.log("[ERROR] db error: ", error);
-    return fail("DB_ERROR", "Failed to fetch outfit");
+    return fail("Failed to fetch outfit");
   }
 }
 
@@ -179,10 +179,10 @@ export async function deleteOutfit({
 }): Promise<ActionResult<null>> {
   try {
     if (!userId) {
-      return fail("INVALID_USER", "User don't exist");
+      return fail("User don't exist");
     }
     if (!outfitId) {
-      return fail("INVALID_OUTFIT", "Outfit don't exist");
+      return fail("Outfit don't exist");
     }
 
     await query("DELETE FROM outfits WHERE id=$1 AND user_id=$2", [
@@ -195,7 +195,7 @@ export async function deleteOutfit({
     return ok(null);
   } catch (error) {
     console.log("[ERROR] db error: ", error);
-    return fail("DB_ERROR", "Failed to delete outfit");
+    return fail("Failed to delete outfit");
   }
 }
 
@@ -206,7 +206,7 @@ export async function getOutfitItemIds(
   cacheTag("outfit");
   try {
     if (!outfitId) {
-      return fail("INVALID_OUTFIT", "Outfit don't exist");
+      return fail("Outfit don't exist");
     }
 
     const { rows } = await query(
@@ -219,7 +219,7 @@ export async function getOutfitItemIds(
     return ok(itemIds);
   } catch (error) {
     console.log("[ERROR] db error: ", error);
-    return fail("DB_ERROR", "Failed to get outfit");
+    return fail("Failed to get outfit");
   }
 }
 
@@ -239,7 +239,7 @@ export async function updateOutfit({
     const { data, success, error } = newOutfitSchema.safeParse(formData);
     if (!success) {
       console.log("error: ", error);
-      return fail("INVALUD_INPUT", "Something went wrong !");
+      return fail("Something went wrong !");
     }
 
     await query("BEGIN");
@@ -268,6 +268,6 @@ export async function updateOutfit({
   } catch (error) {
     await query("ROLLBACK");
     console.log("[ERROR] db error: ", error);
-    return fail("DB_ERROR", "Failed to update outfit");
+    return fail("Failed to update outfit");
   }
 }

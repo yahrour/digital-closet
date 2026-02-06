@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import AuthGate from "@/components/AuthGate";
 import { Pagination } from "@/components/Pagination";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 export default async function ShowOutfits({
   searchParams,
@@ -27,6 +29,26 @@ export default async function ShowOutfits({
   const outfits = await getOutfits({ userId: session.user.id, page });
   if (!outfits.success) {
     return <div>{outfits.error.message}</div>;
+  }
+
+  if (outfits.data.length === 0) {
+    return (
+      <div className="flex flex-col justify-center items-center gap-4 mt-6 mx-auto">
+        <div>
+          <h1 className="text-base text-center text-gray-800">
+            No outfits yet
+          </h1>
+          <p className="text-sm text-center text-gray-400">
+            Create your first outfit to start styling your closet.
+          </p>
+        </div>
+        <Link href="/outfits/new">
+          <Button variant="outline" className="cursor-pointer">
+            New Outfit <Plus />
+          </Button>
+        </Link>
+      </div>
+    )
   }
 
   return (

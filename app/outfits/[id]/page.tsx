@@ -62,7 +62,7 @@ export default async function View({
 
       <div className="space-y-4">
         <h2 className="text-xs uppercase tracking-wide text-neutral-500">
-          Garments
+          Items
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">

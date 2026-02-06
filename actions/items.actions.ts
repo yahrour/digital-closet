@@ -41,7 +41,7 @@ export async function getItems({
   cacheTag("items");
 
   if (!userId) {
-    return fail("INVALID_USER", "User don't exist");
+    return fail("User don't exist");
   }
 
   const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
@@ -74,7 +74,7 @@ export async function getItems({
     return ok(rows);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("DB_ERROR", "Failed to fetch items");
+    return fail("Failed to fetch items");
   }
 }
 
@@ -89,14 +89,13 @@ export async function addNewItem({
   try {
     if (!userId) {
       deleteImages(formData.images);
-      return fail("INVALID_USER", "User does not exist");
+      return fail("User does not exist");
     }
 
-    const { data, success, error } = newItemSchema.safeParse(formData);
+    const { data, success } = newItemSchema.safeParse(formData);
     if (!success) {
       deleteImages(formData.images);
-      console.log("error: ", error);
-      return fail("INVALUD_INPUT", "Something went wrong !");
+      return fail("Something went wrong !");
     }
 
     await query("BEGIN");
@@ -109,7 +108,7 @@ export async function addNewItem({
     const category_id = categoryRows[0].id;
     if (!category_id) {
       deleteImages(formData.images);
-      return fail("INVALID_CATEGORY", "Category not found");
+      return fail("Category not found");
     }
 
     const { rows: itemRows } = await query(
@@ -138,7 +137,7 @@ export async function addNewItem({
       [data.tags, userId],
     );
 
-    // Get all tag IDs (existing + new)
+    // Get all tag IDs (old + new)
     const { rows: tagRows } = await query(
       `SELECT id FROM tags 
       WHERE user_id=$1
@@ -169,16 +168,15 @@ export async function addNewItem({
       switch (error.code) {
         case "23505": // unique_violation
           return fail(
-            "ITEM_ALREADY_EXIST",
             "You already have an item with this name",
           );
 
         case "23503": // foreign_key_violation
-          return fail("INVALID_USER", "User does not exist");
+          return fail("User does not exist");
       }
     }
     console.log(`[ERROR] db error ${error}`);
-    return fail("DB_ERROR", "Failed to add a new item");
+    return fail("Failed to add a new item");
   }
 }
 
@@ -194,10 +192,10 @@ export async function getItem({
   cacheTag("item");
 
   if (!userId) {
-    return fail("INVALID_USER", "User don't exist");
+    return fail("User don't exist");
   }
   if (!itemId) {
-    return fail("INVALID_ITEM", "Item don't exist");
+    return fail("Item don't exist");
   }
 
   try {
@@ -222,7 +220,7 @@ export async function getItem({
     return ok(rows[0]);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("DB_ERROR", "Failed to fetch items");
+    return fail("Failed to fetch items");
   }
 }
 
@@ -236,17 +234,14 @@ export async function deleteItem({
   imageKeys: string[];
 }): Promise<ActionResult<null>> {
   if (!userId) {
-    return fail("INVALID_USER", "User don't exist");
+    return fail("User don't exist");
   }
   if (!itemId) {
-    return fail("INVALID_ITEM", "Item don't exist");
+    return fail("Item don't exist");
   }
 
   try {
-    const result = await deleteImages(imageKeys);
-    if (result.errors.length > 0) {
-      return fail("ITEM", "Failed to delete item images");
-    }
+    deleteImages(imageKeys);
 
     await query("DELETE FROM items WHERE id=$1 AND user_id=$2", [
       itemId,
@@ -259,11 +254,10 @@ export async function deleteItem({
     return ok(null);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("DB_ERROR", "Failed to delete item");
+    return fail("Failed to delete item");
   }
 }
 
-////////////// UPDATE ITEM
 type editItemSchemaType = z.infer<typeof editItemSchema>;
 export async function updateItem({
   userId,
@@ -281,16 +275,15 @@ export async function updateItem({
       if (formData.newImages && formData.newImages.length > 0) {
         deleteImages(formData.newImages);
       }
-      return fail("INVALID_USER", "User does not exist");
+      return fail("User does not exist");
     }
 
-    const { data, success, error } = editItemSchema.safeParse(formData);
+    const { data, success } = editItemSchema.safeParse(formData);
     if (!success) {
       if (formData.newImages && formData.newImages.length > 0) {
         deleteImages(formData.newImages);
       }
-      console.log("error: ", error);
-      return fail("INVALUD_INPUT", "Something went wrong !");
+      return fail("Something went wrong !");
     }
 
     await query("BEGIN");
@@ -305,7 +298,7 @@ export async function updateItem({
       if (formData.newImages && formData.newImages.length > 0) {
         deleteImages(formData.newImages);
       }
-      return fail("INVALID_CATEGORY", "Category not found");
+      return fail("Category not found");
     }
 
     let imageKeys: string[] = [];
@@ -314,7 +307,7 @@ export async function updateItem({
     } else if (formData.existImageKeys && formData.existImageKeys.length > 0) {
       imageKeys = formData.existImageKeys;
     } else {
-      return fail("IMAGES", "Upload at least one image.");
+      return fail("Upload at least one image.");
     }
 
     const { rows: itemRows } = await query(
@@ -376,7 +369,7 @@ export async function updateItem({
 
     // Delete removed images
     if (formData.deletedImageKeys && formData.deletedImageKeys?.length > 0) {
-      await deleteImages(formData.deletedImageKeys);
+      deleteImages(formData.deletedImageKeys);
     }
 
     await query("COMMIT");
@@ -396,14 +389,13 @@ export async function updateItem({
       switch (error.code) {
         case "23505": // unique_violation
           return fail(
-            "ITEM_ALREADY_EXIST",
             "You already have an item with this name",
           );
 
         case "23503": // foreign_key_violation
-          return fail("INVALID_USER", "User does not exist");
+          return fail("User does not exist");
       }
     }
-    return fail("DB_ERROR", "Failed to add update item");
+    return fail("Failed to add update item");
   }
 }

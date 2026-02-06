@@ -13,7 +13,7 @@ export async function getColors({
   cacheTag("colors");
 
   if (!userId) {
-    return fail("INVALID_USER", "User does not exist");
+    return fail("User does not exist");
   }
 
   try {
@@ -37,6 +37,6 @@ export async function getColors({
     return ok(colors);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("DB_ERROR", "Failed to fetch colors");
+    return fail("Failed to fetch colors");
   }
 }

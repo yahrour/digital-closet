@@ -27,69 +27,46 @@ import {
 
 import { colorsType, seasonsType } from "@/constants";
 import { Badge } from "@/components/ui/badge";
+import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { useUploadFiles } from "@better-upload/client";
 import { Progress } from "@/components/ui/progress";
 import { getUserCategories } from "@/actions/categories.actions";
-import { itemType, updateItem } from "@/actions/items.actions";
-import { ExistingItemImagesPreview } from "./ExistingItemImagesPreview";
-import { editItemFormSchema } from "@/schemas";
+import { addNewItem } from "@/actions/items.actions";
 import { XIcon } from "lucide-react";
-import { UploadedImagesPreview } from "./UploadedImagesPreview";
+import { newItemFormSchema } from "@/schemas";
+import { NewItemImagesPreview } from "@/components/Items/New/NewItemImagesPreview";
 
-export type editItemFormSchemaType = z.infer<typeof editItemFormSchema>;
-type itemEditType = itemType & {
-  imageUrls: string[];
-};
+export type newItemFormSchemaType = z.infer<typeof newItemFormSchema>;
 
-function getDeletedTags(arr1: string[], arr2: string[] | undefined): string[] {
-  if (!arr2) {
-    return [];
-  }
-  const deletedTags = arr1.filter((val) => !arr2.includes(val));
-  return deletedTags;
-}
-
-export default function ItemEdit({
-  item,
-  userId,
-}: {
-  item: itemEditType;
-  userId: string;
-}) {
+export function New({userId}: {userId: string}) {
   const [uploadProgress, setUploadProgress] = useState(0);
-  const form = useForm<editItemFormSchemaType>({
-    resolver: zodResolver(editItemFormSchema),
+  const form = useForm<newItemFormSchemaType>({
+    resolver: zodResolver(newItemFormSchema),
     mode: "onSubmit",
     defaultValues: {
-      name: item?.name,
-      seasons: item?.seasons,
-      primaryColor: item?.primary_color,
-      secondaryColors: item?.secondary_colors,
-      brand: item?.brand,
-      category: item?.category,
-      tags: item?.tags.map((tag) => tag.name),
+      name: "",
+      seasons: [],
+      primaryColor: "",
+      secondaryColors: [],
+      brand: "",
+      category: "",
+      tags: [],
       tagInput: "",
-      imageKeys: item.image_keys,
-      deletedImageKeys: [],
-      imageUrls: item.imageUrls,
       images: [],
     },
   });
-  const existImageUrls = form.watch("imageUrls");
-  const uploadedImages = form.watch("images");
-
   const [message, setMessage] = useState<{
     message: string | undefined;
     success: boolean;
   } | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-
   useEffect(() => {
     const func = async () => {
       const result = await getUserCategories({
-        userId: userId,
+        userId,
       });
       if (result.success) {
         setCategories(result.data);
@@ -135,24 +112,29 @@ export default function ItemEdit({
 
   const handleDeleteTag = (tag: string) => {
     const newTags = form.getValues("tags")?.filter((t) => tag !== t);
-    form.setValue("tags", newTags, { shouldDirty: true });
+    form.setValue("tags", newTags);
   };
 
-  const onSubmit = async (formData: editItemFormSchemaType) => {
-    const oldTags = item.tags.map((tag) => tag.name);
-    const deletedTags = getDeletedTags(oldTags, formData.tags);
-
-    if (existImageUrls?.length === 0 && uploadedImages?.length === 0) {
-      form.setError("images", { message: "Upload at least one image." });
-      return;
-    }
+  const onSubmit = async (formData: newItemFormSchemaType) => {
+    console.log("formData: ", formData);
 
     setIsPendig(true);
-    const images: string[] = [];
 
-    if (formData.images && formData.images.length > 0) {
-      const { files } = await uploader.upload(formData.images);
-      files.map((file) => images.push(file.objectInfo.key));
+    const session = await authClient.getSession();
+    if (!session.data) {
+      redirect("/singIn");
+    }
+
+    const { files } = await uploader.upload(formData.images);
+    const images: string[] = [];
+    files.map((file) => images.push(file.objectInfo.key));
+
+    if (images.length === 0) {
+      setMessage({
+        message: "Image upload failed. Please try again.",
+        success: false,
+      });
+      return;
     }
 
     const data = {
@@ -163,25 +145,23 @@ export default function ItemEdit({
       tags: formData.tags,
       primaryColor: formData.primaryColor,
       secondaryColors: formData.secondaryColors,
-      existImageKeys: formData.imageKeys,
-      existImages: formData.imageUrls || [],
-      newImages: images || [],
-      deletedImageKeys: formData.deletedImageKeys,
+      images,
     };
 
-    const result = await updateItem({
-      userId: userId,
-      itemId: item.id,
+    console.log("data: ", data);
+
+    const result = await addNewItem({
+      userId: session.data.user.id,
       formData: data,
-      deletedTags,
     });
 
     if (result.success) {
       setMessage({
-        message: "Item updated successfully",
+        message: "Item added successfully",
         success: true,
       });
-      setIsPendig(false);
+      form.reset();
+      uploader.reset();
     } else {
       setMessage({
         message: result.error.message,
@@ -211,10 +191,10 @@ export default function ItemEdit({
     >
       <FieldSet className="w-full">
         <FieldLegend className="md:text-2xl! max-md:text-xl!">
-          Edit Item
+          Add Item
         </FieldLegend>
         <FieldDescription className="md:text-base">
-          Modify item details.
+          Add a new item to your digital closet with its details and image(s).
         </FieldDescription>
         <FieldGroup>
           <div className="space-y-2">
@@ -388,7 +368,7 @@ export default function ItemEdit({
 
                     <button
                       onClick={() => handleDeleteTag(tag)}
-                      className="ml-0.5 inline-flex items-center justify-center rounded-full p-1 text-primary/60 transition hover:bg-red-500/10 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+                      className="ml-0.5 inline-flex items-center justify-center rounded-full p-1 text-primary/60 transition hover:bg-red-500/10 hover:text-red-500"
                     >
                       <XIcon size={12} />
                     </button>
@@ -484,10 +464,8 @@ export default function ItemEdit({
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="images">Image(s)</FieldLabel>
 
-                    {existImageUrls && existImageUrls.length > 0 ? (
-                      <ExistingItemImagesPreview form={form} />
-                    ) : uploadedImages && uploadedImages.length > 0 ? (
-                      <UploadedImagesPreview form={form} />
+                    {form.getValues("images").length > 0 ? (
+                      <NewItemImagesPreview form={form} />
                     ) : (
                       <UploadDropzone
                         id="images"

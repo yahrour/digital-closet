@@ -4,9 +4,9 @@ import Image from "next/image";
 import { ArrowRightLeft, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { newItemFormSchemaType } from "@/app/items/new/page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { newItemFormSchemaType } from "./New";
 
 export function NewItemImagesPreview({
   form,

@@ -70,7 +70,7 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
         <DialogHeader>
           <DialogTitle>New Category</DialogTitle>
           <DialogDescription>
-            Create a category to organize your garments.
+            Create a category to organize your items.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">

@@ -3,7 +3,6 @@ export type ActionResult<T> =
   | { success: false; error: ActionError };
 
 export type ActionError = {
-  code: string;
   message: string;
 };
 
@@ -12,7 +11,7 @@ export const ok = <T>(data: T): ActionResult<T> => ({
   data,
 });
 
-export const fail = (code: string, message: string): ActionResult<never> => ({
+export const fail = (message: string): ActionResult<never> => ({
   success: false,
-  error: { code, message },
+  error: { message },
 });

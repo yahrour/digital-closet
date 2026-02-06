@@ -12,6 +12,8 @@ import { ColorDot } from "../ColorDot";
 import { Pagination } from "../Pagination";
 import { ActionResult } from "@/lib/actionsType";
 import { DEFAULT_PAGE_LIMIT } from "@/constants";
+import { Button } from "../ui/button";
+import { Plus } from "lucide-react";
 
 function buildFiltersDefaultValues(
   paramValue: string | undefined,
@@ -60,24 +62,38 @@ export default async function Home({
         <ItemFiltersContainer />
       </Suspense>
 
-      {items.data.length === 0 && (
-        <h1 className="text-xl text-center text-gray-500 w-full">
-          No item found
-        </h1>
+      {items.data.length > 0 ? 
+      <>
+        <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
+          {items.data?.map(async (item) => {
+            const imageUrls = await generateItemImageUrls({
+              imageKeys: item.image_keys,
+            });
+            return <Item key={item.id} item={item} imageUrls={imageUrls} />;
+          })}
+        </div>
+        <Pagination
+          currentPage={page}
+          total={Number(items.data[0]?.total) || 0}
+        />
+      </> 
+      : (
+        <div className="flex flex-col justify-center items-center gap-4 mt-6 mx-auto">
+          <div>
+            <h1 className="text-base text-center text-gray-800">
+              No items yet
+            </h1>
+            <p className="text-sm text-center text-gray-400">
+              Add your first item to start building your digital closet.
+            </p>
+          </div>
+          <Link href="/items/new">
+            <Button variant="outline" className="cursor-pointer">
+              New Item <Plus />
+            </Button>
+          </Link>
+        </div>
       )}
-
-      <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
-        {items.data?.map(async (item) => {
-          const imageUrls = await generateItemImageUrls({
-            imageKeys: item.image_keys,
-          });
-          return <Item key={item.id} item={item} imageUrls={imageUrls} />;
-        })}
-      </div>
-      <Pagination
-        currentPage={page}
-        total={Number(items.data[0]?.total) || 0}
-      />
     </div>
   );
 }

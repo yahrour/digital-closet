@@ -13,7 +13,7 @@ export async function getTags({
   cacheTag("tags");
 
   if (!userId) {
-    return fail("INVALID_USER", "User does not exist");
+    return fail("User does not exist");
   }
 
   try {
@@ -29,6 +29,6 @@ export async function getTags({
     return ok(tags);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("DB_ERROR", "Failed to fetch tags");
+    return fail("Failed to fetch tags");
   }
 }
