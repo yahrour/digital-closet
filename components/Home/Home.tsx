@@ -116,6 +116,7 @@ function Item({
           <Image
             src={imageUrls.data[0]}
             alt={item.name}
+            loading="eager"
             fill
             sizes="
                       (max-width: 640px) 50vw,

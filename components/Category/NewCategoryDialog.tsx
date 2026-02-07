@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FieldError } from "@/components/ui/field";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
@@ -22,11 +22,9 @@ import { createNewCategory } from "@/actions/categories.actions";
 import { categoryNameSchema } from "@/schemas";
 
 export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
+  const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [message, setMessage] = useState<{
-    message: string | undefined;
-    success: boolean;
-  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPendig] = useState(false);
 
   const handleCreateCategory = async () => {
@@ -35,10 +33,7 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
     });
     if (!success) {
       const errorObj = JSON.parse(error.message);
-      setMessage({
-        message: errorObj[0].message,
-        success: false,
-      });
+      setError(errorObj[0].message);
       return;
     }
     setIsPendig(true);
@@ -51,18 +46,26 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
       name: data.name,
     });
     if (!result.success) {
-      setMessage({
-        message: result.error.message,
-        success: false,
-      });
-    } else {
-      setMessage({ message: "Category created successfully", success: true });
+      setError(result.error.message);
     }
     setIsPendig(false);
+    setError(null);
+    setOpen(false);
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (!nextOpen) {
+      setError(null);
+      setIsPendig(false);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    }
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger className="flex-1 flex items-center justify-center gap-2 text-sm border h-fit px-4 py-2 cursor-pointer">
         <Plus size={16} /> <span>New Category</span>
       </DialogTrigger>
@@ -83,12 +86,7 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
             defaultValue={categoryName}
           />
           <div>
-            {message && !message.success && <FieldError errors={[message]} />}
-            {message && message.success && (
-              <p className="text-green-500 text-xs font-normal">
-                {message.message}
-              </p>
-            )}
+            {error && <p className="text-red-500 text-xs">{error}</p>}
           </div>
         </div>
 

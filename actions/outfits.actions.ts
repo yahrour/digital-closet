@@ -19,7 +19,6 @@ export async function createNewOutfit({
   try {
     const { data, success, error } = newOutfitSchema.safeParse(formData);
     if (!success) {
-      console.log("error: ", error);
       return fail("Something went wrong !");
     }
 
@@ -68,7 +67,7 @@ export async function getOutfits({
 
   try {
     if (!userId) {
-      return fail("User don't exist");
+      return fail("User doesn't exist");
     }
 
     const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
@@ -127,7 +126,7 @@ export async function getOutfit({
 
   try {
     if (!userId) {
-      return fail("User don't exist");
+      return fail("User doesn't exist");
     }
 
     const { rows } = await query(
@@ -179,10 +178,10 @@ export async function deleteOutfit({
 }): Promise<ActionResult<null>> {
   try {
     if (!userId) {
-      return fail("User don't exist");
+      return fail("User doesn't exist");
     }
     if (!outfitId) {
-      return fail("Outfit don't exist");
+      return fail("Outfit doesn't exist");
     }
 
     await query("DELETE FROM outfits WHERE id=$1 AND user_id=$2", [
@@ -206,7 +205,7 @@ export async function getOutfitItemIds(
   cacheTag("outfit");
   try {
     if (!outfitId) {
-      return fail("Outfit don't exist");
+      return fail("Outfit doesn't exist");
     }
 
     const { rows } = await query(

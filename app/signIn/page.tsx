@@ -122,7 +122,7 @@ export default function SignUp() {
           href="/signUp"
           className="pl-2 font-medium text-blue-600 hover:text-blue-500"
         >
-          Sign Up
+          Sign In
         </Link>
       </p>
     </form>

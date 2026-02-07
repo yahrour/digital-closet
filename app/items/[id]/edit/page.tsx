@@ -21,7 +21,10 @@ export default async function Edit({
 
   const item = await getItem({ userId: session.user.id, itemId: id });
   if (!item.success) {
-    return <div>Failed to fetch item</div>;
+    return <h1 className="w-full text-center">Failed to fetch item</h1>;
+  }
+  if (!item.data) {
+    return <h1 className="w-full text-center">Item not found</h1>;
   }
   const imageUrls = await generateItemImageUrls({
     imageKeys: item.data.image_keys,

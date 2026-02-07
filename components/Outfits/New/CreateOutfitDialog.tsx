@@ -47,11 +47,9 @@ export default function CreateOutfitDialog({
       selectedItemIds: selectedItemIds,
     },
   });
+  const [open, setOpen] = useState(false);
   const [isPending, setIsPendig] = useState(false);
-  const [message, setMessage] = useState<{
-    message: string | undefined;
-    success: boolean;
-  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     form.setValue(
@@ -76,24 +74,24 @@ export default function CreateOutfitDialog({
     setIsPendig(false);
 
     if (!result.success) {
-      setMessage({
-        message: result.error.message,
-        success: false,
-      });
-    } else {
-      setMessage({
-        message: "Outfit Created Successfully.",
-        success: true,
-      });
-      form.reset();
-      setSelectedItems([]);
-    }
-
+      setError(result.error.message);
+    } 
+    
     setIsPendig(false);
+    form.reset();
+    setSelectedItems([]);
+    setOpen(false);
+    redirect("/outfits");
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    setError(null);
+    form.clearErrors();
+    setOpen(nextOpen);
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
           <Button variant="outline" className="cursor-pointer">
@@ -155,12 +153,8 @@ export default function CreateOutfitDialog({
             </Field>
           </FieldGroup>
           <div>
-            {message && !message.success && <FieldError errors={[message]} />}
-            {message && message.success && (
-              <p className="text-green-500 text-xs font-normal">
-                {message.message}
-              </p>
-            )}
+            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {form.formState.errors.selectedItemIds?.message && <p className="text-red-500 text-xs">{form.formState.errors.selectedItemIds?.message}</p>}
           </div>
           <DialogFooter>
             <DialogClose

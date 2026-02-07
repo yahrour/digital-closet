@@ -21,8 +21,11 @@ export default async function Item({
 
   const item = await getItem({ userId: session.user.id, itemId: id });
 
-  if (!item.success || !item.data) {
-    return <div>Item don&apos;t exist</div>;
+  if (!item.success) {
+    return <h1 className="w-full text-center">Failed to fetch item</h1>;
+  }
+  if (!item.data) {
+    return <h1 className="w-full text-center">Item not found</h1>;
   }
 
   const imageUrls = await generateItemImageUrls({

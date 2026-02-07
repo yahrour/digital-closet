@@ -3,6 +3,7 @@
 import { DEFAULT_PAGE_LIMIT } from "@/constants";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
+import { categoryNameSchema } from "@/schemas";
 import { cacheTag, updateTag } from "next/cache";
 import { DatabaseError } from "pg";
 
@@ -142,18 +143,24 @@ export async function createNewCategory({
   userId: string;
   name: string;
 }): Promise<ActionResult<null>> {
-  if (!userId) {
-    return fail("User does not exist");
-  }
-
-  if (!name) {
-    return fail("Category name is required");
-  }
-
   try {
+    if (!userId) {
+      return fail("User does not exist");
+    }
+    if (!name) {
+      return fail("Category name is required");
+    }
+    const { data, success, error } = categoryNameSchema.safeParse({
+      name
+    });
+    if (!success) {
+      const errorObj = JSON.parse(error.message);
+      return fail(errorObj[0].message);
+    }
+
     await query(
       "INSERT INTO item_categories (user_id, name) VALUES ($1, lower($2));",
-      [userId, name],
+      [userId, data.name],
     );
 
     updateTag("categories");

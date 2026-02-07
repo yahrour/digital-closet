@@ -24,7 +24,10 @@ export default async function View({
 
   const outfit = await getOutfit({ outfitId: id, userId: session.user.id });
   if (!outfit.success) {
-    return <div>{outfit.error.message}</div>;
+    return <h1 className="w-full text-center">Failed to fetch outfit</h1>;
+  }
+  if (!outfit.data) {
+    return <h1 className="w-full text-center">Outfit not found</h1>;
   }
 
   if (!outfit.data) {

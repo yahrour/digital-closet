@@ -54,7 +54,10 @@ export async function OutfitItemSelector({
     outfitId: outfitId,
   });
   if (!outfit.success) {
-    return <h1>{outfit.error.message}</h1>;
+    return <h1 className="w-full text-center">Failed to fetch outfit</h1>;
+  }
+  if (!outfit.data) {
+    return <h1 className="w-full text-center">Outfit not found</h1>;
   }
 
   const existOutfitItemIdsImages = outfit.data.item_ids.map((id, idx) => {

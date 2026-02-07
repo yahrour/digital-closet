@@ -85,10 +85,7 @@ function Delete({
   categoryId: number;
   userId: string;
 }) {
-  const [message, setMessage] = useState<{
-    message: string;
-    success: boolean;
-  } | null>(null);
+  const [error, setError] = useState<string |null>(null);
   const [loading, setLoading] = useState(false);
   const handleDelete = async () => {
     setLoading(true);
@@ -97,7 +94,9 @@ function Delete({
       userId: userId,
     });
     if (!result.success) {
-      setMessage({ message: result.error.message, success: false });
+      setError(result.error.message);
+      setLoading(false);
+      return;
     }
     setLoading(false);
   };
@@ -113,9 +112,9 @@ function Delete({
             This action cannot be undone. This will permanently delete the
             category.
           </AlertDialogDescription>
-          {!message?.success && (
-            <p className="text-red-500 text-xs">{message?.message}</p>
-          )}
+          {error && 
+            <p className="text-red-500 text-xs">{error}</p>
+          }
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="cursor-pointer" disabled={loading}>
@@ -144,32 +143,27 @@ function Rename({
   categoryId: number;
   categoryName: string;
 }) {
+  const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [message, setMessage] = useState<{
-    message: string;
-    success: boolean;
-  } | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPendig, setIsPendig] = useState(false);
   const handleRename = async () => {
-    setLoading(true);
+    setIsPendig(true);
 
     const { data, success, error } = categoryNameSchema.safeParse({
       name: inputRef.current?.value,
     });
 
     if (categoryName.toLocaleLowerCase() === data?.name.toLocaleLowerCase()) {
-      setMessage({
-        message: "Nothing changed",
-        success: false,
-      });
-      setLoading(false);
+      setError("Nothing changed");
+      setIsPendig(false);
       return;
     }
 
     if (!success) {
       const parsedError = JSON.parse(error.message);
-      setMessage({ message: parsedError[0].message, success: false });
-      setLoading(false);
+      setError(parsedError[0].message);
+      setIsPendig(false);
       return;
     }
 
@@ -180,14 +174,25 @@ function Rename({
     });
 
     if (!result.success) {
-      setMessage({ message: result.error.message, success: false });
+      setError(result.error.message);
     }
-    setMessage({ message: "Category renamed successfully", success: true });
-    setLoading(false);
+    setIsPendig(false);
+    setOpen(false);
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (!nextOpen) {
+      setError(null);
+      setIsPendig(false);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    }
+  }
+
   return (
-    <Dialog onOpenChange={() => setMessage(null)}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger className="flex items-center justify-center gap-1 cursor-pointer">
         <Pencil size={16} /> <span className="max-sm:hidden">Rename</span>
       </DialogTrigger>
@@ -198,24 +203,21 @@ function Rename({
         <div className="space-y-2">
           <Label htmlFor="category">Category</Label>
           <Input id="category" ref={inputRef} defaultValue={categoryName} />
-          {!message?.success && (
-            <p className="text-red-500 text-xs">{message?.message}</p>
-          )}
-          {message?.success && (
-            <p className="text-green-500 text-xs">{message.message}</p>
-          )}
+          {error &&
+            <p className="text-red-500 text-xs">{error}</p>
+          }
         </div>
 
         <DialogFooter>
-          <DialogClose className="cursor-pointer" disabled={loading}>
+          <DialogClose className="cursor-pointer" disabled={isPendig}>
             Cancel
           </DialogClose>
           <Button
             onClick={handleRename}
             className="cursor-pointer"
-            disabled={loading}
+            disabled={isPendig}
           >
-            {loading ? "Renaming..." : "Rename"}
+            {isPendig ? "Renaming..." : "Rename"}
           </Button>
         </DialogFooter>
       </DialogContent>

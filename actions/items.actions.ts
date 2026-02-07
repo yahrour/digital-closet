@@ -41,7 +41,7 @@ export async function getItems({
   cacheTag("items");
 
   if (!userId) {
-    return fail("User don't exist");
+    return fail("User doesn't exist");
   }
 
   const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
@@ -192,10 +192,10 @@ export async function getItem({
   cacheTag("item");
 
   if (!userId) {
-    return fail("User don't exist");
+    return fail("User doesn't exist");
   }
   if (!itemId) {
-    return fail("Item don't exist");
+    return fail("Item doesn't exist");
   }
 
   try {
@@ -234,10 +234,10 @@ export async function deleteItem({
   imageKeys: string[];
 }): Promise<ActionResult<null>> {
   if (!userId) {
-    return fail("User don't exist");
+    return fail("User doesn't exist");
   }
   if (!itemId) {
-    return fail("Item don't exist");
+    return fail("Item doesn't exist");
   }
 
   try {
