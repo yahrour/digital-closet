@@ -72,19 +72,20 @@ export default async function Categories({
       <div className="min-h-[400px] flex flex-col gap-4">
         <ActionBar />
         <CategoryTable categories={categories.data} />
-        {
-          categories.data.length > 0 
-          ?
+        {categories.data.length > 0 ? (
           <>
-            <Pagination currentPage={page} total={categories.data[0]?.total || 0} />
+            <Pagination
+              currentPage={page}
+              total={categories.data[0]?.total || 0}
+            />
           </>
-          :
+        ) : (
           <div className="mt-6 mx-auto">
             <h1 className="text-base text-center text-gray-500">
               No categories found
             </h1>
           </div>
-        }
+        )}
       </div>
     </div>
   );

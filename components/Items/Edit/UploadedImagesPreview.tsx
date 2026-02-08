@@ -42,7 +42,7 @@ export function UploadedImagesPreview({
       form.setValue(
         "images",
         images.filter((_, i) => i !== index),
-        { shouldDirty: true },
+        { shouldDirty: true }
       );
     }
   };

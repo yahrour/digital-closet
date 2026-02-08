@@ -46,7 +46,7 @@ export default function SignUp() {
       },
       {
         onError: (err) => setError({ message: err.error.message }),
-      },
+      }
     );
   };
 

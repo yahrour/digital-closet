@@ -2,13 +2,13 @@
 
 import { itemType } from "@/actions/items.actions";
 import { ColorDot } from "@/components/ColorDot";
+import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
+import { XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import SaveOutfitDialog from "./SaveOutfitDialog";
-import { Pagination } from "@/components/Pagination";
 
 type itemsWithImageUrls = itemType & {
   imageUrls: string[] | null;
@@ -36,6 +36,7 @@ export function Items({
   const [selectedItems, setSelectedItems] = useState<selectedItem[]>([]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedItems(existOutfitItemIdsImages);
   }, []);
 
@@ -43,14 +44,14 @@ export function Items({
     setSelectedItems((prev) =>
       prev.some((existItem) => existItem.id === item.id)
         ? prev.filter((existItem) => existItem.id !== item.id)
-        : [...prev, item],
+        : [...prev, item]
     );
   };
 
   const handleRemoveItem = (itemId: number) => {
     console.log("remove: ", itemId);
     setSelectedItems((prev) =>
-      prev.filter((existItem) => existItem.id != itemId),
+      prev.filter((existItem) => existItem.id != itemId)
     );
   };
 
@@ -99,7 +100,6 @@ export function Items({
               return item.id;
             })}
             selectedItems={selectedItems}
-            setSelectedItems={setSelectedItems}
           />
         </div>
       </div>

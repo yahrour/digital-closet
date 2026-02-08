@@ -14,7 +14,7 @@ export function SelectedItemsBar({
 }) {
   const handleRemoveItem = (itemId: number) => {
     setSelectedItems((prev) =>
-      prev.filter((existItem) => existItem.id != itemId),
+      prev.filter((existItem) => existItem.id != itemId)
     );
   };
 

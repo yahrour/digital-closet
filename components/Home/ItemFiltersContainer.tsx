@@ -9,7 +9,7 @@ import { ItemFiltersSelect } from "./ItemFiltersSelect";
 
 export async function ItemFiltersContainer() {
   const session = await auth.api.getSession({ headers: await headers() });
-  
+
   if (!session?.user) {
     return <AuthGate />;
   }

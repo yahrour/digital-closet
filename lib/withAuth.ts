@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 
 export async function withAuth<T, P extends object>(
   callback: (params: { userId: string } & P) => Promise<T>,
-  params: P,
+  params: P
 ): Promise<T> {
   const session = await auth.api.getSession({ headers: await headers() });
 

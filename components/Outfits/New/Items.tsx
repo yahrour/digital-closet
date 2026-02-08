@@ -30,7 +30,7 @@ export function Items({
     setSelectedItems((prev) =>
       prev.some((existItem) => existItem.id === item.id)
         ? prev.filter((existItem) => existItem.id !== item.id)
-        : [...prev, item],
+        : [...prev, item]
     );
   };
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { updateOutfit } from "@/actions/outfits.actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,15 +20,14 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { authClient } from "@/lib/auth-client";
 import { newOutfitSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { selectedItem } from "./Items";
-import { useEffect, useState } from "react";
-import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
-import { updateOutfit } from "@/actions/outfits.actions";
 
 export type newOutfitSchemaType = z.infer<typeof newOutfitSchema>;
 export default function SaveOutfitDialog({
@@ -36,14 +36,12 @@ export default function SaveOutfitDialog({
   outfitNote,
   existOutfitItemIds,
   selectedItems,
-  setSelectedItems,
 }: {
   outfitId: number;
   outfitName: string;
   outfitNote: string;
   existOutfitItemIds: number[];
   selectedItems: selectedItem[];
-  setSelectedItems: React.Dispatch<React.SetStateAction<selectedItem[]>>;
 }) {
   const selectedItemIds: number[] = selectedItems?.map((item) => item.id);
   const form = useForm<newOutfitSchemaType>({
@@ -63,7 +61,7 @@ export default function SaveOutfitDialog({
   useEffect(() => {
     form.setValue(
       "selectedItemIds",
-      selectedItems.map((item) => item.id),
+      selectedItems.map((item) => item.id)
     );
   }, [selectedItems]);
 
@@ -76,7 +74,7 @@ export default function SaveOutfitDialog({
     }
 
     const removedItemIds = existOutfitItemIds.filter(
-      (id) => !selectedItemIds.includes(id),
+      (id) => !selectedItemIds.includes(id)
     );
 
     const result = await updateOutfit({

@@ -1,22 +1,21 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { generateItemImageUrls } from "@/actions/images.actions";
+import { getItems, itemType } from "@/actions/items.actions";
 import AuthGate from "@/components/AuthGate";
-import { Suspense } from "react";
+import { ActionResult } from "@/lib/actionsType";
+import { auth } from "@/lib/auth";
+import { Plus } from "lucide-react";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { getItems, itemType } from "@/actions/items.actions";
-import { generateItemImageUrls } from "@/actions/images.actions";
-import { ItemFiltersSkeleton } from "./ItemFiltersSkeleton";
-import { ItemFiltersContainer } from "./ItemFiltersContainer";
+import { Suspense } from "react";
 import { ColorDot } from "../ColorDot";
 import { Pagination } from "../Pagination";
-import { ActionResult } from "@/lib/actionsType";
-import { DEFAULT_PAGE_LIMIT } from "@/constants";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { ItemFiltersContainer } from "./ItemFiltersContainer";
+import { ItemFiltersSkeleton } from "./ItemFiltersSkeleton";
 
 function buildFiltersDefaultValues(
-  paramValue: string | undefined,
+  paramValue: string | undefined
 ): string[] | null {
   if (!paramValue || paramValue.length === 0) {
     return null;
@@ -62,22 +61,22 @@ export default async function Home({
         <ItemFiltersContainer />
       </Suspense>
 
-      {items.data.length > 0 ? 
-      <>
-        <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
-          {items.data?.map(async (item) => {
-            const imageUrls = await generateItemImageUrls({
-              imageKeys: item.image_keys,
-            });
-            return <Item key={item.id} item={item} imageUrls={imageUrls} />;
-          })}
-        </div>
-        <Pagination
-          currentPage={page}
-          total={Number(items.data[0]?.total) || 0}
-        />
-      </> 
-      : (
+      {items.data.length > 0 ? (
+        <>
+          <div className="grid grid-cols-4 max-lg:grid-cols-3 max-sm:grid-cols-2 gap-6 justify-center items-center">
+            {items.data?.map(async (item) => {
+              const imageUrls = await generateItemImageUrls({
+                imageKeys: item.image_keys,
+              });
+              return <Item key={item.id} item={item} imageUrls={imageUrls} />;
+            })}
+          </div>
+          <Pagination
+            currentPage={page}
+            total={Number(items.data[0]?.total) || 0}
+          />
+        </>
+      ) : (
         <div className="flex flex-col justify-center items-center gap-4 mt-6 mx-auto">
           <div>
             <h1 className="text-base text-center text-gray-800">

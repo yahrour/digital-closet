@@ -1,14 +1,14 @@
 "use server";
 
+import { DEFAULT_PAGE_LIMIT } from "@/constants";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
+import { withAuth } from "@/lib/withAuth";
 import { editItemSchema, newItemSchema } from "@/schemas";
 import { cacheTag, updateTag } from "next/cache";
-import z from "zod";
 import { DatabaseError } from "pg";
+import z from "zod";
 import { deleteImages } from "./images.actions";
-import { DEFAULT_PAGE_LIMIT } from "@/constants";
-import { withAuth } from "@/lib/withAuth";
 
 export type itemType = {
   id: number;
@@ -69,7 +69,7 @@ export async function getItems({
     ORDER BY i.created_at DESC
     LIMIT $6 OFFSET $7;
     `,
-      [userId, categories, seasons, colors, tags, DEFAULT_PAGE_LIMIT, offset],
+      [userId, categories, seasons, colors, tags, DEFAULT_PAGE_LIMIT, offset]
     );
 
     return ok(rows);
@@ -80,10 +80,14 @@ export async function getItems({
 }
 
 type newItemSchemaType = z.infer<typeof newItemSchema>;
-export async function addNewItem({formData}: {formData: newItemSchemaType}) {
+export async function addNewItem({
+  formData,
+}: {
+  formData: newItemSchemaType;
+}) {
   try {
-    return withAuth(addNewItemHandler, {formData});
-  } catch (error) {
+    return withAuth(addNewItemHandler, { formData });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -110,7 +114,7 @@ async function addNewItemHandler({
 
     const { rows: categoryRows } = await query(
       "SELECT id FROM item_categories WHERE name=$1",
-      [data.category],
+      [data.category]
     );
 
     const category_id = categoryRows[0].id;
@@ -131,7 +135,7 @@ async function addNewItemHandler({
         formData.secondaryColors,
         formData.brand,
         formData.images,
-      ],
+      ]
     );
     const itemId = itemRows[0].id;
 
@@ -142,7 +146,7 @@ async function addNewItemHandler({
       FROM unnest($1::text[]) AS tag 
       ON CONFLICT DO NOTHING
     `,
-      [data.tags, userId],
+      [data.tags, userId]
     );
 
     // Get all tag IDs (old + new)
@@ -152,7 +156,7 @@ async function addNewItemHandler({
       AND name = ANY (
         SELECT lower(tag) FROM unnest($2::text[]) AS tag
       )`,
-      [userId, data.tags],
+      [userId, data.tags]
     );
 
     // Insert into item_tags
@@ -160,7 +164,7 @@ async function addNewItemHandler({
       `INSERT INTO item_tags (tag_id, item_id)
      SELECT id, $1 FROM unnest($2::int[]) AS id
       ON CONFLICT DO NOTHING;`,
-      [itemId, tagRows.map((r) => r.id)],
+      [itemId, tagRows.map((r) => r.id)]
     );
 
     await query("COMMIT");
@@ -175,9 +179,7 @@ async function addNewItemHandler({
     if (error instanceof DatabaseError) {
       switch (error.code) {
         case "23505": // unique_violation
-          return fail(
-            "You already have an item with this name",
-          );
+          return fail("You already have an item with this name");
 
         case "23503": // foreign_key_violation
           return fail("User doesn't exist");
@@ -221,7 +223,7 @@ export async function getItem({
     GROUP BY i.id, ic.name
     ORDER BY i.created_at DESC
     `,
-      [userId, itemId],
+      [userId, itemId]
     );
 
     return ok(rows[0]);
@@ -231,10 +233,16 @@ export async function getItem({
   }
 }
 
-export async function deleteItem({itemId, imageKeys}: {itemId: number, imageKeys: string[]}) {
+export async function deleteItem({
+  itemId,
+  imageKeys,
+}: {
+  itemId: number;
+  imageKeys: string[];
+}) {
   try {
-    return withAuth(deleteItemHandler, {itemId, imageKeys});
-  } catch (error) {
+    return withAuth(deleteItemHandler, { itemId, imageKeys });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -283,8 +291,8 @@ export async function updateItem({
   deletedTags: string[];
 }) {
   try {
-    return withAuth(updateItemHandler, {itemId, formData, deletedTags});
-  } catch (error) {
+    return withAuth(updateItemHandler, { itemId, formData, deletedTags });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -319,7 +327,7 @@ async function updateItemHandler({
 
     const { rows: categoryRows } = await query(
       "SELECT id FROM item_categories WHERE name=$1",
-      [data.category],
+      [data.category]
     );
 
     const categoryId = categoryRows[0].id;
@@ -352,7 +360,7 @@ async function updateItemHandler({
         imageKeys,
         userId,
         itemId,
-      ],
+      ]
     );
     const insertedItemId = itemRows[0].id;
 
@@ -363,7 +371,7 @@ async function updateItemHandler({
       FROM unnest($1::text[]) AS tag 
       ON CONFLICT DO NOTHING
     `,
-      [data.tags, userId],
+      [data.tags, userId]
     );
 
     // Get all tag IDs (existing + new)
@@ -373,7 +381,7 @@ async function updateItemHandler({
       AND name = ANY (
         SELECT lower(tag) FROM unnest($2::text[]) AS tag
       )`,
-      [userId, data.tags],
+      [userId, data.tags]
     );
 
     // Insert into item_tags
@@ -381,19 +389,19 @@ async function updateItemHandler({
       `INSERT INTO item_tags (tag_id, item_id)
      SELECT id, $1 FROM unnest($2::int[]) AS id
       ON CONFLICT DO NOTHING;`,
-      [insertedItemId, tagRows.map((r) => r.id)],
+      [insertedItemId, tagRows.map((r) => r.id)]
     );
 
     // Get removed tags id
     const { rows: deletedTagsRows } = await query(
       "SELECT id FROM tags WHERE name=ANY($1::text[])",
-      [deletedTags],
+      [deletedTags]
     );
     const deletedTagsIds = deletedTagsRows.map((tag) => tag.id);
     // Delete removed tags
     await query(
       `DELETE FROM item_tags WHERE tag_id=ANY($1::int[]) AND item_id=$2`,
-      [deletedTagsIds, itemId],
+      [deletedTagsIds, itemId]
     );
 
     // Delete removed images
@@ -417,9 +425,7 @@ async function updateItemHandler({
     if (error instanceof DatabaseError) {
       switch (error.code) {
         case "23505": // unique_violation
-          return fail(
-            "You already have an item with this name",
-          );
+          return fail("You already have an item with this name");
 
         case "23503": // foreign_key_violation
           return fail("User doesn't exist");

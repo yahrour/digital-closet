@@ -16,7 +16,7 @@ export async function getColors({
     if (!userId) {
       return fail("User doesn't exist");
     }
-    
+
     const primary_color =
       "SELECT user_id, primary_color::text AS color FROM items";
     const secondary_colors =
@@ -26,7 +26,7 @@ export async function getColors({
         FROM (${primary_color} UNION ALL ${secondary_colors}) colors 
         WHERE user_id=$1 
         ORDER BY color`,
-      [userId],
+      [userId]
     );
 
     const colors: string[] = [];

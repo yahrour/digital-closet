@@ -47,7 +47,7 @@ export default async function New({
 }
 
 function buildFiltersDefaultValues(
-  paramValue: string | undefined,
+  paramValue: string | undefined
 ): string[] | null {
   if (!paramValue || paramValue.length === 0) {
     return null;

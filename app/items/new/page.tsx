@@ -5,13 +5,11 @@ import { headers } from "next/headers";
 
 export default async function Page() {
   const session = await auth.api.getSession({
-    headers: await headers()
-  })
+    headers: await headers(),
+  });
   if (!session?.user) {
-    return <AuthGate />
+    return <AuthGate />;
   }
 
-  return (
-    <New userId={session.user.id} />
-  );
+  return <New userId={session.user.id} />;
 }

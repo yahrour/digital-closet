@@ -31,7 +31,7 @@ export function ExistingItemImagesPreview({
       form.setValue(
         "imageUrls",
         images.filter((_, i) => i !== index),
-        { shouldDirty: true },
+        { shouldDirty: true }
       );
 
       let deletedImageKeys = form.getValues("deletedImageKeys");
@@ -46,7 +46,7 @@ export function ExistingItemImagesPreview({
       form.setValue(
         "imageKeys",
         imageKeys.filter((_, i) => i !== index),
-        { shouldDirty: true },
+        { shouldDirty: true }
       );
     }
   };

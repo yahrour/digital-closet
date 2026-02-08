@@ -23,6 +23,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import {
+  categoryUsageCountType,
+  deleteUserCategory,
+  renameUserCategory,
+} from "@/actions/categories.actions";
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -31,16 +36,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { useRef, useState } from "react";
-import {
-  categoryUsageCountType,
-  deleteUserCategory,
-  renameUserCategory,
-} from "@/actions/categories.actions";
 import { categoryNameSchema } from "@/schemas";
+import { useRef, useState } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 export default function CategoryTable({
   categories,
@@ -64,12 +64,8 @@ export default function CategoryTable({
             <TableCell className="font-medium">{category.name}</TableCell>
             <TableCell>{category.usageCount}</TableCell>
             <TableCell className="flex justify-end items-center gap-4 min-sm:h-[50px] max-sm:h-[40px]">
-              <Delete categoryId={category.id} userId={category.userId} />
-              <Rename
-                categoryId={category.id}
-                categoryName={category.name}
-                userId={category.userId}
-              />
+              <Delete categoryId={category.id} />
+              <Rename categoryId={category.id} categoryName={category.name} />
             </TableCell>
           </TableRow>
         ))}
@@ -78,14 +74,8 @@ export default function CategoryTable({
   );
 }
 
-function Delete({
-  categoryId,
-  userId,
-}: {
-  categoryId: number;
-  userId: string;
-}) {
-  const [error, setError] = useState<string |null>(null);
+function Delete({ categoryId }: { categoryId: number }) {
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const handleDelete = async () => {
     setLoading(true);
@@ -111,9 +101,7 @@ function Delete({
             This action cannot be undone. This will permanently delete the
             category.
           </AlertDialogDescription>
-          {error && 
-            <p className="text-red-500 text-xs">{error}</p>
-          }
+          {error && <p className="text-red-500 text-xs">{error}</p>}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="cursor-pointer" disabled={loading}>
@@ -134,11 +122,9 @@ function Delete({
 }
 
 function Rename({
-  userId,
   categoryId,
   categoryName,
 }: {
-  userId: string;
   categoryId: number;
   categoryName: string;
 }) {
@@ -187,7 +173,7 @@ function Rename({
         inputRef.current.value = "";
       }
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -201,9 +187,7 @@ function Rename({
         <div className="space-y-2">
           <Label htmlFor="category">Category</Label>
           <Input id="category" ref={inputRef} defaultValue={categoryName} />
-          {error &&
-            <p className="text-red-500 text-xs">{error}</p>
-          }
+          {error && <p className="text-red-500 text-xs">{error}</p>}
         </div>
 
         <DialogFooter>

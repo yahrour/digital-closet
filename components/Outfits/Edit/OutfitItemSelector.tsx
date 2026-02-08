@@ -46,7 +46,7 @@ export async function OutfitItemSelector({
       } else {
         return { ...item, imageUrls: null };
       }
-    }),
+    })
   );
 
   const outfit = await getOutfit({

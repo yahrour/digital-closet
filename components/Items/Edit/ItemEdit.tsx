@@ -11,10 +11,10 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Controller, useForm } from "react-hook-form";
-import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
 
 import {
   MultiSelect,
@@ -25,16 +25,16 @@ import {
   MultiSelectValue,
 } from "@/components/ui/multi-select";
 
-import { colorsType, seasonsType } from "@/constants";
-import { Badge } from "@/components/ui/badge";
-import { UploadDropzone } from "@/components/ui/upload-dropzone";
-import { useUploadFiles } from "@better-upload/client";
-import { Progress } from "@/components/ui/progress";
 import { getUserCategories } from "@/actions/categories.actions";
 import { itemType, updateItem } from "@/actions/items.actions";
-import { ExistingItemImagesPreview } from "./ExistingItemImagesPreview";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { UploadDropzone } from "@/components/ui/upload-dropzone";
+import { colorsType, seasonsType } from "@/constants";
 import { editItemFormSchema } from "@/schemas";
+import { useUploadFiles } from "@better-upload/client";
 import { XIcon } from "lucide-react";
+import { ExistingItemImagesPreview } from "./ExistingItemImagesPreview";
 import { UploadedImagesPreview } from "./UploadedImagesPreview";
 
 export type editItemFormSchemaType = z.infer<typeof editItemFormSchema>;
@@ -50,13 +50,7 @@ function getDeletedTags(arr1: string[], arr2: string[] | undefined): string[] {
   return deletedTags;
 }
 
-export default function ItemEdit({
-  item,
-  userId,
-}: {
-  item: itemEditType;
-  userId: string;
-}) {
+export default function ItemEdit({ item }: { item: itemEditType }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const form = useForm<editItemFormSchemaType>({
     resolver: zodResolver(editItemFormSchema),

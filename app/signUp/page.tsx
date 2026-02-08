@@ -52,7 +52,7 @@ export default function SignUp() {
         onSuccess: () => {
           form.reset();
         },
-      },
+      }
     );
 
     if (error === null) {

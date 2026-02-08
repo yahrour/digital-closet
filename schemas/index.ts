@@ -21,9 +21,7 @@ export const signUpSchema = z
 
 export const signInSchema = z.object({
   email: z.email(),
-  password: z
-    .string()
-    .min(1, "please set a password")
+  password: z.string().min(1, "please set a password"),
 });
 
 export const accountDetailsSchema = z

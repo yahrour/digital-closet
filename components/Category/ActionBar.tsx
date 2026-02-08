@@ -22,15 +22,14 @@ export default function ActionBar() {
     c.set("category", String(category));
     c.set("page", "1");
     router.push(`?${c.toString()}`);
-  }
+  };
 
   const removeCategoryParam = () => {
     const c = new URLSearchParams(params);
     c.delete("category");
     const query = c.toString();
     router.push(query ? `?${query}` : "?");
-  }
-
+  };
 
   const handleSearch = () => {
     if (categoryName.length > 0) {
@@ -53,7 +52,7 @@ export default function ActionBar() {
             size="icon-xs"
             className="cursor-pointer"
             onClick={() => {
-              setCategoryName(""); 
+              setCategoryName("");
               removeCategoryParam();
             }}
           >

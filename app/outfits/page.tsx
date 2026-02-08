@@ -48,7 +48,7 @@ export default async function ShowOutfits({
           </Button>
         </Link>
       </div>
-    )
+    );
   }
 
   return (

@@ -51,7 +51,7 @@ export async function OutfitItemSelector({
           </Button>
         </Link>
       </div>
-    )
+    );
   }
 
   const itemsWithImages = await Promise.all(
@@ -65,7 +65,7 @@ export async function OutfitItemSelector({
       } else {
         return { ...item, imageUrls: null };
       }
-    }),
+    })
   );
 
   return <Items items={itemsWithImages} page={page} />;

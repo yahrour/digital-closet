@@ -1,19 +1,23 @@
 "use server";
 
 import { newOutfitSchemaType } from "@/components/Outfits/New/CreateOutfitDialog";
+import { DEFAULT_PAGE_LIMIT } from "@/constants";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
+import { withAuth } from "@/lib/withAuth";
 import { newOutfitSchema, updateOutfitSchema } from "@/schemas";
-import { generateItemImageUrls } from "./images.actions";
 import { cacheTag, updateTag } from "next/cache";
 import z from "zod";
-import { DEFAULT_PAGE_LIMIT } from "@/constants";
-import { withAuth } from "@/lib/withAuth";
+import { generateItemImageUrls } from "./images.actions";
 
-export async function createNewOutfit({ formData }: { formData: newOutfitSchemaType }) {
+export async function createNewOutfit({
+  formData,
+}: {
+  formData: newOutfitSchemaType;
+}) {
   try {
-    return withAuth(createNewOutfitHandler, {formData});
-  } catch (error) {
+    return withAuth(createNewOutfitHandler, { formData });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -25,7 +29,7 @@ async function createNewOutfitHandler({
   userId: string;
 }): Promise<ActionResult<null>> {
   try {
-    const { data, success, error } = newOutfitSchema.safeParse(formData);
+    const { data, success } = newOutfitSchema.safeParse(formData);
     if (!success) {
       return fail("Something went wrong !");
     }
@@ -34,13 +38,13 @@ async function createNewOutfitHandler({
 
     const { rows } = await query(
       "INSERT INTO outfits (user_id, name, note) VALUES ($1, $2, $3) RETURNING id",
-      [userId, data.name, data.note],
+      [userId, data.name, data.note]
     );
     const outfitId = rows[0].id;
 
     await query(
       "INSERT INTO outfit_items (outfit_id, item_id) SELECT $1, itemId FROM unnest($2::int[]) AS itemId ON CONFLICT DO NOTHING",
-      [outfitId, data.selectedItemIds],
+      [outfitId, data.selectedItemIds]
     );
 
     await query("COMMIT");
@@ -94,25 +98,25 @@ export async function getOutfits({
       ORDER BY o.created_at DESC
       LIMIT $2 OFFSET $3
     `,
-      [userId, DEFAULT_PAGE_LIMIT, offset],
+      [userId, DEFAULT_PAGE_LIMIT, offset]
     );
 
     await Promise.all(
       rows.map(
         async (outfit) =>
-        (outfit.primary_image_keys = await Promise.all(
-          outfit.primary_image_keys.map(async (key: string) => {
-            if (!key) {
+          (outfit.primary_image_keys = await Promise.all(
+            outfit.primary_image_keys.map(async (key: string) => {
+              if (!key) {
+                return null;
+              }
+              const res = await generateItemImageUrls({ imageKeys: [key] });
+              if (res.success) {
+                return res.data[0];
+              }
               return null;
-            }
-            const res = await generateItemImageUrls({ imageKeys: [key] });
-            if (res.success) {
-              return res.data[0];
-            }
-            return null;
-          }),
-        )),
-      ),
+            })
+          ))
+      )
     );
 
     return ok(rows);
@@ -149,25 +153,25 @@ export async function getOutfit({
       GROUP BY o.id, o.name, o.note 
       ORDER BY o.created_at DESC
     `,
-      [outfitId, userId],
+      [outfitId, userId]
     );
 
     await Promise.all(
       rows.map(
         async (outfit) =>
-        (outfit.primary_image_keys = await Promise.all(
-          outfit.primary_image_keys.map(async (key: string) => {
-            if (!key) {
+          (outfit.primary_image_keys = await Promise.all(
+            outfit.primary_image_keys.map(async (key: string) => {
+              if (!key) {
+                return null;
+              }
+              const res = await generateItemImageUrls({ imageKeys: [key] });
+              if (res.success) {
+                return res.data[0];
+              }
               return null;
-            }
-            const res = await generateItemImageUrls({ imageKeys: [key] });
-            if (res.success) {
-              return res.data[0];
-            }
-            return null;
-          }),
-        )),
-      ),
+            })
+          ))
+      )
     );
 
     return ok(rows[0]);
@@ -179,8 +183,8 @@ export async function getOutfit({
 
 export async function deleteOutfit({ outfitId }: { outfitId: number }) {
   try {
-    return withAuth(deleteOutfitHandler, {outfitId})
-  } catch (error) {
+    return withAuth(deleteOutfitHandler, { outfitId });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -214,10 +218,22 @@ async function deleteOutfitHandler({
 }
 
 type updateOutfitSchemaType = z.infer<typeof updateOutfitSchema>;
-export async function updateOutfit({formData, removedItemIds, outfitId}: {formData: updateOutfitSchemaType, removedItemIds: number[], outfitId: number}) {
+export async function updateOutfit({
+  formData,
+  removedItemIds,
+  outfitId,
+}: {
+  formData: updateOutfitSchemaType;
+  removedItemIds: number[];
+  outfitId: number;
+}) {
   try {
-    return withAuth(updateOutfitHandler, {formData, removedItemIds, outfitId});
-  } catch (error) {
+    return withAuth(updateOutfitHandler, {
+      formData,
+      removedItemIds,
+      outfitId,
+    });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -243,18 +259,18 @@ async function updateOutfitHandler({
 
     await query(
       "UPDATE outfits SET name=$1, note=$2 WHERE user_id=$3 AND id=$4",
-      [data.name, data.note, userId, outfitId],
+      [data.name, data.note, userId, outfitId]
     );
 
     await query(
       "INSERT INTO outfit_items (outfit_id, item_id) SELECT $1, itemId FROM unnest($2::int[]) AS itemId ON CONFLICT DO NOTHING",
-      [outfitId, data.selectedItemIds],
+      [outfitId, data.selectedItemIds]
     );
 
     if (removedItemIds.length > 0) {
       await query(
         "DELETE FROM outfit_items WHERE outfit_id=$1 AND item_id=ANY($2)",
-        [outfitId, removedItemIds],
+        [outfitId, removedItemIds]
       );
     }
 

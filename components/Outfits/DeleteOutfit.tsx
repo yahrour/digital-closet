@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { deleteOutfit } from "@/actions/outfits.actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,16 +13,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash } from "lucide-react";
-import { deleteOutfit } from "@/actions/outfits.actions";
 import { redirect } from "next/navigation";
+import { useState } from "react";
 
-export function DeleteOutfit({
-  outfitId,
-  userId,
-}: {
-  outfitId: number;
-  userId: string;
-}) {
+export function DeleteOutfit({ outfitId }: { outfitId: number }) {
   const [message, setMessage] = useState<{
     message: string;
     success: boolean;

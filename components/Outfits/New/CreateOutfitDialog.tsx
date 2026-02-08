@@ -54,7 +54,7 @@ export default function CreateOutfitDialog({
   useEffect(() => {
     form.setValue(
       "selectedItemIds",
-      selectedItems.map((item) => item.id),
+      selectedItems.map((item) => item.id)
     );
   }, [selectedItems]);
 
@@ -66,14 +66,14 @@ export default function CreateOutfitDialog({
       redirect("/signIn");
     }
 
-    const result = await createNewOutfit({formData});
+    const result = await createNewOutfit({ formData });
 
     setIsPendig(false);
 
     if (!result.success) {
       setError(result.error.message);
-    } 
-    
+    }
+
     setIsPendig(false);
     form.reset();
     setSelectedItems([]);
@@ -85,7 +85,7 @@ export default function CreateOutfitDialog({
     setError(null);
     form.clearErrors();
     setOpen(nextOpen);
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -151,7 +151,11 @@ export default function CreateOutfitDialog({
           </FieldGroup>
           <div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
-            {form.formState.errors.selectedItemIds?.message && <p className="text-red-500 text-xs">{form.formState.errors.selectedItemIds?.message}</p>}
+            {form.formState.errors.selectedItemIds?.message && (
+              <p className="text-red-500 text-xs">
+                {form.formState.errors.selectedItemIds?.message}
+              </p>
+            )}
           </div>
           <DialogFooter>
             <DialogClose

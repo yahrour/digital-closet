@@ -22,7 +22,7 @@ async function setupDb() {
 
     const initSqlFile = fs.readFileSync(
       path.join("__direname", "../database/init.sql"),
-      "utf8",
+      "utf8"
     );
 
     await pool.query(initSqlFile);

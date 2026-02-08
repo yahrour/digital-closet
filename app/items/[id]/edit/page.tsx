@@ -34,5 +34,5 @@ export default async function Edit({
   }
 
   const completeItemInfo = { ...item.data, imageUrls: imageUrls.data };
-  return <ItemEdit item={completeItemInfo} userId={session.user.id} />;
+  return <ItemEdit item={completeItemInfo} />;
 }

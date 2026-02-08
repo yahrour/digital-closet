@@ -40,7 +40,7 @@ import { NewItemImagesPreview } from "@/components/Items/New/NewItemImagesPrevie
 
 export type newItemFormSchemaType = z.infer<typeof newItemFormSchema>;
 
-export function New({userId}: {userId: string}) {
+export function New({ userId }: { userId: string }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const form = useForm<newItemFormSchemaType>({
     resolver: zodResolver(newItemFormSchema),

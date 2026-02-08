@@ -28,8 +28,8 @@ export async function generateItemImageUrls({
         bucket: bucketName,
         key: imageKey,
         expiresIn: 3600,
-      }),
-    ),
+      })
+    )
   );
 
   return ok(urls);

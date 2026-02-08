@@ -11,7 +11,7 @@ import { DatabaseError } from "pg";
 export async function getUserCategories() {
   try {
     return withAuth(getUserCategoriesHandler, {});
-  } catch (error) {
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -28,7 +28,7 @@ async function getUserCategoriesHandler({
   try {
     const { rows } = await query(
       "SELECT name FROM item_categories WHERE user_id=$1",
-      [userId],
+      [userId]
     );
 
     const categories: string[] = [];
@@ -39,7 +39,6 @@ async function getUserCategoriesHandler({
     return fail("Failed to fetch categories");
   }
 }
-
 
 export type categoryUsageCountType = {
   id: number;
@@ -52,7 +51,7 @@ export async function getUserCategoriesUsageCount({
   userId,
   page = 1,
 }: {
-  userId: string ;
+  userId: string;
   page: number;
 }): Promise<ActionResult<categoryUsageCountType[]>> {
   "use cache";
@@ -76,7 +75,7 @@ export async function getUserCategoriesUsageCount({
       GROUP BY ic.name, ic.id 
       ORDER BY ic.name 
       LIMIT $2 OFFSET $3;`,
-      [userId, DEFAULT_PAGE_LIMIT, offset],
+      [userId, DEFAULT_PAGE_LIMIT, offset]
     );
 
     const categories: categoryUsageCountType[] = [];
@@ -87,7 +86,7 @@ export async function getUserCategoriesUsageCount({
         name: category.name,
         usageCount: category.count,
         total: Number(category.total),
-      }),
+      })
     );
     return ok(categories);
   } catch (error) {
@@ -95,7 +94,6 @@ export async function getUserCategoriesUsageCount({
     return fail("Failed to fetch categories");
   }
 }
-
 
 export async function searchUserCategoriesUsageCount({
   userId,
@@ -108,14 +106,14 @@ export async function searchUserCategoriesUsageCount({
 }): Promise<ActionResult<categoryUsageCountType[]>> {
   "use cache";
   cacheTag("categoryUsageCounts");
-  
+
   try {
     if (!userId) {
       return fail("User doesn't exist");
     }
-    
+
     const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
-    
+
     const { rows } = await query(
       `
       SELECT ic.id, ic.user_id, ic.name, COUNT(i.id), COUNT(*) OVER () AS total 
@@ -126,7 +124,7 @@ export async function searchUserCategoriesUsageCount({
       GROUP BY ic.name, ic.id 
       ORDER BY ic.name 
       LIMIT $3 OFFSET $4;`,
-      [userId, `%${category}%`, DEFAULT_PAGE_LIMIT, offset],
+      [userId, `%${category}%`, DEFAULT_PAGE_LIMIT, offset]
     );
 
     const categories: categoryUsageCountType[] = [];
@@ -137,7 +135,7 @@ export async function searchUserCategoriesUsageCount({
         name: category.name,
         usageCount: category.count,
         total: Number(category.total),
-      }),
+      })
     );
 
     return ok(categories);
@@ -147,11 +145,10 @@ export async function searchUserCategoriesUsageCount({
   }
 }
 
-
-export async function createNewCategory({name}: {name: string}) {
+export async function createNewCategory({ name }: { name: string }) {
   try {
-    return withAuth(createNewCategoryHandler, {name});
-  } catch (error) {
+    return withAuth(createNewCategoryHandler, { name });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -170,7 +167,7 @@ async function createNewCategoryHandler({
       return fail("Category name is required");
     }
     const { data, success, error } = categoryNameSchema.safeParse({
-      name
+      name,
     });
     if (!success) {
       const errorObj = JSON.parse(error.message);
@@ -179,7 +176,7 @@ async function createNewCategoryHandler({
 
     await query(
       "INSERT INTO item_categories (user_id, name) VALUES ($1, lower($2));",
-      [userId, data.name],
+      [userId, data.name]
     );
 
     updateTag("categories");
@@ -190,9 +187,7 @@ async function createNewCategoryHandler({
     if (error instanceof DatabaseError) {
       switch (error.code) {
         case "23505": // unique_violation
-          return fail(
-            "You already have a category with this name",
-          );
+          return fail("You already have a category with this name");
 
         case "23503": // foreign_key_violation
           return fail("User doesn't exist");
@@ -202,11 +197,14 @@ async function createNewCategoryHandler({
   }
 }
 
-
-export async function deleteUserCategory({categoryId}:{categoryId: number}) {
+export async function deleteUserCategory({
+  categoryId,
+}: {
+  categoryId: number;
+}) {
   try {
-    return withAuth(deleteUserCategoryHandler, {categoryId});
-  } catch (error) {
+    return withAuth(deleteUserCategoryHandler, { categoryId });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -240,11 +238,16 @@ async function deleteUserCategoryHandler({
   }
 }
 
-
-export async function renameUserCategory({newName, categoryId}: {newName: string, categoryId: number}) {
+export async function renameUserCategory({
+  newName,
+  categoryId,
+}: {
+  newName: string;
+  categoryId: number;
+}) {
   try {
-    return withAuth(renameUserCategoryHandler, {newName, categoryId});
-  } catch (error) {
+    return withAuth(renameUserCategoryHandler, { newName, categoryId });
+  } catch {
     return fail("Unauthorized");
   }
 }
@@ -267,10 +270,10 @@ async function renameUserCategoryHandler({
     if (!categoryId) {
       return fail("Invalid category name");
     }
-    
+
     await query(
       "UPDATE item_categories SET name=$1 WHERE id=$2 AND user_id=$3",
-      [newName, categoryId, userId],
+      [newName, categoryId, userId]
     );
 
     updateTag("items");

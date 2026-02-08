@@ -53,7 +53,7 @@ export function UploadDropzone({
         "border-input text-foreground relative border border-dashed transition-colors",
         {
           "border-primary/80": isDragActive,
-        },
+        }
       )}
     >
       <label
@@ -64,7 +64,7 @@ export function UploadDropzone({
             "text-muted-foreground cursor-not-allowed": isPending,
             "hover:bg-accent dark:hover:bg-accent/40": !isPending,
             "opacity-0": isDragActive,
-          },
+          }
         )}
         htmlFor={_id || id}
       >

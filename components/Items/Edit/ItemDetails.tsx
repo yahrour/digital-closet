@@ -1,8 +1,7 @@
 "use client";
 
 import { deleteItem, itemType } from "@/actions/items.actions";
-import Image from "next/image";
-import { useState } from "react";
+import { ColorDot } from "@/components/ColorDot";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,18 +14,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Pencil, Trash } from "lucide-react";
-import { redirect } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
-import { ColorDot } from "@/components/ColorDot";
+import { redirect } from "next/navigation";
+import { useState } from "react";
 
 export function ItemDetails({
   item,
   imageUrls,
-  userId,
 }: {
   item: itemType;
   imageUrls: string[];
-  userId: string;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -106,7 +104,7 @@ export function ItemDetails({
           <Pencil size={16} />
           Edit
         </Link>
-        <Delete itemId={item.id} userId={userId} imageKeys={item.image_keys} />
+        <Delete itemId={item.id} imageKeys={item.image_keys} />
       </div>
     </div>
   );
@@ -139,11 +137,9 @@ function Pill({ children }: { children: React.ReactNode }) {
 
 function Delete({
   itemId,
-  userId,
   imageKeys,
 }: {
   itemId: number;
-  userId: string;
   imageKeys: string[];
 }) {
   const [message, setMessage] = useState<{

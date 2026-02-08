@@ -35,11 +35,5 @@ export default async function Item({
     return <div>Failed to fetch item images</div>;
   }
 
-  return (
-    <ItemDetails
-      item={item.data}
-      imageUrls={imageUrls.data}
-      userId={session.user.id}
-    />
-  );
+  return <ItemDetails item={item.data} imageUrls={imageUrls.data} />;
 }

@@ -60,7 +60,7 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
         inputRef.current.value = "";
       }
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -83,9 +83,7 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
             placeholder="e.g. Tops, Outerwear, Shoes"
             defaultValue={categoryName}
           />
-          <div>
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-          </div>
+          <div>{error && <p className="text-red-500 text-xs">{error}</p>}</div>
         </div>
 
         <DialogFooter>
