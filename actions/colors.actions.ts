@@ -12,11 +12,11 @@ export async function getColors({
   "use cache";
   cacheTag("colors");
 
-  if (!userId) {
-    return fail("User does not exist");
-  }
-
   try {
+    if (!userId) {
+      return fail("User does not exist");
+    }
+    
     const primary_color =
       "SELECT user_id, primary_color::text AS color FROM items";
     const secondary_colors =

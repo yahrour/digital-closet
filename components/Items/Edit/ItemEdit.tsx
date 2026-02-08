@@ -88,9 +88,7 @@ export default function ItemEdit({
 
   useEffect(() => {
     const func = async () => {
-      const result = await getUserCategories({
-        userId: userId,
-      });
+      const result = await getUserCategories();
       if (result.success) {
         setCategories(result.data);
       } else {
@@ -170,7 +168,6 @@ export default function ItemEdit({
     };
 
     const result = await updateItem({
-      userId: userId,
       itemId: item.id,
       formData: data,
       deletedTags,

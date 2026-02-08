@@ -1,4 +1,3 @@
-import { getUserCategories } from "@/actions/categories.actions";
 import AuthGate from "@/components/AuthGate";
 import { New } from "@/components/Items/New/New";
 import { auth } from "@/lib/auth";

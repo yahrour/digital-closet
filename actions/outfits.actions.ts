@@ -8,8 +8,16 @@ import { generateItemImageUrls } from "./images.actions";
 import { cacheTag, updateTag } from "next/cache";
 import z from "zod";
 import { DEFAULT_PAGE_LIMIT } from "@/constants";
+import { withAuth } from "@/lib/withAuth";
 
-export async function createNewOutfit({
+export async function createNewOutfit({ formData }: { formData: newOutfitSchemaType }) {
+  try {
+    return withAuth(createNewOutfitHandler, {formData});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function createNewOutfitHandler({
   formData,
   userId,
 }: {
@@ -169,7 +177,14 @@ export async function getOutfit({
   }
 }
 
-export async function deleteOutfit({
+export async function deleteOutfit({ outfitId }: { outfitId: number }) {
+  try {
+    return withAuth(deleteOutfitHandler, {outfitId})
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function deleteOutfitHandler({
   outfitId,
   userId,
 }: {
@@ -198,32 +213,15 @@ export async function deleteOutfit({
   }
 }
 
-export async function getOutfitItemIds(
-  outfitId: string,
-): Promise<ActionResult<number[]>> {
-  "use cache";
-  cacheTag("outfit");
+type updateOutfitSchemaType = z.infer<typeof updateOutfitSchema>;
+export async function updateOutfit({formData, removedItemIds, outfitId}: {formData: updateOutfitSchemaType, removedItemIds: number[], outfitId: number}) {
   try {
-    if (!outfitId) {
-      return fail("Outfit doesn't exist");
-    }
-
-    const { rows } = await query(
-      "SELECT item_id FROM outfit_items WHERE outfit_id=$1",
-      [outfitId],
-    );
-
-    const itemIds = rows.map((row) => row.item_id);
-
-    return ok(itemIds);
+    return withAuth(updateOutfitHandler, {formData, removedItemIds, outfitId});
   } catch (error) {
-    console.log("[ERROR] db error: ", error);
-    return fail("Failed to get outfit");
+    return fail("Unauthorized");
   }
 }
-
-type updateOutfitSchemaType = z.infer<typeof updateOutfitSchema>;
-export async function updateOutfit({
+async function updateOutfitHandler({
   formData,
   userId,
   removedItemIds,

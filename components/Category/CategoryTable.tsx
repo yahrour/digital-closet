@@ -91,7 +91,6 @@ function Delete({
     setLoading(true);
     const result = await deleteUserCategory({
       categoryId: categoryId,
-      userId: userId,
     });
     if (!result.success) {
       setError(result.error.message);
@@ -168,7 +167,6 @@ function Rename({
     }
 
     const result = await renameUserCategory({
-      userId: userId,
       categoryId: categoryId,
       newName: data.name,
     });

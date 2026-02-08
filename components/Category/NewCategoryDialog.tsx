@@ -14,8 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { FieldError } from "@/components/ui/field";
+import { useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 import { createNewCategory } from "@/actions/categories.actions";
@@ -42,7 +41,6 @@ export function NewCategoryDialog({ categoryName }: { categoryName: string }) {
       redirect("/signIn");
     }
     const result = await createNewCategory({
-      userId: session.data.user.id,
       name: data.name,
     });
     if (!result.success) {

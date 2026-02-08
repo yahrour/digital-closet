@@ -12,11 +12,11 @@ export async function getTags({
   "use cache";
   cacheTag("tags");
 
-  if (!userId) {
-    return fail("User does not exist");
-  }
-
   try {
+    if (!userId) {
+      return fail("User does not exist");
+    }
+
     const { rows } = await query("SELECT name FROM tags WHERE user_id=$1", [
       userId,
     ]);

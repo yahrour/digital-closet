@@ -30,10 +30,7 @@ export function DeleteOutfit({
   const [loading, setLoading] = useState(false);
   const handleDelete = async () => {
     setLoading(true);
-    const result = await deleteOutfit({
-      outfitId: outfitId,
-      userId: userId,
-    });
+    const result = await deleteOutfit({ outfitId });
     setLoading(false);
     if (!result.success) {
       setMessage({ message: result.error.message, success: false });

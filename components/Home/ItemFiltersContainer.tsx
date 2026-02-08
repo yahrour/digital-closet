@@ -9,16 +9,15 @@ import { ItemFiltersSelect } from "./ItemFiltersSelect";
 
 export async function ItemFiltersContainer() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const userId = session?.user.id;
-
-  if (!session) {
+  
+  if (!session?.user) {
     return <AuthGate />;
   }
 
   const [categories, colors, tags] = await Promise.all([
-    getUserCategories({ userId: userId }),
-    getColors({ userId: userId }),
-    getTags({ userId: userId }),
+    getUserCategories(),
+    getColors({ userId: session.user.id }),
+    getTags({ userId: session.user.id }),
   ]);
 
   return (

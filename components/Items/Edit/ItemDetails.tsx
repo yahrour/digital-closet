@@ -155,7 +155,6 @@ function Delete({
     setLoading(true);
     const result = await deleteItem({
       itemId: itemId,
-      userId: userId,
       imageKeys,
     });
     setLoading(false);

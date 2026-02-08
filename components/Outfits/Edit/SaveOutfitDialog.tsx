@@ -81,7 +81,6 @@ export default function SaveOutfitDialog({
 
     const result = await updateOutfit({
       formData,
-      userId: session.data.user.id,
       outfitId,
       removedItemIds,
     });

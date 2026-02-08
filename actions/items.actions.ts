@@ -8,6 +8,7 @@ import z from "zod";
 import { DatabaseError } from "pg";
 import { deleteImages } from "./images.actions";
 import { DEFAULT_PAGE_LIMIT } from "@/constants";
+import { withAuth } from "@/lib/withAuth";
 
 export type itemsType = {
   id: number;
@@ -79,7 +80,14 @@ export async function getItems({
 }
 
 type newItemSchemaType = z.infer<typeof newItemSchema>;
-export async function addNewItem({
+export async function addNewItem({formData}: {formData: newItemSchemaType}) {
+  try {
+    return withAuth(addNewItemHandler, {formData});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function addNewItemHandler({
   userId,
   formData,
 }: {
@@ -220,11 +228,18 @@ export async function getItem({
     return ok(rows[0]);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("Failed to fetch items");
+    return fail("Failed to fetch item");
   }
 }
 
-export async function deleteItem({
+export async function deleteItem({itemId, imageKeys}: {itemId: number, imageKeys: string[]}) {
+  try {
+    return withAuth(deleteItemHandler, {itemId, imageKeys});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function deleteItemHandler({
   userId,
   itemId,
   imageKeys,
@@ -260,6 +275,21 @@ export async function deleteItem({
 
 type editItemSchemaType = z.infer<typeof editItemSchema>;
 export async function updateItem({
+  itemId,
+  formData,
+  deletedTags,
+}: {
+  itemId: number;
+  formData: editItemSchemaType;
+  deletedTags: string[];
+}) {
+  try {
+    return withAuth(updateItemHandler, {itemId, formData, deletedTags});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function updateItemHandler({
   userId,
   itemId,
   formData,
@@ -396,6 +426,6 @@ export async function updateItem({
           return fail("User does not exist");
       }
     }
-    return fail("Failed to add update item");
+    return fail("Failed to update item");
   }
 }

@@ -3,11 +3,19 @@
 import { DEFAULT_PAGE_LIMIT } from "@/constants";
 import { ActionResult, fail, ok } from "@/lib/actionsType";
 import { query } from "@/lib/db";
+import { withAuth } from "@/lib/withAuth";
 import { categoryNameSchema } from "@/schemas";
 import { cacheTag, updateTag } from "next/cache";
 import { DatabaseError } from "pg";
 
-export async function getUserCategories({
+export async function getUserCategories() {
+  try {
+    return withAuth(getUserCategoriesHandler, {});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function getUserCategoriesHandler({
   userId,
 }: {
   userId: string | undefined;
@@ -32,6 +40,7 @@ export async function getUserCategories({
   }
 }
 
+
 export type categoryUsageCount = {
   id: number;
   userId: string;
@@ -43,18 +52,19 @@ export async function getUserCategoriesUsageCount({
   userId,
   page = 1,
 }: {
-  userId: string | undefined;
+  userId: string ;
   page: number;
 }): Promise<ActionResult<categoryUsageCount[]>> {
   "use cache";
   cacheTag("categoryUsageCounts");
 
-  const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
-
-  if (!userId) {
-    return fail("User does not exist");
-  }
   try {
+    if (!userId) {
+      return fail("User does not exist");
+    }
+
+    const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
+
     const { rows } = await query(
       `
       SELECT ic.id, ic.user_id, ic.name, COUNT(i.id), 
@@ -86,6 +96,7 @@ export async function getUserCategoriesUsageCount({
   }
 }
 
+
 export async function searchUserCategoriesUsageCount({
   userId,
   page = 1,
@@ -97,14 +108,14 @@ export async function searchUserCategoriesUsageCount({
 }): Promise<ActionResult<categoryUsageCount[]>> {
   "use cache";
   cacheTag("categoryUsageCounts");
-
-  const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
-
-  if (!userId) {
-    return fail("User does not exist");
-  }
-
+  
   try {
+    if (!userId) {
+      return fail("User does not exist");
+    }
+    
+    const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
+    
     const { rows } = await query(
       `
       SELECT ic.id, ic.user_id, ic.name, COUNT(i.id), COUNT(*) OVER () AS total 
@@ -136,7 +147,15 @@ export async function searchUserCategoriesUsageCount({
   }
 }
 
-export async function createNewCategory({
+
+export async function createNewCategory({name}: {name: string}) {
+  try {
+    return withAuth(createNewCategoryHandler, {name});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function createNewCategoryHandler({
   userId,
   name,
 }: {
@@ -179,24 +198,33 @@ export async function createNewCategory({
           return fail("User does not exist");
       }
     }
-    return fail("Failed to create category");
+    return fail("Failed to create new category");
   }
 }
 
-export async function deleteUserCategory({
+
+export async function deleteUserCategory({categoryId}:{categoryId: number}) {
+  try {
+    return withAuth(deleteUserCategoryHandler, {categoryId});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function deleteUserCategoryHandler({
   userId,
   categoryId,
 }: {
   userId: string;
   categoryId: number;
 }): Promise<ActionResult<null>> {
-  if (!userId) {
-    return fail("User does not exist");
-  }
-  if (!categoryId) {
-    return fail("Invalid category name");
-  }
   try {
+    if (!userId) {
+      return fail("User does not exist");
+    }
+    if (!categoryId) {
+      return fail("Invalid category name");
+    }
+
     await query("DELETE FROM item_categories WHERE id=$1 AND user_id=$2", [
       categoryId,
       userId,
@@ -208,11 +236,19 @@ export async function deleteUserCategory({
     return ok(null);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("Failed to fetch tags");
+    return fail("Failed to delete category");
   }
 }
 
-export async function renameUserCategory({
+
+export async function renameUserCategory({newName, categoryId}: {newName: string, categoryId: number}) {
+  try {
+    return withAuth(renameUserCategoryHandler, {newName, categoryId});
+  } catch (error) {
+    return fail("Unauthorized");
+  }
+}
+async function renameUserCategoryHandler({
   newName,
   userId,
   categoryId,
@@ -221,16 +257,17 @@ export async function renameUserCategory({
   userId: string;
   categoryId: number;
 }): Promise<ActionResult<null>> {
-  if (!newName) {
-    return fail("Invalid category name");
-  }
-  if (!userId) {
-    return fail("User does not exist");
-  }
-  if (!categoryId) {
-    return fail("Invalid category name");
-  }
   try {
+    if (!newName) {
+      return fail("Invalid category name");
+    }
+    if (!userId) {
+      return fail("User does not exist");
+    }
+    if (!categoryId) {
+      return fail("Invalid category name");
+    }
+    
     await query(
       "UPDATE item_categories SET name=$1 WHERE id=$2 AND user_id=$3",
       [newName, categoryId, userId],
@@ -242,6 +279,6 @@ export async function renameUserCategory({
     return ok(null);
   } catch (error) {
     console.log(`[ERROR] db error ${error}`);
-    return fail("Failed to fetch tags");
+    return fail("Failed to rename category");
   }
 }

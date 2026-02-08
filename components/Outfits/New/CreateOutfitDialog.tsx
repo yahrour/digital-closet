@@ -66,10 +66,7 @@ export default function CreateOutfitDialog({
       redirect("/signIn");
     }
 
-    const result = await createNewOutfit({
-      formData,
-      userId: session.data.user.id,
-    });
+    const result = await createNewOutfit({formData});
 
     setIsPendig(false);
 

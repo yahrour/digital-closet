@@ -65,9 +65,7 @@ export function New({userId}: {userId: string}) {
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   useEffect(() => {
     const func = async () => {
-      const result = await getUserCategories({
-        userId,
-      });
+      const result = await getUserCategories();
       if (result.success) {
         setCategories(result.data);
       } else {
@@ -151,7 +149,6 @@ export function New({userId}: {userId: string}) {
     console.log("data: ", data);
 
     const result = await addNewItem({
-      userId: session.data.user.id,
       formData: data,
     });
 
