@@ -11,10 +11,10 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Controller, useForm } from "react-hook-form";
-import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
 
 import {
   MultiSelect,
@@ -25,22 +25,22 @@ import {
   MultiSelectValue,
 } from "@/components/ui/multi-select";
 
-import { colorsType, seasonsType } from "@/constants";
-import { Badge } from "@/components/ui/badge";
-import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
-import { UploadDropzone } from "@/components/ui/upload-dropzone";
-import { useUploadFiles } from "@better-upload/client";
-import { Progress } from "@/components/ui/progress";
 import { getUserCategories } from "@/actions/categories.actions";
 import { addNewItem } from "@/actions/items.actions";
-import { XIcon } from "lucide-react";
-import { newItemFormSchema } from "@/schemas";
 import { NewItemImagesPreview } from "@/components/Items/New/NewItemImagesPreview";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { UploadDropzone } from "@/components/ui/upload-dropzone";
+import { colorsType, seasonsType } from "@/constants";
+import { authClient } from "@/lib/auth-client";
+import { newItemFormSchema } from "@/schemas";
+import { useUploadFiles } from "@better-upload/client";
+import { XIcon } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export type newItemFormSchemaType = z.infer<typeof newItemFormSchema>;
 
-export function New({ userId }: { userId: string }) {
+export function New() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const form = useForm<newItemFormSchemaType>({
     resolver: zodResolver(newItemFormSchema),

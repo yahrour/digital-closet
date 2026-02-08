@@ -40,6 +40,17 @@ export default async function Settings() {
             className="text-xl text-gray-400 group-hover:translate-x-1 transition"
           />
         </Link>
+
+        <Link
+          href="/settings/tags"
+          className="group flex items-center justify-between py-6 transition hover:opacity-70"
+        >
+          <span className="text-lg font-light tracking-wide">Tags</span>
+          <MoveRight
+            size={16}
+            className="text-xl text-gray-400 group-hover:translate-x-1 transition"
+          />
+        </Link>
       </div>
     </div>
   );

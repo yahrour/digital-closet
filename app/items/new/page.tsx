@@ -11,5 +11,5 @@ export default async function Page() {
     return <AuthGate />;
   }
 
-  return <New userId={session.user.id} />;
+  return <New />;
 }
