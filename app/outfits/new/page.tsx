@@ -1,11 +1,11 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import AuthGate from "@/components/AuthGate";
-import { Suspense } from "react";
-import { ItemFiltersSkeleton } from "@/components/Home/ItemFiltersSkeleton";
 import { ItemFiltersContainer } from "@/components/Home/ItemFiltersContainer";
+import { ItemFiltersSkeleton } from "@/components/Home/ItemFiltersSkeleton";
 import { OutfitItemSelector } from "@/components/Outfits/New/OutfitItemSelector";
 import { OutfitItemSelectorSkeleton } from "@/components/Outfits/New/OutfitItemSelectorSkeleton";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { Suspense } from "react";
 
 export default async function New({
   searchParams,
@@ -27,7 +27,7 @@ export default async function New({
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 w-full mx-auto">
       <Suspense fallback={<ItemFiltersSkeleton />}>
         <ItemFiltersContainer />
       </Suspense>

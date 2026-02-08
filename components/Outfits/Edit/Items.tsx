@@ -49,7 +49,6 @@ export function Items({
   };
 
   const handleRemoveItem = (itemId: number) => {
-    console.log("remove: ", itemId);
     setSelectedItems((prev) =>
       prev.filter((existItem) => existItem.id != itemId)
     );
@@ -57,7 +56,7 @@ export function Items({
 
   return (
     <div className="space-y-6">
-      <div className="flex max-sm:flex-wrap items-center gap-3">
+      <div className="flex max-sm:flex-wrap items-center gap-3 max-w-[1050px] mx-auto">
         <div className="flex gap-2 overflow-x-auto w-fit">
           {selectedItems.map((item) => (
             <div
@@ -103,7 +102,7 @@ export function Items({
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-12 justify-center items-center">
         {items.map((item) => {
           return (
             <div

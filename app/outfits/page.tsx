@@ -1,12 +1,12 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { getOutfits, outfitType } from "@/actions/outfits.actions";
-import Link from "next/link";
-import Image from "next/image";
 import AuthGate from "@/components/AuthGate";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
 import { Plus } from "lucide-react";
+import { headers } from "next/headers";
+import Image from "next/image";
+import Link from "next/link";
 
 export default async function ShowOutfits({
   searchParams,
@@ -52,8 +52,8 @@ export default async function ShowOutfits({
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 gap-6 justify-center items-center">
+    <div className="space-y-6 w-full mx-auto">
+      <div className="grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 gap-6 lg:gap-12 justify-center items-center">
         {outfits.data.map((outfit) => (
           <Outfit key={outfit.id} outfit={outfit} />
         ))}

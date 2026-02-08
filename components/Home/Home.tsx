@@ -56,7 +56,7 @@ export default async function Home({
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 w-full mx-auto">
       <Suspense fallback={<ItemFiltersSkeleton />}>
         <ItemFiltersContainer />
       </Suspense>

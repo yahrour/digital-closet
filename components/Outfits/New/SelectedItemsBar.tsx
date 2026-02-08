@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import { selectedItemType } from "./Items";
 import { XIcon } from "lucide-react";
+import Image from "next/image";
 import CreateOutfitDialog from "./CreateOutfitDialog";
+import { selectedItemType } from "./Items";
 
 export function SelectedItemsBar({
   selectedItems,
@@ -19,7 +19,7 @@ export function SelectedItemsBar({
   };
 
   return (
-    <div className="flex max-sm:flex-wrap items-center gap-3">
+    <div className="flex max-sm:flex-wrap items-center gap-3 max-w-[1050px] mx-auto">
       <div className="flex gap-2 overflow-x-auto w-fit">
         {selectedItems.map((item) => (
           <div

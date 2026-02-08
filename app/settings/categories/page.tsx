@@ -65,7 +65,7 @@ export default async function Categories({
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 w-full max-w-6xl mx-auto">
       <FieldLegend className="md:text-2xl! max-md:text-xl!">
         Category management
       </FieldLegend>

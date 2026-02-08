@@ -44,7 +44,7 @@ export default async function View({
     );
   }
   return (
-    <div className="max-w-4xl mx-auto px-4 space-y-10">
+    <div className="w-full mx-auto px-4 space-y-10">
       <Link
         href="/outfits"
         className="text-sm text-neutral-500 flex items-center gap-1 cursor-pointer"
@@ -68,7 +68,7 @@ export default async function View({
           Items
         </h2>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+        <div className="max-w-3xl grid grid-cols-2 sm:grid-cols-3 gap-5">
           {outfit.data.items.map((item, idx) => (
             <div key={outfit.data.item_ids[idx]} className="space-y-2">
               <div className="relative aspect-square bg-neutral-50 overflow-hidden">
@@ -95,13 +95,13 @@ export default async function View({
         </div>
       </div>
 
-      <div className="w-fit flex gap-4 ml-auto">
+      <div className="max-w-3xl flex justify-end gap-4">
         <Link href={`/outfits/${outfit.data.id}/edit`}>
           <Button variant="outline" className="text-sm cursor-pointer px-6">
             Edit
           </Button>
         </Link>
-        <DeleteOutfit userId={session.user.id} outfitId={outfit.data.id} />
+        <DeleteOutfit outfitId={outfit.data.id} />
       </div>
     </div>
   );
