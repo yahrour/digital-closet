@@ -5,7 +5,5 @@ export default function Page({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  return;
-
-  <Home searchParams={searchParams} />;
+  return <Home searchParams={searchParams} />;
 }
