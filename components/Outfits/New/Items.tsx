@@ -1,6 +1,6 @@
 "use client";
 
-import { itemsType } from "@/actions/items.actions";
+import { itemType } from "@/actions/items.actions";
 import { ColorDot } from "@/components/ColorDot";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -9,10 +9,10 @@ import { useState } from "react";
 import { SelectedItemsBar } from "./SelectedItemsBar";
 import { Pagination } from "@/components/Pagination";
 
-type itemsWithImageUrls = itemsType & {
+type itemsWithImageUrlsType = itemType & {
   imageUrls: string[] | null;
 };
-export type selectedItem = {
+export type selectedItemType = {
   id: number;
   imageUrl: string | null;
 };
@@ -21,12 +21,12 @@ export function Items({
   items,
   page,
 }: {
-  items: itemsWithImageUrls[];
+  items: itemsWithImageUrlsType[];
   page: number;
 }) {
-  const [selectedItems, setSelectedItems] = useState<selectedItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<selectedItemType[]>([]);
 
-  const toggleSelectItem = (item: selectedItem) => {
+  const toggleSelectItem = (item: selectedItemType) => {
     setSelectedItems((prev) =>
       prev.some((existItem) => existItem.id === item.id)
         ? prev.filter((existItem) => existItem.id !== item.id)
@@ -62,9 +62,9 @@ function Item({
   toggleSelectItem,
   selectedItems,
 }: {
-  item: itemsWithImageUrls;
-  selectedItems: selectedItem[];
-  toggleSelectItem: (item: selectedItem) => void;
+  item: itemsWithImageUrlsType;
+  selectedItems: selectedItemType[];
+  toggleSelectItem: (item: selectedItemType) => void;
 }) {
   return (
     <div

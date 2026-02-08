@@ -10,7 +10,7 @@ import { deleteImages } from "./images.actions";
 import { DEFAULT_PAGE_LIMIT } from "@/constants";
 import { withAuth } from "@/lib/withAuth";
 
-export type itemsType = {
+export type itemType = {
   id: number;
   name: string;
   seasons: string[];
@@ -20,7 +20,7 @@ export type itemsType = {
   image_keys: string[];
   category: string;
   tags: { id: number; name: string }[];
-  total: number;
+  total?: number;
 };
 
 export async function getItems({
@@ -37,7 +37,7 @@ export async function getItems({
   seasons: string[] | null;
   colors: string[] | null;
   tags: string[] | null;
-}): Promise<ActionResult<itemsType[]>> {
+}): Promise<ActionResult<itemType[]>> {
   "use cache";
   cacheTag("items");
 
@@ -97,7 +97,7 @@ async function addNewItemHandler({
   try {
     if (!userId) {
       deleteImages(formData.images);
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
 
     const { data, success } = newItemSchema.safeParse(formData);
@@ -180,7 +180,7 @@ async function addNewItemHandler({
           );
 
         case "23503": // foreign_key_violation
-          return fail("User does not exist");
+          return fail("User doesn't exist");
       }
     }
     console.log(`[ERROR] db error ${error}`);
@@ -188,7 +188,6 @@ async function addNewItemHandler({
   }
 }
 
-export type itemType = Omit<itemsType, "total">;
 export async function getItem({
   userId,
   itemId,
@@ -305,7 +304,7 @@ async function updateItemHandler({
       if (formData.newImages && formData.newImages.length > 0) {
         deleteImages(formData.newImages);
       }
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
 
     const { data, success } = editItemSchema.safeParse(formData);
@@ -423,7 +422,7 @@ async function updateItemHandler({
           );
 
         case "23503": // foreign_key_violation
-          return fail("User does not exist");
+          return fail("User doesn't exist");
       }
     }
     return fail("Failed to update item");

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { selectedItem } from "./Items";
+import { selectedItemType } from "./Items";
 import { XIcon } from "lucide-react";
 import CreateOutfitDialog from "./CreateOutfitDialog";
 
@@ -9,8 +9,8 @@ export function SelectedItemsBar({
   selectedItems,
   setSelectedItems,
 }: {
-  selectedItems: selectedItem[];
-  setSelectedItems: React.Dispatch<React.SetStateAction<selectedItem[]>>;
+  selectedItems: selectedItemType[];
+  setSelectedItems: React.Dispatch<React.SetStateAction<selectedItemType[]>>;
 }) {
   const handleRemoveItem = (itemId: number) => {
     setSelectedItems((prev) =>

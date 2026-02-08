@@ -1,6 +1,6 @@
 "use client";
 
-import { itemsType } from "@/actions/items.actions";
+import { itemType } from "@/actions/items.actions";
 import { ColorDot } from "@/components/ColorDot";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import SaveOutfitDialog from "./SaveOutfitDialog";
 import { Pagination } from "@/components/Pagination";
 
-type itemsWithImageUrls = itemsType & {
+type itemsWithImageUrls = itemType & {
   imageUrls: string[] | null;
 };
 export type selectedItem = {

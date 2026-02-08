@@ -14,7 +14,7 @@ export async function getColors({
 
   try {
     if (!userId) {
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
     
     const primary_color =

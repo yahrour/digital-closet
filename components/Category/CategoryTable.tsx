@@ -36,7 +36,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useRef, useState } from "react";
 import {
-  categoryUsageCount,
+  categoryUsageCountType,
   deleteUserCategory,
   renameUserCategory,
 } from "@/actions/categories.actions";
@@ -45,7 +45,7 @@ import { categoryNameSchema } from "@/schemas";
 export default function CategoryTable({
   categories,
 }: {
-  categories: categoryUsageCount[];
+  categories: categoryUsageCountType[];
 }) {
   return (
     <Table>

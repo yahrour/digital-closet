@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getOutfits, outfit } from "@/actions/outfits.actions";
+import { getOutfits, outfitType } from "@/actions/outfits.actions";
 import Link from "next/link";
 import Image from "next/image";
 import AuthGate from "@/components/AuthGate";
@@ -66,7 +66,7 @@ export default async function ShowOutfits({
   );
 }
 
-function Outfit({ outfit }: { outfit: outfit }) {
+function Outfit({ outfit }: { outfit: outfitType }) {
   const containerSize = 200;
   const offsetMultiplier = containerSize * 0.024;
 

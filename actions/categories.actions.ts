@@ -23,7 +23,7 @@ async function getUserCategoriesHandler({
   "use cache";
   cacheTag("categories");
   if (!userId) {
-    return fail("User does not exist");
+    return fail("User doesn't exist");
   }
   try {
     const { rows } = await query(
@@ -41,7 +41,7 @@ async function getUserCategoriesHandler({
 }
 
 
-export type categoryUsageCount = {
+export type categoryUsageCountType = {
   id: number;
   userId: string;
   name: string;
@@ -54,13 +54,13 @@ export async function getUserCategoriesUsageCount({
 }: {
   userId: string ;
   page: number;
-}): Promise<ActionResult<categoryUsageCount[]>> {
+}): Promise<ActionResult<categoryUsageCountType[]>> {
   "use cache";
   cacheTag("categoryUsageCounts");
 
   try {
     if (!userId) {
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
 
     const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
@@ -79,7 +79,7 @@ export async function getUserCategoriesUsageCount({
       [userId, DEFAULT_PAGE_LIMIT, offset],
     );
 
-    const categories: categoryUsageCount[] = [];
+    const categories: categoryUsageCountType[] = [];
     rows.map((category) =>
       categories.push({
         id: category.id,
@@ -105,13 +105,13 @@ export async function searchUserCategoriesUsageCount({
   userId: string | undefined;
   page: number;
   category: string;
-}): Promise<ActionResult<categoryUsageCount[]>> {
+}): Promise<ActionResult<categoryUsageCountType[]>> {
   "use cache";
   cacheTag("categoryUsageCounts");
   
   try {
     if (!userId) {
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
     
     const offset = (page - 1) * DEFAULT_PAGE_LIMIT;
@@ -129,7 +129,7 @@ export async function searchUserCategoriesUsageCount({
       [userId, `%${category}%`, DEFAULT_PAGE_LIMIT, offset],
     );
 
-    const categories: categoryUsageCount[] = [];
+    const categories: categoryUsageCountType[] = [];
     rows.map((category) =>
       categories.push({
         id: category.id,
@@ -164,7 +164,7 @@ async function createNewCategoryHandler({
 }): Promise<ActionResult<null>> {
   try {
     if (!userId) {
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
     if (!name) {
       return fail("Category name is required");
@@ -195,7 +195,7 @@ async function createNewCategoryHandler({
           );
 
         case "23503": // foreign_key_violation
-          return fail("User does not exist");
+          return fail("User doesn't exist");
       }
     }
     return fail("Failed to create new category");
@@ -219,7 +219,7 @@ async function deleteUserCategoryHandler({
 }): Promise<ActionResult<null>> {
   try {
     if (!userId) {
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
     if (!categoryId) {
       return fail("Invalid category name");
@@ -262,7 +262,7 @@ async function renameUserCategoryHandler({
       return fail("Invalid category name");
     }
     if (!userId) {
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
     if (!categoryId) {
       return fail("Invalid category name");

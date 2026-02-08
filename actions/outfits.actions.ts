@@ -53,7 +53,7 @@ async function createNewOutfitHandler({
   }
 }
 
-export type outfit = {
+export type outfitType = {
   id: number;
   name: string;
   note: string;
@@ -69,7 +69,7 @@ export async function getOutfits({
 }: {
   userId: string;
   page: number;
-}): Promise<ActionResult<outfit[]>> {
+}): Promise<ActionResult<outfitType[]>> {
   "use cache";
   cacheTag("outfits");
 
@@ -128,7 +128,7 @@ export async function getOutfit({
 }: {
   outfitId: string;
   userId: string;
-}): Promise<ActionResult<outfit>> {
+}): Promise<ActionResult<outfitType>> {
   "use cache";
   cacheTag("outfit");
 

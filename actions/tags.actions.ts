@@ -14,7 +14,7 @@ export async function getTags({
 
   try {
     if (!userId) {
-      return fail("User does not exist");
+      return fail("User doesn't exist");
     }
 
     const { rows } = await query("SELECT name FROM tags WHERE user_id=$1", [

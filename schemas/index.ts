@@ -24,7 +24,6 @@ export const signInSchema = z.object({
   password: z
     .string()
     .min(1, "please set a password")
-    .min(8, "password too short"),
 });
 
 export const accountDetailsSchema = z
@@ -34,7 +33,6 @@ export const accountDetailsSchema = z
     currentPassword: z
       .string()
       .min(1, "please set current password")
-      .min(8, "password too short")
       .optional(),
     newPassword: z
       .string()
@@ -99,7 +97,7 @@ export const categoryNameSchema = z.object({
 export const editItemFormSchema = z.object({
   name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
   seasons: z
-    .array(z.enum(seasonsType, "please select a season"))
+    .array(z.enum(seasonsType, "please select a season(s)"))
     .min(1, "please select a season(s)"),
   primaryColor: z.enum(colorsType, "please select a primary color"),
   secondaryColors: z.array(z.enum(colorsType)).optional(),
@@ -116,7 +114,7 @@ export const editItemFormSchema = z.object({
 export const editItemSchema = z.object({
   name: z.string().trim().min(1, "please set a name").max(50, "name too long"),
   seasons: z
-    .array(z.enum(seasonsType, "please select a season"))
+    .array(z.enum(seasonsType, "please select a season(s)"))
     .min(1, "please select a season(s)"),
   primaryColor: z.enum(colorsType, "please select a primary color"),
   secondaryColors: z.array(z.enum(colorsType)).optional(),

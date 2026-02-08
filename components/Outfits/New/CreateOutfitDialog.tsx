@@ -23,7 +23,7 @@ import { newOutfitSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
-import { selectedItem } from "./Items";
+import { selectedItemType } from "./Items";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
@@ -35,8 +35,8 @@ export default function CreateOutfitDialog({
   selectedItems,
   setSelectedItems,
 }: {
-  selectedItems: selectedItem[];
-  setSelectedItems: React.Dispatch<React.SetStateAction<selectedItem[]>>;
+  selectedItems: selectedItemType[];
+  setSelectedItems: React.Dispatch<React.SetStateAction<selectedItemType[]>>;
 }) {
   const selectedItemIds: number[] = selectedItems?.map((item) => item.id);
   const form = useForm<newOutfitSchemaType>({
