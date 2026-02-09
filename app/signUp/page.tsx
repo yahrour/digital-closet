@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -11,15 +12,14 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 import { signUpSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@/lib/auth-client";
-import { useState } from "react";
-import Link from "next/link";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { redirect } from "next/navigation";
 
 type signUpSchemaType = z.infer<typeof signUpSchema>;
 
@@ -57,8 +57,7 @@ export default function SignUp() {
 
     if (error === null) {
       setMessage({
-        message:
-          "Your account has been created. Please check your email to verify your account.",
+        message: "Account created. Please verify via email.",
         isError: false,
       });
     }
@@ -79,8 +78,7 @@ export default function SignUp() {
           break;
         default:
           setMessage({
-            message:
-              "One or more input values are invalid. Please check and try again.",
+            message: "Some inputs are invalid. Try again.",
             isError: true,
           });
       }

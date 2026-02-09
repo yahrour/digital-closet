@@ -57,10 +57,7 @@ export function New() {
       images: [],
     },
   });
-  const [message, setMessage] = useState<{
-    message: string | undefined;
-    success: boolean;
-  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   useEffect(() => {
@@ -69,17 +66,11 @@ export function New() {
       if (result.success) {
         setCategories(result.data);
       } else {
-        setMessage({
-          message: result.error.message,
-          success: false,
-        });
+        setError(result.error.message);
       }
       setIsLoadingCategories(false);
     };
-    setMessage({
-      message: undefined,
-      success: true,
-    });
+    setError(null);
     func();
   }, []);
 
@@ -114,8 +105,6 @@ export function New() {
   };
 
   const onSubmit = async (formData: newItemFormSchemaType) => {
-    console.log("formData: ", formData);
-
     setIsPendig(true);
 
     const session = await authClient.getSession();
@@ -128,10 +117,7 @@ export function New() {
     files.map((file) => images.push(file.objectInfo.key));
 
     if (images.length === 0) {
-      setMessage({
-        message: "Image upload failed. Please try again.",
-        success: false,
-      });
+      setError("Image upload failed. Please try again.");
       return;
     }
 
@@ -146,24 +132,16 @@ export function New() {
       images,
     };
 
-    console.log("data: ", data);
-
     const result = await addNewItem({
       formData: data,
     });
 
     if (result.success) {
-      setMessage({
-        message: "Item added successfully",
-        success: true,
-      });
       form.reset();
       uploader.reset();
+      redirect("/");
     } else {
-      setMessage({
-        message: result.error.message,
-        success: false,
-      });
+      setError(result.error.message);
     }
 
     setIsPendig(false);
@@ -491,16 +469,7 @@ export function New() {
           </div>
         </FieldGroup>
       </FieldSet>
-
-      <div>
-        {message && !message.success && <FieldError errors={[message]} />}
-        {message && message.success && (
-          <p className="text-green-500 text-xs font-normal">
-            {message.message}
-          </p>
-        )}
-      </div>
-
+      {error && <p className="text-red-500 text-xs">{error}</p>}
       <Button
         disabled={!form.formState.isDirty || isPending || uploader.isPending}
         type="submit"

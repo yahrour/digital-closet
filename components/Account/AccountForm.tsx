@@ -11,13 +11,13 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { accountDetailsSchema } from "@/schemas";
-import { Controller, useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { SessionType } from "@/lib/auth";
 import { authClient } from "@/lib/auth-client";
+import { accountDetailsSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
 
 type accountDetailsSchemaType = z.infer<typeof accountDetailsSchema>;
 
@@ -48,7 +48,7 @@ export function AccountForm({ session }: { session: SessionType | null }) {
       setIsPendig(false);
       console.log("1)error: ", error);
       if (!error) {
-        setMessage({ message: "Name updated successfully.", isError: false });
+        setMessage({ message: "Name updated.", isError: false });
       }
     }
 
@@ -61,7 +61,7 @@ export function AccountForm({ session }: { session: SessionType | null }) {
       });
       setIsPendig(false);
       setMessage({
-        message: "Verify your new email address to complete the update.",
+        message: "Verify your new email to complete the update.",
         isError: false,
       });
     }
@@ -77,19 +77,18 @@ export function AccountForm({ session }: { session: SessionType | null }) {
       setIsPendig(false);
       if (!error) {
         setMessage({
-          message: "Password updated successfully.",
+          message: "Password updated.",
           isError: false,
         });
       } else {
         switch (error.code) {
           case "INVALID_PASSWORD":
             setMessage({
-              message: "Current password is incorrect",
+              message: "Incorrect current password.",
               isError: true,
             });
         }
       }
-      console.log("pwd error: ", error);
     }
   };
 

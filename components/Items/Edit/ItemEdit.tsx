@@ -169,7 +169,7 @@ export default function ItemEdit({ item }: { item: itemEditType }) {
 
     if (result.success) {
       setMessage({
-        message: "Item updated successfully",
+        message: "Item updated.",
         success: true,
       });
       setIsPendig(false);
