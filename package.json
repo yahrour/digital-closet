@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -H localhost",
     "dev-expose": "next dev",
-    "db:setup": "dotenv -e .env -- node scripts/setupDb.mts",
+    "db:setup": "dotenv -e .env -- node scripts/setupDb.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint --write",

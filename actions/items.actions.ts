@@ -172,6 +172,7 @@ async function addNewItemHandler({
     updateTag("items");
     updateTag("tags");
     updateTag("colors");
+    updateTag("categoryUsageCounts");
     return ok(null);
   } catch (error: unknown) {
     await query("ROLLBACK");
@@ -270,6 +271,8 @@ async function deleteItemHandler({
       userId,
     ]);
 
+    updateTag("outfits");
+    updateTag("outfit");
     updateTag("colors");
     updateTag("items");
     updateTag("categoryUsageCounts");
@@ -415,6 +418,7 @@ async function updateItemHandler({
     updateTag("items");
     updateTag("tags");
     updateTag("colors");
+    updateTag("categoryUsageCounts");
     return ok(null);
   } catch (error: unknown) {
     console.log(`[ERROR] db error ${error}`);

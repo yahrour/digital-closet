@@ -136,6 +136,7 @@ export function New() {
       formData: data,
     });
 
+    setIsPendig(false);
     if (result.success) {
       form.reset();
       uploader.reset();
@@ -143,8 +144,6 @@ export function New() {
     } else {
       setError(result.error.message);
     }
-
-    setIsPendig(false);
   };
 
   const uploader = useUploadFiles({

@@ -1,18 +1,37 @@
-CREATE TYPE season_type AS ENUM ('spring', 'summer', 'autumn', 'winter');
-CREATE TYPE color_type AS ENUM (
-  'black',
-  'white',
-  'gray',
-  'blue',
-  'red',
-  'green',
-  'yellow',
-  'brown',
-  'beige',
-  'pink',
-  'purple',
-  'orange'
-);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_type
+        WHERE typname = 'season_type'
+    ) THEN
+        CREATE TYPE season_type AS ENUM ('spring', 'summer', 'autumn', 'winter');
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_type
+        WHERE typname = 'color_type'
+    ) THEN
+        CREATE TYPE color_type AS ENUM (
+          'black',
+          'white',
+          'gray',
+          'blue',
+          'red',
+          'green',
+          'yellow',
+          'brown',
+          'beige',
+          'pink',
+          'purple',
+          'orange'
+        );
+    END IF;
+END $$;
 
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
@@ -23,14 +42,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE TABLE item_categories (
+CREATE TABLE IF NOT EXISTS item_categories (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(25),
   CONSTRAINT unique_category_name UNIQUE (user_id, name)
 );
 
-CREATE TABLE items (
+CREATE TABLE IF NOT EXISTS items (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(50) NOT NULL,
@@ -45,21 +64,21 @@ CREATE TABLE items (
   CONSTRAINT unique_item_name UNIQUE (user_id, name)
 );
 
-CREATE TABLE tags (
+CREATE TABLE IF NOT EXISTS tags  (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(25) NOT NULL,
   CONSTRAINT unique_tag_name UNIQUE (user_id, name)
 );
 
-CREATE TABLE item_tags (
+CREATE TABLE IF NOT EXISTS item_tags (
   tag_id INTEGER REFERENCES tags(id) ON DELETE CASCADE,
   item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
 
   PRIMARY KEY (tag_id, item_id)
 );
 
-CREATE TABLE outfits (
+CREATE TABLE IF NOT EXISTS outfits (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
   name VARCHAR(50) NOT NULL,
@@ -68,7 +87,7 @@ CREATE TABLE outfits (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE outfit_items (
+CREATE TABLE IF NOT EXISTS outfit_items (
   outfit_id INTEGER REFERENCES outfits(id) ON DELETE CASCADE,
   item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
 

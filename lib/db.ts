@@ -10,16 +10,6 @@ const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
-// Check PostgreSQL Status
-(async () => {
-  try {
-    await pool.connect();
-  } catch (err) {
-    console.error("[ERROR] Failed to connect to Postgres", err);
-    process.exit(1);
-  }
-})();
-
 pool.on("error", (err) => {
   console.log("[ERROR] database error", err);
 });
