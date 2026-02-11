@@ -28,10 +28,8 @@ services:
     image: postgres:latest
     networks:
       - app-network
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_DB=digital_closet
+    env_file:
+      - ./.env
     volumes:
       - app-volume:/var/lib/postgresql
     ports:
