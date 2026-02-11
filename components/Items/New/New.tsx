@@ -171,7 +171,7 @@ export function New() {
           Add a new item to your digital closet with its details and image(s).
         </FieldDescription>
         <FieldGroup>
-          <div className="space-y-2">
+          <div className="flex max-sm:flex-col gap-2">
             <Controller
               name="name"
               control={form.control}
@@ -214,85 +214,87 @@ export function New() {
             />
           </div>
           <div className="space-y-2">
-            <Controller
-              name="seasons"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="seasons">Season(s)</FieldLabel>
+            <div className="flex max-sm:flex-col gap-2">
+              <Controller
+                name="seasons"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="seasons">Season(s)</FieldLabel>
 
-                  <MultiSelect
-                    values={field.value}
-                    onValuesChange={field.onChange}
-                  >
-                    <MultiSelectTrigger className="flex-1">
-                      <MultiSelectValue
-                        id="seasons"
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        overflowBehavior="cutoff"
-                        placeholder="Season(s)"
-                      />
-                    </MultiSelectTrigger>
-                    <MultiSelectContent>
-                      <MultiSelectGroup>
-                        {seasonsType?.map((season) => (
-                          <MultiSelectItem key={season} value={season}>
-                            {season}
-                          </MultiSelectItem>
-                        ))}
-                      </MultiSelectGroup>
-                    </MultiSelectContent>
-                  </MultiSelect>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="category"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="category">Category</FieldLabel>
-                  {isLoadingCategories ? (
-                    <div className="h-9 bg-gray-200 animate-pulse"></div>
-                  ) : (
                     <MultiSelect
-                      single
-                      values={field.value ? [field.value] : []}
-                      onValuesChange={(values) => {
-                        field.onChange(values[0] ?? "");
-                      }}
+                      values={field.value}
+                      onValuesChange={field.onChange}
                     >
                       <MultiSelectTrigger className="flex-1">
                         <MultiSelectValue
-                          id="category"
+                          id="seasons"
                           {...field}
                           aria-invalid={fieldState.invalid}
                           overflowBehavior="cutoff"
-                          placeholder="Categories"
+                          placeholder="Season(s)"
                         />
                       </MultiSelectTrigger>
-                      <MultiSelectContent className="w-full">
+                      <MultiSelectContent>
                         <MultiSelectGroup>
-                          {categories?.map((category) => (
-                            <MultiSelectItem key={category} value={category}>
-                              {category}
+                          {seasonsType?.map((season) => (
+                            <MultiSelectItem key={season} value={season}>
+                              {season}
                             </MultiSelectItem>
                           ))}
                         </MultiSelectGroup>
                       </MultiSelectContent>
                     </MultiSelect>
-                  )}
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="category"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="category">Category</FieldLabel>
+                    {isLoadingCategories ? (
+                      <div className="h-9 bg-gray-200 animate-pulse"></div>
+                    ) : (
+                      <MultiSelect
+                        single
+                        values={field.value ? [field.value] : []}
+                        onValuesChange={(values) => {
+                          field.onChange(values[0] ?? "");
+                        }}
+                      >
+                        <MultiSelectTrigger className="flex-1">
+                          <MultiSelectValue
+                            id="category"
+                            {...field}
+                            aria-invalid={fieldState.invalid}
+                            overflowBehavior="cutoff"
+                            placeholder="Categories"
+                          />
+                        </MultiSelectTrigger>
+                        <MultiSelectContent className="w-full">
+                          <MultiSelectGroup>
+                            {categories?.map((category) => (
+                              <MultiSelectItem key={category} value={category}>
+                                {category}
+                              </MultiSelectItem>
+                            ))}
+                          </MultiSelectGroup>
+                        </MultiSelectContent>
+                      </MultiSelect>
+                    )}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
             <div
               className={
                 (form.getValues("tags")?.length ?? 0) > 0 ? "space-y-1" : ""
