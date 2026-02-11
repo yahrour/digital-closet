@@ -17,7 +17,7 @@ export async function generateItemImageUrls({
     return fail("Images not found");
   }
 
-  const bucketName = process.env.S3_BUCKET_NAME;
+  const bucketName = process.env.AWS_S3_BUCKET_NAME;
   if (!bucketName) {
     return fail("Images not found");
   }
@@ -37,7 +37,7 @@ export async function generateItemImageUrls({
 
 export async function deleteImages(images: string[]) {
   const keys = images.map((value) => ({ key: value }));
-  const bucketName = process.env.S3_BUCKET_NAME;
+  const bucketName = process.env.AWS_S3_BUCKET_NAME;
   if (!bucketName) {
     return fail("Server misconfiguration: S3 bucket is missing");
   }

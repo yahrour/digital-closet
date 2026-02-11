@@ -4,14 +4,14 @@ import { toRouteHandler } from "@better-upload/server/adapters/next";
 import { aws } from "@better-upload/server/clients";
 
 export const s3 = aws({
-  accessKeyId: process.env.S3_ACCESS_KEY || "",
-  secretAccessKey: process.env.S3_SECRET_KEY || "",
+  accessKeyId: process.env.AWS_S3_ACCESS_KEY || "",
+  secretAccessKey: process.env.AWS_S3_SECRET_KEY || "",
   region: "eu-west-3",
 });
 
 const router: Router = {
   client: s3,
-  bucketName: process.env.S3_BUCKET_NAME || "",
+  bucketName: process.env.AWS_S3_BUCKET_NAME || "",
   routes: {
     form: route({
       multipleFiles: true,
