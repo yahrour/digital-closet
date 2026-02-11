@@ -40,13 +40,41 @@ the app is for people who struggle managing their closet and building outfits, t
 - Docker Compose
 - AWS S3 Bucket
 
-**Environment Variables**
+## Environment Variables
 
-- BETTER_AUTH_SECRET
-- RESEND_API_KEY
-- AWS_S3_BUCKET_NAME
-- AWS_S3_ACCESS_KEY
-- AWS_S3_SECRET_KEY
+Rename `.env.example` to `.env` in the project root and fill in the following values.
+
+### Database (App Connection)
+
+These variables are used by the application to connect to PostgreSQL:
+
+- `DB_USER` — Database user used by the app (should match `POSTGRES_USER`)
+- `DB_PASSWORD` — Password for the database user (should match `POSTGRES_PASSWORD`)
+- `DB_NAME` — Name of the application database (should match `POSTGRES_DB`)
+
+### PostgreSQL (Docker Initialization)
+
+These variables are used by the official PostgreSQL Docker image when starting the container:
+
+- `POSTGRES_USER` — Initial PostgreSQL user
+- `POSTGRES_PASSWORD` — Password for the user
+- `POSTGRES_DB` — Database created on first startup
+
+### Authentication
+
+- `BETTER_AUTH_SECRET` — Secret key used to sign and secure user sessions (use a long random string)
+
+### Email Service
+
+- `RESEND_API_KEY` — API key for Resend, used to send verification emails
+
+### AWS S3 (Image Storage)
+
+Used for uploading and retrieving item images:
+
+- `AWS_S3_BUCKET_NAME` — S3 bucket name
+- `AWS_S3_ACCESS_KEY` — IAM access key ID
+- `AWS_S3_SECRET_KEY` — IAM secret access key
 
 **Run**
 
