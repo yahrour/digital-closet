@@ -28,7 +28,7 @@ the app is for people who struggle managing their closet and building outfits, t
 
 ## Database Design
 
-- categories ↔ items (one-to-many)
+- categories → items (one-to-many)
 - items ↔ tags (many-to-many)
 - outfits ↔ items (many-to-many)
 
