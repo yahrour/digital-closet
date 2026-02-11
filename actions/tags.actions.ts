@@ -29,7 +29,7 @@ export async function getTags({
 
     return ok(tags);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to fetch tags");
   }
 }
@@ -53,7 +53,7 @@ export async function getUnusedTags({
 
     return ok(tags);
   } catch (error) {
-    console.log("[ERROR] db error: ", error);
+    console.log("db error: ", error);
     return fail("Failed to fetch unused tags");
   }
 }

@@ -74,7 +74,7 @@ export async function getItems({
 
     return ok(rows);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to fetch items");
   }
 }
@@ -186,7 +186,7 @@ async function addNewItemHandler({
           return fail("User doesn't exist");
       }
     }
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to add a new item");
   }
 }
@@ -229,7 +229,7 @@ export async function getItem({
 
     return ok(rows[0]);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to fetch item");
   }
 }
@@ -278,7 +278,7 @@ async function deleteItemHandler({
     updateTag("categoryUsageCounts");
     return ok(null);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to delete item");
   }
 }
@@ -421,7 +421,7 @@ async function updateItemHandler({
     updateTag("categoryUsageCounts");
     return ok(null);
   } catch (error: unknown) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     await query("ROLLBACK");
     if (formData.newImages && formData.newImages.length > 0) {
       deleteImages(formData.newImages);

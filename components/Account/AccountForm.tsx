@@ -46,7 +46,6 @@ export function AccountForm({ session }: { session: SessionType | null }) {
         name: formData.name,
       });
       setIsPendig(false);
-      console.log("1)error: ", error);
       if (!error) {
         setMessage({ message: "Name updated.", isError: false });
       }

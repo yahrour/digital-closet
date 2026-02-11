@@ -36,7 +36,7 @@ export async function getColors({
 
     return ok(colors);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to fetch colors");
   }
 }

@@ -35,7 +35,7 @@ async function getUserCategoriesHandler({
     rows.map((value) => categories.push(value.name));
     return ok(categories);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to fetch categories");
   }
 }
@@ -90,7 +90,7 @@ export async function getUserCategoriesUsageCount({
     );
     return ok(categories);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to fetch categories");
   }
 }
@@ -140,7 +140,7 @@ export async function searchUserCategoriesUsageCount({
 
     return ok(categories);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to fetch categories");
   }
 }
@@ -183,7 +183,7 @@ async function createNewCategoryHandler({
     updateTag("categoryUsageCounts");
     return ok(null);
   } catch (error: unknown) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     if (error instanceof DatabaseError) {
       switch (error.code) {
         case "23505": // unique_violation
@@ -233,7 +233,7 @@ async function deleteUserCategoryHandler({
     updateTag("categories");
     return ok(null);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to delete category");
   }
 }
@@ -281,7 +281,7 @@ async function renameUserCategoryHandler({
     updateTag("categories");
     return ok(null);
   } catch (error) {
-    console.log(`[ERROR] db error ${error}`);
+    console.log("db error: ", error);
     return fail("Failed to rename category");
   }
 }

@@ -30,9 +30,9 @@ export async function sendEmail({ to, subject, text }: propsType) {
     });
 
     if (error) {
-      console.log(`[ERROR] RESEND ${error.message}`);
+      console.log("resend error: ", error.message);
     }
   } catch (error) {
-    console.log(`[ERROR] RESEND ${error}`);
+    console.log("resend error: ", error);
   }
 }

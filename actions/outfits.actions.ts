@@ -52,7 +52,7 @@ async function createNewOutfitHandler({
     return ok(null);
   } catch (error) {
     await query("ROLLBACK");
-    console.log("[ERROR] db error: ", error);
+    console.log("db error: ", error);
     return fail("Failed to create outfit");
   }
 }
@@ -121,7 +121,7 @@ export async function getOutfits({
 
     return ok(rows);
   } catch (error) {
-    console.log("[ERROR] db error: ", error);
+    console.log("db error: ", error);
     return fail("Failed to fetch outfits");
   }
 }
@@ -176,7 +176,7 @@ export async function getOutfit({
 
     return ok(rows[0]);
   } catch (error) {
-    console.log("[ERROR] db error: ", error);
+    console.log("db error: ", error);
     return fail("Failed to fetch outfit");
   }
 }
@@ -212,7 +212,7 @@ async function deleteOutfitHandler({
     updateTag("outfits");
     return ok(null);
   } catch (error) {
-    console.log("[ERROR] db error: ", error);
+    console.log("db error: ", error);
     return fail("Failed to delete outfit");
   }
 }
@@ -280,7 +280,7 @@ async function updateOutfitHandler({
     return ok(null);
   } catch (error) {
     await query("ROLLBACK");
-    console.log("[ERROR] db error: ", error);
+    console.log("db error: ", error);
     return fail("Failed to update outfit");
   }
 }

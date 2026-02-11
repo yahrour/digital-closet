@@ -10,8 +10,8 @@ const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
-pool.on("error", (err) => {
-  console.log("[ERROR] database error", err);
+pool.on("error", (error) => {
+  console.log("db error: ", error);
 });
 
 // eslint-disable-next-line
