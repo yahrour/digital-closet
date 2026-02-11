@@ -29,9 +29,9 @@ export function ItemDetails({
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="max-w-md w-full mx-auto space-y-4">
+    <div className="flex max-lg:flex-col lg:min-w-md justify-center max-lg:items-center mx-auto gap-6">
       {/* Images */}
-      <div className="space-y-2 max-w-sm mx-auto">
+      <div className="space-y-2 max-w-md w-full">
         <div className="relative max-w-md aspect-square overflow-hidden">
           <Image
             src={imageUrls[activeIndex]}
@@ -65,46 +65,47 @@ export function ItemDetails({
           </div>
         )}
       </div>
-      {/* Identity */}
-      <div className="space-y-1 text-center">
-        <h1 className="text-lg font-medium">{item.name}</h1>
-        <p className="text-xs text-neutral-500">
-          {item.brand} · {item.category ?? "Uncategorized"}
-        </p>
-      </div>
+      <div className="flex flex-col justify-between max-h-[450px] w-full max-w-sm gap-6">
+        <div className="flex flex-col gap-4">
+          {/* Identity */}
+          <div className="space-y-1 text-center">
+            <h1 className="text-lg font-medium">{item.name}</h1>
+            <p className="text-xs text-neutral-500">
+              {item.brand} · {item.category ?? "Uncategorized"}
+            </p>
+          </div>
+          {/* Attributes */}
+          <Section title="Seasons">
+            {item.seasons.map((s) => (
+              <Pill key={s}>{s}</Pill>
+            ))}
+          </Section>
 
-      {/* Attributes */}
-      <div className="space-y-6 text-sm max-w-sm mx-auto">
-        <Section title="Seasons">
-          {item.seasons.map((s) => (
-            <Pill key={s}>{s}</Pill>
-          ))}
-        </Section>
+          <Section title="Colors">
+            <ColorDot color={item.primary_color} />
+            {item.secondary_colors.map((c) => (
+              <ColorDot key={c} color={c} />
+            ))}
+          </Section>
 
-        <Section title="Colors">
-          <ColorDot color={item.primary_color} />
-          {item.secondary_colors.map((c) => (
-            <ColorDot key={c} color={c} />
-          ))}
-        </Section>
+          <Section title="Tags">
+            {item.tags.map((tag) => (
+              <Pill key={tag.id}>{tag.name}</Pill>
+            ))}
+          </Section>
+        </div>
 
-        <Section title="Tags">
-          {item.tags.map((tag) => (
-            <Pill key={tag.id}>{tag.name}</Pill>
-          ))}
-        </Section>
-      </div>
-
-      {/* Actions */}
-      <div className="max-w-sm mx-auto flex gap-2">
-        <Link
-          href={`/items/${item.id}/edit`}
-          className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition duration-200 border px-4 py-1.5"
-        >
-          <Pencil size={16} />
-          Edit
-        </Link>
-        <Delete itemId={item.id} imageKeys={item.image_keys} />
+        {/* Actions */}
+        <div className="max-w-sm flex gap-2">
+          <Link
+            href={`/items/${item.id}/edit`}
+            className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 transition duration-200 border px-4 py-1.5"
+          >
+            <Pencil size={16} />
+            Edit
+          </Link>
+          <Delete itemId={item.id} imageKeys={item.image_keys} />
+        </div>
       </div>
     </div>
   );
@@ -128,11 +129,7 @@ function Section({
 }
 
 function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="px-3 py-1 rounded-full bg-neutral-100 text-xs">
-      {children}
-    </span>
-  );
+  return <span className="px-3 py-1 bg-neutral-100 text-xs">{children}</span>;
 }
 
 function Delete({
