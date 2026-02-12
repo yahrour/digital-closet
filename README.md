@@ -34,6 +34,11 @@ the app is for people who struggle managing their closet and building outfits, t
 
 ## Local Setup
 
+```bash
+git clone https://github.com/yahrour/digital-closet
+cd digital-closet
+```
+
 **Requirements**
 
 - Docker
@@ -80,6 +85,12 @@ Used for uploading and retrieving item images:
 
 ```bash
 docker compose up --build
+```
+
+After the containers start successfully, the app will be available at:
+
+```
+http://localhost:3000
 ```
 
 ## Screenshots
